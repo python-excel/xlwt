@@ -25,12 +25,12 @@
 #  3. All advertising materials mentioning features or use of this
 #     software must display the following acknowledgment:
 #     "This product includes software developed by
-#      Roman V. Kiseliov <unicorn@kurskline.ru>."
+#      Roman V. Kiseliov <roman@kiseliov.ru>."
 # 
 #  4. Redistributions of any form whatsoever must retain the following
 #     acknowledgment:
 #     "This product includes software developed by
-#      Roman V. Kiseliov <unicorn@kurskline.ru>."
+#      Roman V. Kiseliov <roman@kiseliov.ru>."
 # 
 #  THIS SOFTWARE IS PROVIDED BY Roman V. Kiseliov ``AS IS'' AND ANY
 #  EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE

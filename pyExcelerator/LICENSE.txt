@@ -43,5 +43,5 @@ Libknecht St., 4
 
 +7(0712)56-09-83
 
-<unicorn@kurskline.ru>
+<roman@kiseliov.ru>
 Subject: pyExcelerator
