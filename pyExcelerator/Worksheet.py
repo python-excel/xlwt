@@ -91,7 +91,7 @@ class Worksheet(object):
     #################################################################
     ## Constructor
     #################################################################
-    @accepts(object, str, Workbook)
+    @accepts(object, (str, unicode), Workbook)
     def __init__(self, sheetname, parent_book):
         import Row
         self.Row = Row.Row
@@ -185,7 +185,7 @@ class Worksheet(object):
     ## Properties, "getters", "setters"
     #################################################################
 
-    @accepts(object, str)
+    @accepts(object, (str, unicode))
     def set_name(self, value):
         self.__name = value
 
@@ -693,7 +693,7 @@ class Worksheet(object):
 
     #################################################################    
 
-    @accepts(object, str)
+    @accepts(object, (str, unicode))
     def set_header_str(self, value):
         self.__header_str = value
 
@@ -704,7 +704,7 @@ class Worksheet(object):
 
     #################################################################    
 
-    @accepts(object, str)
+    @accepts(object, (str, unicode))
     def set_footer_str(self, value):
         self.__footer_str = value
 

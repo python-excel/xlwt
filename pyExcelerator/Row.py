@@ -106,7 +106,7 @@ class Row(object):
     def get_str_count(self):
         return self._total_str
 
-    @accepts(object, int, str, Style.XFStyle)
+    @accepts(object, int, (str, unicode), Style.XFStyle)
     def write(self, col, label, style):
         twips = style.font.height
         points = float(twips)/20.0
