@@ -342,7 +342,7 @@ class Workbook(object):
     def add_style(self, style):
         return self.__styles.add(style)
 
-    @accepts(object, str)    
+    @accepts(object, (str, unicode))    
     def add_str(self, s):
         return self.__sst.add_str(s)
         
@@ -350,7 +350,7 @@ class Workbook(object):
     def str_index(self, s):
         return self.__sst.str_index(s)
         
-    @accepts(object, str)    
+    @accepts(object, (str, unicode))    
     def add_sheet(self, sheetname):
         import Worksheet
         self.__worksheets.append(Worksheet.Worksheet(sheetname, self))

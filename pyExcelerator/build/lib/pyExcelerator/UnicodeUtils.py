@@ -98,7 +98,10 @@ def upack2(_str):
         ustr = u2bytes(unicode(_str, 'ascii'))
         return struct.pack('<HB', len(_str), 0) + _str    
     except:
-        ustr = u2bytes(unicode(_str, DEFAULT_ENCODING))
+        if isinstance(_str, unicode):
+            ustr = u2bytes(_str)
+        else:
+            ustr = u2bytes(unicode(_str, DEFAULT_ENCODING))
         return struct.pack('<HB', len(_str), 1) + ustr
 
 def upack1(_str):
@@ -106,7 +109,10 @@ def upack1(_str):
         ustr = u2bytes(unicode(_str, 'ascii'))
         return struct.pack('BB', len(_str), 0) + _str    
     except:
-        ustr = u2bytes(unicode(_str, DEFAULT_ENCODING))
+        if isinstance(_str, unicode):
+            ustr = u2bytes(_str)
+        else:
+            ustr = u2bytes(unicode(_str, DEFAULT_ENCODING))
         return struct.pack('BB', len(_str), 1) + ustr
 
 if __name__ == '__main__':   
