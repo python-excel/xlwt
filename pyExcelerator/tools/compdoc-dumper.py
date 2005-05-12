@@ -134,8 +134,7 @@ def main():
     next = msat_start_sid
     while next > 0:
        msat_sector = struct.unpack('128l', SECTORS[next])
-       for x in msat_sector[:128]:
-           MSAT_2nd.append(x)
+       MSAT_2nd.extend(msat_sector[:127])
        next = msat_sector[-1]
     print 'additional MSAT sectors: \n', MSAT_2nd
 
