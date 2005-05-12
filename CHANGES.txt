@@ -1,0 +1,15 @@
+0.4.0a (27.03.2005)
+---------
+    * First public version
+
+0.5.0a (11.05.2005)
+---------
+    * pyExcelerator now can import Excel 5/95/97/2000/XP/2003 files.
+      With imported information you can do what you want.
+      See ./examples/xls2txt.py for reference.
+    * fixed bug in MS OLE2 compound document dumper (not in writer :))
+      Bug causes dumper to combine links in sectors' allocation chain sectors
+      contained in additional MSAT with SAT data.
+    * Excel files dumper supports now Excel 5/95/97/2000/XP/2003 files
+      and produces more informative output.
+      

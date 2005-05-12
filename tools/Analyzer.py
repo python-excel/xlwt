@@ -1367,17 +1367,17 @@ def analyze_XCT_record(data):
 
 def analyze_XF_record(data):
     # 0x0043, 0x00E0, 0x0243, 0x0443
-    fnt_idx, num_ftm_idx, \
-        cell_prot,         \
-        align, rotation, txt_format, \
-        used_attrib, \
-        border0, border1, border2 = struct.unpack('<3H4B2LH', data)
-    print 'fnt idx                 : 0x%000X'  % fnt_idx
-    print 'num fmt idx             : 0x%000X'  % num_ftm_idx
-    print 'cell is locked          : 0x%0X  '  % ((cell_prot) & 0x01)
-    print 'format is hidden        : 0x%0X  '  % ((cell_prot & 0x02) >> 1)
-    print 'style XF(1), cell XF(0) : 0x%0X  '  % ((cell_prot & 0x03) >> 3)
-    print 'Index to parent style XF: 0x%0000X' % ((cell_prot & 0xFFF0) >> 4)
+    #fnt_idx, num_ftm_idx, \
+    #    cell_prot,         \
+    #    align, rotation, txt_format, \
+    #    used_attrib, \
+    #    border0, border1, border2 = struct.unpack('<3H4B2LH', data)
+    #print 'fnt idx                 : 0x%000X'  % fnt_idx
+    #print 'num fmt idx             : 0x%000X'  % num_ftm_idx
+    #print 'cell is locked          : 0x%0X  '  % ((cell_prot) & 0x01)
+    #print 'format is hidden        : 0x%0X  '  % ((cell_prot & 0x02) >> 1)
+    #print 'style XF(1), cell XF(0) : 0x%0X  '  % ((cell_prot & 0x03) >> 3)
+    #print 'Index to parent style XF: 0x%0000X' % ((cell_prot & 0xFFF0) >> 4)
 
     pass
 
