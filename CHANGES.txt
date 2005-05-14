@@ -13,3 +13,6 @@
     * Excel files dumper supports now Excel 5/95/97/2000/XP/2003 files
       and produces more informative output.
       
+0.5.1a (14.05.2005)
+---------
+    * improved floating point decoding code

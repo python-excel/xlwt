@@ -319,7 +319,7 @@ def parse_xls(filename):
         if is_integer:
             result = float(encoded >> 2)
         else:
-            ieee754 = struct.pack('<2I', 0, (encoded & 0xFFFFFFFC))
+            ieee754 = struct.pack('<2I', 0, (encoded & 0xFFFFFFFCL))
             result , = struct.unpack('<d', ieee754)
         if is_multed_100:
             result /= 100.0
