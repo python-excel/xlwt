@@ -12,7 +12,8 @@ me, args = sys.argv[0], sys.argv[1:]
 
 if args:
     for arg in args:
-        for sheet_name, values in parse_xls(arg):
+        print >>sys.stderr, 'extracting data from', arg
+        for sheet_name, values in parse_xls(arg): # parse_xls(arg, 'cp1251'):
             print 'Sheet = "%s"' % sheet_name.encode('cp866', 'backslashreplace')
             print '----------------'
             for row_idx, col_idx in sorted(values.keys()):
