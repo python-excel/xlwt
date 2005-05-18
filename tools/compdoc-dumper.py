@@ -60,8 +60,8 @@ def print_bin_data(data):
         print '<NO DATA>'
 
 
-def get_ole_storages(filename):
-    STORAGES = {}
+def get_ole_streams(filename):
+    STREAMS = {}
 
     doc = file(filename, 'rb').read()
     header, data = doc[0:512], doc[512:]
@@ -263,16 +263,16 @@ def get_ole_storages(filename):
 
         if name != '':
             # BAD IDEA: names may be equal. NEED use full paths...
-            STORAGES[name] = stream_data
+            STREAMS[name] = stream_data
         print
 
-    return STORAGES
+    return STREAMS
 
 def main():
     if len(sys.argv) < 2:
         print 'no input files.'
         print sys.exit(1)
 
-    get_ole_storages(sys.argv[1])        
+    get_ole_streams(sys.argv[1])        
 
 main()
