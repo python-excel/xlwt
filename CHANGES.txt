@@ -16,3 +16,12 @@
 0.5.1a (14.05.2005)
 ---------
     * improved floating point decoding code
+
+0.5.2a (18.05.2005)
+---------
+    * improved perfomance (especially on nonfragmented streams)
+    * now pyExcelerator can process XLS files with short streams
+    * OLE2 compound document dumper supports short streams
+    * reading UTF-16-LE and Latin-1 with more accuracy
+    * in DSF (double stream file) XLS data extracted from stream "Workbook"
+    * improved floating point/integer values decoding code

@@ -60,12 +60,10 @@ def print_bin_data(data):
         print '<NO DATA>'
 
 
-def main():
-    if len(sys.argv) < 2:
-        print 'no input files.'
-        print sys.exit(1)
+def get_ole_storages(filename):
+    STORAGES = {}
 
-    doc = file(sys.argv[1], 'rb').read()
+    doc = file(filename, 'rb').read()
     header, data = doc[0:512], doc[512:]
     del doc
 
@@ -94,7 +92,7 @@ def main():
     while i < len(data):
         SECTORS.append(data[i:i+sect_size])
         i += sect_size
-    del data
+    #del data
 
     total_sectors = len(SECTORS)
 
@@ -149,12 +147,23 @@ def main():
 
     print 'SAT content:\n', SAT
 
-    dir_stream_sectors = [dir_start_sid]
+    ssat_sectors = []
+    sid = ssat_start_sid
+    while sid >= 0:
+        ssat_sectors.append(sid)    
+        sid = SAT[sid]
+
+    print 'SSAT sectors:\n', ssat_sectors
+    ssids_count = total_ssat_sectors * (sect_size >> 2)
+    print 'SSID count:', ssids_count
+    SSAT = struct.unpack('<' + 'l'*ssids_count, ''.join([SECTORS[sect] for sect in ssat_sectors]))
+    print 'SSAT content:\n', SSAT
+
+    dir_stream_sectors = []
     sid = dir_start_sid
-    while SAT[sid] >= 0:
-        next_in_chain = SAT[sid]
-        dir_stream_sectors.append(next_in_chain)    
-        sid = next_in_chain
+    while sid >= 0:
+        dir_stream_sectors.append(sid)    
+        sid = SAT[sid]
 
     print 'Directory sectors:\n', dir_stream_sectors
 
@@ -181,20 +190,26 @@ def main():
         0x00: 'Red',
         0x01: 'Black'
     }
+    
+    SHORT_SECTORS = []
+    short_sectors_data = ''
     for dentry in dir_entry_list:
         print 'DID', dir_entry_list.index(dentry)
-        name = dentry[0:64]
-        name = name.split('\x00')
-        name = ''.join(name)
-        print 'dir entry name:', name
 
         sz, = struct.unpack('<H', dentry[64:66])
         print 'Size of the used area of the character buffer of the name:', sz
 
-        t ,  = struct.unpack('B', dentry[66])
+        if sz > 0 :
+            name = dentry[0:sz-2].decode('utf_16_le', 'replace')
+        else:
+            name = ''
+
+        print 'dir entry name:', repr(name)
+
+        t,  = struct.unpack('B', dentry[66])
         print 'type of entry:', t, dentry_types[t]
 
-        c ,  = struct.unpack('B', dentry[67])
+        c,  = struct.unpack('B', dentry[67])
         print 'entry colour:', c, node_colours[c]
 
         did_left ,  = struct.unpack('<l', dentry[68:72])
@@ -207,17 +222,57 @@ def main():
         dentry_start_sid ,  = struct.unpack('<l', dentry[116:120])
         print 'start SID       :', dentry_start_sid
 
-        stream_sid_chain = [dentry_start_sid]
-        sid = dentry_start_sid
-        while SAT[sid] >= 0:
-            next_in_chain = SAT[sid]
-            stream_sid_chain.append(next_in_chain)    
-            sid = next_in_chain
-        print 'SID chain:\n', stream_sid_chain
-
         stream_size ,  = struct.unpack('<L', dentry[120:124])
         print 'stream size     :', stream_size
 
+        stream_data = ''
+        if stream_size > 0:
+            sid = dentry_start_sid
+            chunks = [(sid, sid)]
+            if stream_size >= min_stream_size:
+                print 'stream stored as normal stream'
+                while SAT[sid] >= 0:
+                    next_in_chain = SAT[sid]
+                    last_chunk_start, last_chunk_finish = chunks[-1]
+                    if next_in_chain - last_chunk_finish <= 1:
+                        chunks[-1] = last_chunk_start, next_in_chain
+                    else:
+                        chunks.extend([(next_in_chain, next_in_chain)]) 
+                    sid = next_in_chain
+                for s, f in chunks:
+                    stream_data += data[s*sect_size:(f+1)*sect_size]
+                if t == 0x05: # root storage contains data for short streams
+                    short_sectors_data = stream_data
+                    i = 0
+                    while i < len(short_sectors_data):
+                        SHORT_SECTORS.append(short_sectors_data[i:i+short_sect_size])
+                        i += short_sect_size
+            else:
+                print 'stream stored as short-stream'
+                while SSAT[sid] >= 0:
+                    next_in_chain = SSAT[sid]
+                    last_chunk_start, last_chunk_finish = chunks[-1]
+                    if next_in_chain - last_chunk_finish <= 1:
+                        chunks[-1] = last_chunk_start, next_in_chain
+                    else:
+                        chunks.extend([(next_in_chain, next_in_chain)]) 
+                    sid = next_in_chain
+                for s, f in chunks:
+                    stream_data += short_sectors_data[s*sect_size:(f+1)*sect_size]
+            print 'chunks:', chunks
+
+        if name != '':
+            # BAD IDEA: names may be equal. NEED use full paths...
+            STORAGES[name] = stream_data
         print
+
+    return STORAGES
+
+def main():
+    if len(sys.argv) < 2:
+        print 'no input files.'
+        print sys.exit(1)
+
+    get_ole_storages(sys.argv[1])        
 
 main()
