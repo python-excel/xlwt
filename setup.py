@@ -62,7 +62,7 @@ CLASSIFIERS = \
  'Operating System :: OS Independent',
  'Programming Language :: Python',
  'License :: OSI Approved :: BSD-like',
- 'Development Status :: 0.4 - Alpha',
+ 'Development Status :: 0.5 - Alpha',
  'Intended Audience :: Developers',
  'Topic :: Software Development :: Libraries :: Python Modules',
  'Topic :: Office/Business :: Financial :: Spreadsheet',
@@ -74,7 +74,7 @@ KEYWORDS = \
 'xls openoffice excel spreadsheet workbook database table unicode'
 
 setup(name = 'pyExcelerator',
-      version = '0.5.0a',
+      version = '0.5.3a',
       author = 'Roman V. Kiseliov',
       author_email = 'roman@kiseliov.ru',
       url = 'http://www.kiseliov.ru',

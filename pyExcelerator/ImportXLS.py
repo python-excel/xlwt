@@ -275,9 +275,6 @@ def get_ole_streams(filename):
 
 def parse_xls(filename, encoding = None):
     
-    if not encoding:
-        encoding = UnicodeUtils.DEFAULT_ENCODING
-
     ##########################################################################
 
     def process_BOUNDSHEET(biff8, rec_data):
@@ -551,24 +548,24 @@ def parse_xls(filename, encoding = None):
     ole_streams = get_ole_streams(filename)
 
     if 'Workbook' in ole_streams:
-        wb_bin_data = ole_streams['Workbook']
+        workbook_stream = ole_streams['Workbook']
     elif 'Book' in ole_streams:
-        wb_bin_data = ole_streams['Book']
+        workbook_stream = ole_streams['Book']
     else:
         raise Exception, 'No workbook stream in file.'
 
-    wb_bin_data_len = len(wb_bin_data)
+    workbook_stream_len = len(workbook_stream)
     stream_pos = 0
     
     # Excel's method of data storing is based on 
     # ancient technology "TLV" (Type, Length, Value).
     # In addition, if record size grows to some limit
     # Excel writes CONTINUE records
-    while stream_pos < wb_bin_data_len and EOFs <= ws_num:
-        rec_id, data_size = struct.unpack('<2H', wb_bin_data[stream_pos:stream_pos+4])
+    while stream_pos < workbook_stream_len and EOFs <= ws_num:
+        rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
         stream_pos += 4
         
-        rec_data = wb_bin_data[stream_pos:stream_pos+data_size]
+        rec_data = workbook_stream[stream_pos:stream_pos+data_size]
         stream_pos += data_size
 
         if rec_id == 0x0809: # BOF
@@ -581,6 +578,14 @@ def parse_xls(filename, encoding = None):
             elif substream_type == 0x0010:
                 # worksheet substream
                 pass
+            else: # skip chart stream or unknown stream
+            # stream offsets may be used from BOUNDSHEET record
+                rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+                while rec_id != 0x000A: # EOF
+                    #print 'SST CONTINUE'
+                    stream_pos += 4
+                    stream_pos += data_size
+                    rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
             #print 'BIFF8 == ', biff8
         elif rec_id == 0x000A: # EOF
             #print 'EOF'
@@ -591,7 +596,8 @@ def parse_xls(filename, encoding = None):
         elif rec_id == 0x0042: # CODEPAGE
             cp ,  = struct.unpack('<H', rec_data)
             #print 'CODEPAGE', hex(cp)
-            encoding = encodings[cp]
+            if not encoding:
+                encoding = encodings[cp]
             #print encoding
         elif rec_id == 0x0085: # BOUNDSHEET
             #print 'BOUNDSHEET',
@@ -603,14 +609,14 @@ def parse_xls(filename, encoding = None):
             #print 'SST'
             sst_data = rec_data
             sst_continues = []
-            rec_id, data_size = struct.unpack('<2H', wb_bin_data[stream_pos:stream_pos+4])
+            rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
             while rec_id == 0x003C: # CONTINUE
                 #print 'SST CONTINUE'
                 stream_pos += 4
-                rec_data = wb_bin_data[stream_pos:stream_pos+data_size]
+                rec_data = workbook_stream[stream_pos:stream_pos+data_size]
                 sst_continues.extend([rec_data])
                 stream_pos += data_size
-                rec_id, data_size = struct.unpack('<2H', wb_bin_data[stream_pos:stream_pos+4])
+                rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
             SST = process_SST(sst_data, sst_continues)
         elif rec_id == 0x00FD: # LABELSST
             #print 'LABELSST',
@@ -643,4 +649,5 @@ def parse_xls(filename, encoding = None):
             values[(r, c)] = b
             #print r, c, b
 
+    encoding = None
     return zip(sheet_names, sheets)
