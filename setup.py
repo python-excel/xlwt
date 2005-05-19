@@ -45,7 +45,7 @@ import sys
 from distutils.core import setup
 
 DESCRIPTION = \
-'generation Excel 97+ and OpenOffice Calc compatible spreadsheets'
+'generating Excel 97+ files; importing Excel 95+ files; Excel files dumper; OLE2 files dumper; xls2txt, xls2csv, xls2html'
 
 LONG_DESCRIPTION = \
 '''pyExcelerator  is a   library  for  generating  Excel  97/2000/XP/2003  and
@@ -55,14 +55,15 @@ using variety of formatting features,   provides   interface   to  printing
 options   of   Excel   and OpenOffice  Calc.  pyExcelerator  contains  also
 Excel BIFF8 dumper and MS compound  documents  dumper.  Main  advantage  is
 possibility  of generating Excel  spreadsheets  without  COM  servers.  The
-only requirement -- Python 2.4b2 or higher.'''
+only requirement -- Python 2.4b2 or higher.
+From version 0.5 pyExcelerator can import data from Excel spreadsheets.'''
 
 CLASSIFIERS = \
 [
  'Operating System :: OS Independent',
  'Programming Language :: Python',
- 'License :: OSI Approved :: BSD-like',
- 'Development Status :: 0.5 - Alpha',
+ 'License :: OSI Approved :: BSD License',
+ 'Development Status :: 3 - Alpha',
  'Intended Audience :: Developers',
  'Topic :: Software Development :: Libraries :: Python Modules',
  'Topic :: Office/Business :: Financial :: Spreadsheet',
@@ -77,11 +78,11 @@ setup(name = 'pyExcelerator',
       version = '0.5.3a',
       author = 'Roman V. Kiseliov',
       author_email = 'roman@kiseliov.ru',
-      url = 'http://www.kiseliov.ru',
-      download_url='http://www.kiseliov.ru',    
+      url = 'http://sourceforge.net/projects/pyexcelerator/',
+      download_url='http://sourceforge.net/projects/pyexcelerator/',    
       description = DESCRIPTION,
       long_description = LONG_DESCRIPTION,
-      license = 'BSD-like',
+      license = 'BSD',
       platforms = 'Platform Independent',
       packages = ['pyExcelerator'],
       keywords = KEYWORDS,
