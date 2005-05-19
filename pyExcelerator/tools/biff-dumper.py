@@ -89,10 +89,19 @@ def main():
 
     # Inside MS Office document looks like filesystem
     # We need extract stream named 'Workbook' or 'Book'
-    workbook_stream = get_wb_stream_data(sys.argv[1])
-    stream_pos = 0
+    ole_streams = get_ole_streams(sys.argv[1])
 
-    print 'workbook stream size %X: '% len(workbook_stream)
+    if 'Workbook' in ole_streams:
+        workbook_stream = ole_streams['Workbook']
+    elif 'Book' in ole_streams:
+        workbook_stream = ole_streams['Book']
+    else:
+        raise Exception, 'No workbook stream in file.'
+
+    wb_bin_data_len = len(workbook_stream)
+    stream_pos = 0
+    
+    print 'workbook stream size 0x%X bytes '% len(workbook_stream)
 
     # Excel's method of data storing is based on 
     # ancient technology "TLV" (Type, Length, Value).
