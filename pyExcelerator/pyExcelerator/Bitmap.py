@@ -45,17 +45,21 @@
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 __rev_id__ = """$Id$"""
 
 
 from BIFFRecords import BiffRecord
 from struct import *
 
+
 def _size_col(sheet, col):
     return sheet.col_width(col)
 
+
 def _size_row(sheet, row):
     return sheet.row_height(row)     
+
 
 def _position_image(sheet, row_start, col_start, x1, y1, width, height):
     """Calculate the vertices that define the position of the image as required by

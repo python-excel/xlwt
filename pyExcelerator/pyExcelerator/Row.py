@@ -42,25 +42,66 @@
 
 __rev_id__ = """$Id$"""
 
+
 import BIFFRecords
 from Deco import *
 from Worksheet import Worksheet
 import Style
+import Cell
+import datetime as dt
+
 
 class Row(object):
+    __slots__ = ["__init__", 
+                 "__adjust_height",
+                 "__adjust_bound_col_idx",
+                 "__excel_date_dt",
+                 "get_height_in_pixels",
+                 "set_style",
+                 "get_xf_index",
+                 "get_cells_count",
+                 "get_min_col",
+                 "get_max_col",
+                 "get_str_count",
+                 "get_row_biff_data",
+                 "get_cells_biff_data",
+                 "get_index",
+                 "write",
+                 "write_blanks",
+                 # private variables
+                 "__idx",
+                 "__parent",
+                 "__parent_wb",
+                 "__cells",
+                 "__min_col_idx",
+                 "__max_col_idx",
+                 "__total_str",
+                 "__xf_index",
+                 "__has_default_format",
+                 "__height_in_pixels",
+                 # public variables
+                 "height",
+                 "has_default_height",
+                 "level",
+                 "collapse",
+                 "hidden",
+                 "space_above",
+                 "space_below"]
+
     #################################################################
     ## Constructor
     #################################################################
     def __init__(self, index, parent_sheet):
-        self._index = index
-        self._parent = parent_sheet
-        self._parent_wb = parent_sheet.get_parent()
-        self._cells = {}
-        self._mul_blanks = []
-        self._total_str = 0
-        self._xf_index = 0x0F
-        self._has_default_format = 0
-        self._height_in_pixels = 0x11
+        self.__idx = index
+        self.__parent = parent_sheet
+        self.__parent_wb = parent_sheet.get_parent()
+        self.__cells = []
+        self.__min_col_idx = 0
+        self.__max_col_idx = 0
+        self.__total_str = 0
+        self.__xf_index = 0x0F
+        self.__has_default_format = 0
+        self.__height_in_pixels = 0x11
         
         self.height = 0x00FF
         self.has_default_height = 0x00
@@ -70,70 +111,70 @@ class Row(object):
         self.space_above = 0
         self.space_below = 0
 
-    def height_in_pixels(self):
-        return self._height_in_pixels
+
+    def __adjust_height(self, style):
+        twips = style.font.height
+        points = float(twips)/20.0
+        # Cell height in pixels can be calcuted by following approx. formula:
+        # cell height in pixels = font height in points * 83/50 + 2/5
+        # It works when screen resolution is 96 dpi 
+        pix = int(round(points*83.0/50.0 + 2.0/5.0))
+        if pix > self.__height_in_pixels:
+            self.__height_in_pixels = pix
+
+
+    def __adjust_bound_col_idx(self, *args):
+        for arg in args:
+            if arg < self.__min_col_idx:
+                self.__min_col_idx = arg
+            elif arg > self.__max_col_idx:
+                self.__max_col_idx = arg
+
+    def __excel_date_dt(self, date):
+        if isinstance(date, dt.date) and (not isinstance(date, dt.datetime)):
+            epoch = dt.date(1899, 12, 31)
+        elif isinstance(date, dt.time):
+            date = dt.datetime.combine(dt.datetime(1900, 1, 1), date)
+            epoch = dt.datetime(1900, 1, 1, 0, 0, 0)
+        else:
+            epoch = dt.datetime(1899, 12, 31, 0, 0, 0)
+        delta = date - epoch
+        xldate = delta.days + float(delta.seconds) / (24*60*60)
+        # Add a day for Excel's missing leap day in 1900
+        if xldate > 59:
+            xldate += 1
+        return xldate
+
+    def get_height_in_pixels(self):
+        return self.__height_in_pixels
+
 
     @accepts(object, Style.XFStyle)
     def set_style(self, style):
-        twips = style.font.height
-        points = float(twips)/20.0
-        # Cell height in pixels can be calcuted by following approx. formula:
-        # cell height in pixels = font height in points * 83/50 + 2/5
-        # It works when screen resolution is 96 dpi 
-        pix = int(round(points*83.0/50.0 + 2.0/5.0))
-        if pix > self._height_in_pixels:
-            self._height_in_pixels = pix
-        self._xf_index = self._parent_wb.add_style(style)
+        self.__adjust_height(style)
+        self.__xf_index = self.__parent_wb.add_style(style)
+
             
     def get_xf_index(self):
-        return self._xf_index
+        return self.__xf_index
+
     
     def get_cells_count(self):
-        return len(self._cells)
+        return len(self.__cells)
+
     
     def get_min_col(self):
-        result = 0
-        if len(self._cells) > 0:
-            result = min(self._cells)
-        return result
+        return self.__min_col_idx
+
         
     def get_max_col(self):
-        result = 0
-        if len(self._cells) > 0:
-            result = max(self._cells)
-        return result
+        return self.__min_col_idx
+
         
     def get_str_count(self):
-        return self._total_str
+        return self.__total_str
 
-    @accepts(object, int, (str, unicode), Style.XFStyle)
-    def write(self, col, label, style):
-        twips = style.font.height
-        points = float(twips)/20.0
-        # Cell height in pixels can be calcuted by following approx. formula:
-        # cell height in pixels = font height in points * 83/50 + 2/5
-        # It works when screen resolution is 96 dpi 
-        pix = int(round(points*83.0/50.0 + 2.0/5.0))
-        if pix > self._height_in_pixels:
-            self._height_in_pixels = pix
-        self._cells[col] = (self._parent_wb.add_style(style), self._parent_wb.add_str(label))
-        self._total_str += 1
 
-    @accepts(object, int, int, Style.XFStyle)                        
-    def write_blanks(self, c1, c2, style):
-        twips = style.font.height
-        points = float(twips)/20.0
-        # Cell height in pixels can be calcuted by following approx. formula:
-        # cell height in pixels = font height in points * 83/50 + 2/5
-        # It works when screen resolution is 96 dpi 
-        pix = int(round(points*83.0/50.0 + 2.0/5.0))
-        if pix > self._height_in_pixels:
-            self._height_in_pixels = pix
-        style_idx = self._parent_wb.add_style(style)
-        for col in range(c1, c2):
-            self._cells[col] = (style_idx, -2)
-        self._mul_blanks.append((c1, c2, style_idx))
-        
     def get_row_biff_data(self):
         height_options = (self.height & 0x07FFF) 
         height_options |= (self.has_default_height & 0x01) << 15
@@ -143,36 +184,45 @@ class Row(object):
         options |= (self.hidden & 0x01) << 5
         options |= (0x00 & 0x01) << 6
         options |= (0x01 & 0x01) << 8
-        if self._xf_index != 0x0F:
+        if self.__xf_index != 0x0F:
             options |= (0x01 & 0x01) << 7
         else:
             options |= (0x00 & 0x01) << 7
-        options |= (self._xf_index & 0x0FFF) << 16 
+        options |= (self.__xf_index & 0x0FFF) << 16 
         options |= (0x00 & self.space_above) << 28
         options |= (0x00 & self.space_below) << 29
         
-        col_nums = self._cells.keys()
-        if len(col_nums) > 0:
-            min_col = min(col_nums)
-            max_col = max(col_nums)
-        else:
-            min_col = 0
-            max_col = 0
-        return BIFFRecords.RowRecord(self._index, min_col, max_col, height_options, options).get()                                              
+        return BIFFRecords.RowRecord(self.__idx, self.__min_col_idx, self.__max_col_idx, height_options, options).get()                                              
                         
+
     def get_cells_biff_data(self):
-        result = ''
-        for col_idx in self._cells:
-            xf_idx, sst_idx = self._cells[col_idx]
-            if self._xf_index != 0x0F:
-                xf_idx = self._xf_index
-            if sst_idx != -2:
-                 result += BIFFRecords.LabelSSTRecord(self._index, col_idx, xf_idx, sst_idx).get()        
-                
-        for col1, col2, xf_idx in self._mul_blanks:
-            if self._xf_index != 0x0F:
-                xf_idx = self._xf_index
-            result += BIFFRecords.MulBlankRecord(self._index, col1, col2, xf_idx).get()
-            
-        return result
+        return ''.join([ cell.get_biff_data() for cell in self.__cells ])
+
+
+    def get_index(self):
+        return self.__idx
+
+
+    @accepts(object, int, (str, unicode, int, float, dt.datetime, dt.time, dt.date), Style.XFStyle)
+    def write(self, col, label, style):
+        self.__adjust_height(style)
+        self.__adjust_bound_col_idx(col)
+        if isinstance(label, (str, unicode)):
+            if len(label) > 0:
+                self.__cells.extend([ Cell.StrCell(self, col, self.__parent_wb.add_style(style), self.__parent_wb.add_str(label)) ])
+                self.__total_str += 1
+            else:
+                self.__cells.extend([ Cell.BlankCell(self, col, self.__parent_wb.add_style(style)) ])
+        elif isinstance(label, (int, float)):
+            self.__cells.extend([ Cell.NumberCell(self, col, self.__parent_wb.add_style(style), label) ])            
+        else:
+            self.__cells.extend([ Cell.NumberCell(self, col, self.__parent_wb.add_style(style), self.__excel_date_dt(label)) ])
+
+    @accepts(object, int, int, Style.XFStyle)                        
+    def write_blanks(self, c1, c2, style):
+        self.__adjust_height(style)
+        self.__adjust_bound_col_idx(c1, c2)
+        self.__cells.extend([ Cell.MulBlankCell(self, c1, c2, self.__parent_wb.add_style(style)) ])
+
+        
         

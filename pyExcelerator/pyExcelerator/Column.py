@@ -39,12 +39,14 @@
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 __rev_id__ = """$Id$"""
 
 
 from BIFFRecords import ColInfoRecord
 from Deco import *
 from Worksheet import Worksheet
+
 
 class Column(object):
     @accepts(object, int, Worksheet)
@@ -58,6 +60,7 @@ class Column(object):
         self.hidden = 0
         self.level = 0
         self.collapse = 0
+
 
     def get_biff_record(self):
         options =  (self.hidden & 0x01) << 0

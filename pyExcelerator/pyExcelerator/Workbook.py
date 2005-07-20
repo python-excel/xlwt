@@ -81,12 +81,14 @@ Record Order in BIFF8
       EOF
 '''
 
+
 __rev_id__ = """$Id$"""
+
 
 import BIFFRecords
 import Style
-
 from Deco import accepts, returns
+
 
 class Workbook(object):
 

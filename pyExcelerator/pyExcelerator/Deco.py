@@ -20,6 +20,7 @@
 #           return arg1 * arg2
 # because of decorators are applied from bottom to up.
 
+
 __rev_id__ = """$Id$"""
 
 

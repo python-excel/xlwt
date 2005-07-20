@@ -32,3 +32,12 @@
     * now pyExcelerator can correctly import XLS files with charts
     * added ability to override default file's encoding
     * new examples (or tools :)) -- ./examples/xls2csv.py, ./examples/xls2html.py
+
+0.5.4a (19.07.2005)
+---------
+    * blanks, numbers, currency (use number formats!) and dates (use number formats!)
+    * pyExcelerator uses 1.5-2 times less memory (thanks to __brains__ and __slots__)
+    * fixes for Big Endian CPUs
+    * some refactorings
+    * new examples: blanks.py, numbers.py, num_formats.py
+    * formulas support in progress!

@@ -69,6 +69,7 @@ not  contain  explicit  attributes  in a group (if the attribute group flag
 is not set), it repeats the attributes of its style XF record.
 
 '''
+
 __rev_id__ = """$Id$"""
 
 

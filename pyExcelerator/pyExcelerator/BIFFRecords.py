@@ -46,7 +46,7 @@ from struct import pack
 from UnicodeUtils import * 
 import sys
 
-class SharedStringTable:
+class SharedStringTable(object):
     _SST_ID = 0x00FC
     _CONTINUE_ID = 0x003C
     
@@ -139,7 +139,7 @@ class SharedStringTable:
             i += atom_len
         
         
-class BiffRecord:
+class BiffRecord(object):
     def __init__(self):
         self._rec_data = ''
     
@@ -1409,6 +1409,31 @@ class BlankRecord(BiffRecord):
     def __init__(self, row, col, xf_index):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<3H', row, col, xf_index)
+
+
+class RKRecord(BiffRecord):
+    '''
+    This record represents a cell that contains an RK value (encoded integer or 
+    floating-point value). If a floating-point value cannot be encoded to an RK value, 
+    a NUMBER record will be written.
+    '''            
+    _REC_ID = 0x027E
+
+    def __init__(self, row, col, xf_index, rk_encoded):
+        BiffRecord.__init__(self)
+        self._rec_data = struct.pack('<3HI', row, col, xf_index, rk_encoded)
+
+        
+class NumberRecord(BiffRecord):
+    '''
+    This record represents a cell that contains an IEEE-754 floating-point value.
+    '''            
+    _REC_ID = 0x0203
+
+    def __init__(self, row, col, xf_index, number):
+        BiffRecord.__init__(self)
+        self._rec_data = struct.pack('<3Hd', row, col, xf_index, number)
+
         
 class GutsRecord(BiffRecord):
     '''
