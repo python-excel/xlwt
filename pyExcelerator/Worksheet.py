@@ -76,14 +76,16 @@
             EOF
 
 '''
+
 __rev_id__ = """$Id$"""
+
 
 import BIFFRecords
 import Bitmap
 import Formatting
 import Style
-
 from Deco import *
+
 
 class Worksheet(object):
     from Workbook import Workbook
@@ -1005,7 +1007,7 @@ class Worksheet(object):
 
     def row_height(self, row): # in pixels
         if row in self.__rows:
-            return self.__rows[row].height_in_pixels()
+            return self.__rows[row].get_height_in_pixels()
         else:
             return 17
                      

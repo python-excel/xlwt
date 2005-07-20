@@ -78,10 +78,13 @@ var.     ln or
 [var.]   4·rt   (optional, only if richtext=1) List of rt formatting runs 
 [var.]   sz     (optional, only if phonetic=1) Asian Phonetic Settings Block 
 '''
+
+
 __rev_id__ = """$Id$"""
 
 
 import struct
+
 
 DEFAULT_ENCODING = 'cp1251'
 
@@ -91,7 +94,7 @@ def u2ints(ustr):
 
 def u2bytes(ustr):
     ints = u2ints(ustr)
-    return struct.pack('H'*len(ints), *ints)
+    return struct.pack('<' + 'H'*len(ints), *ints)
 
 def upack2(_str):
     try:

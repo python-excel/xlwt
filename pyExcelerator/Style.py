@@ -39,11 +39,13 @@
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 __rev_id__ = """$Id$"""
 
 
 import Formatting
 from BIFFRecords import *
+
 
 _default_num_format = 'general'
 _default_font = Formatting.Font()
@@ -112,9 +114,9 @@ class StyleCollection(object):
         self._fonts[Formatting.Font()] = 5
         
         self._num_formats = {}
-        for fmtidx, fmtstr in zip(range(0, 23), self._std_num_fmt_list[0:23]):
+        for fmtidx, fmtstr in zip(range(0, 23), StyleCollection._std_num_fmt_list[0:23]):
             self._num_formats[fmtstr] = fmtidx 
-        for fmtidx, fmtstr in zip(range(37, 50), self._std_num_fmt_list[23:]):
+        for fmtidx, fmtstr in zip(range(37, 50), StyleCollection._std_num_fmt_list[23:]):
             self._num_formats[fmtstr] = fmtidx 
 
         self._xf = {}
@@ -131,7 +133,7 @@ class StyleCollection(object):
         if num_format_str in self._num_formats:
             num_format_idx = self._num_formats[num_format_str]
         else:
-            num_format_idx = 163 + len(self._num_formats) - len(self._std_fmt_list)
+            num_format_idx = 163 + len(self._num_formats) - len(StyleCollection._std_num_fmt_list)
             self._num_formats[num_format_str] = num_format_idx
             
         font = style.font
