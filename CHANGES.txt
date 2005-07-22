@@ -39,5 +39,5 @@
     * pyExcelerator uses 1.5-2 times less memory (thanks to __brains__ and __slots__)
     * fixes for Big Endian CPUs
     * some refactorings
-    * new examples: blanks.py, numbers.py, num_formats.py
+    * new examples: blanks.py, merged1.py, dates.py, numbers.py, num_formats.py
     * formulas support in progress!
