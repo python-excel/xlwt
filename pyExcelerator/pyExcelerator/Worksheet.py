@@ -975,19 +975,18 @@ class Worksheet(object):
     def get_parent(self):
         return self.__parent
          
-    def write(self, row, col, label, style=Style.XFStyle()):
-        if row not in self.__rows:
-            self.__rows[row] = self.Row(row, self)
-        self.__rows[row].write(col, label, style)
-        
-    def write_merge(self, r1, r2, c1, c2, label, style=Style.XFStyle()):
-        self.write(r1, c1,  label, style)        
-        self.__rows[r1].write_blanks(c1+1, c2,  style)
-        for row in range(r1+1, r2+1):
-            if row not in self.__rows:
-                self.__rows[row] = self.Row(row, self)        
-            self.__rows[row].write_blanks(c1, c2,  style)
+    def write(self, r, c, label="", style=Style.XFStyle()):
+        self.row(r).write(c, label, style)
+
+    def merge(self, r1, r2, c1, c2, style=Style.XFStyle()):
+        self.row(r1).write_blanks(c1, c2,  style)
+        for r in range(r1+1, r2+1):
+            self.row(r).write_blanks(c1, c2,  style)
         self.__merged_ranges.append((r1, r2, c1, c2))
+
+    def write_merge(self, r1, r2, c1, c2, label="", style=Style.XFStyle()):
+        self.merge(r1, r2, c1, c2, style)
+        self.write(r1, c1,  label, style)
 
     def insert_bitmap(self, filename, row, col, x = 0, y = 0, scale_x = 1, scale_y = 1):
         bmp = Bitmap.ImDataBmpRecord(filename) 

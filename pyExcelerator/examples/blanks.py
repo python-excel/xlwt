@@ -34,5 +34,6 @@ for i in range(0, 0x53):
     ws0.write(i, 2, '', style)
     ws0.write(i, 3, hex(i), style0)
 
+ws0.write_merge(5, 8, 6, 10, "")
 
 wb.save('blanks.xls')
