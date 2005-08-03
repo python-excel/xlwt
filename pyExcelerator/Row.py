@@ -48,6 +48,7 @@ from Deco import *
 from Worksheet import Worksheet
 import Style
 import Cell
+import ExcelFormula
 import datetime as dt
 
 
@@ -203,7 +204,7 @@ class Row(object):
         return self.__idx
 
 
-    @accepts(object, int, (str, unicode, int, float, dt.datetime, dt.time, dt.date), Style.XFStyle)
+    @accepts(object, int, (str, unicode, int, float, dt.datetime, dt.time, dt.date, ExcelFormula.Formula), Style.XFStyle)
     def write(self, col, label, style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
@@ -215,8 +216,10 @@ class Row(object):
                 self.__cells.extend([ Cell.BlankCell(self, col, self.__parent_wb.add_style(style)) ])
         elif isinstance(label, (int, float)):
             self.__cells.extend([ Cell.NumberCell(self, col, self.__parent_wb.add_style(style), label) ])            
-        else:
+        elif isinstance(label, (dt.datetime, dt.time)):
             self.__cells.extend([ Cell.NumberCell(self, col, self.__parent_wb.add_style(style), self.__excel_date_dt(label)) ])
+        else:
+            self.__cells.extend([ Cell.FormulaCell(self, col, self.__parent_wb.add_style(style), label) ])
 
     @accepts(object, int, int, Style.XFStyle)                        
     def write_blanks(self, c1, c2, style):

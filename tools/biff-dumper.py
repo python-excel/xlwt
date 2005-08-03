@@ -89,7 +89,7 @@ def main():
 
     # Inside MS Office document looks like filesystem
     # We need extract stream named 'Workbook' or 'Book'
-    ole_streams = get_ole_streams(sys.argv[1])
+    ole_streams = CompoundDoc.get_ole_streams(sys.argv[1])
 
     if 'Workbook' in ole_streams:
         workbook_stream = ole_streams['Workbook']

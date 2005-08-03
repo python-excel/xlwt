@@ -10,7 +10,8 @@ if version < '2.3':
     True = not False
 ### header action >>> 
 __rev_id__ = """$Id$"""
-from ExcelFormula import *
+
+import struct
 ### header action <<< 
 ### preamble action >>> 
 
@@ -53,7 +54,7 @@ GE = 25
 GT = 26
 WHITE_SPACE = 27
 DIGIT = 28
-INT = 29
+DIGITS = 29
 LOWER = 30
 UPPER = 31
 LETTER = 32
@@ -131,6 +132,10 @@ class Lexer(antlr.CharScanner) :
                                 pass
                                 self.mWHITE_SPACE(True)
                                 theRetToken = self._returnToken
+                            elif la1 and la1 in u'0123456789':
+                                pass
+                                self.mINT_CONST(True)
+                                theRetToken = self._returnToken
                             else:
                                 if (self.LA(1)==u'<') and (self.LA(2)==u'>'):
                                     pass
@@ -144,11 +149,7 @@ class Lexer(antlr.CharScanner) :
                                     pass
                                     self.mGE(True)
                                     theRetToken = self._returnToken
-                                elif ((self.LA(1) >= u'0' and self.LA(1) <= u'9')) and (_tokenSet_0.member(self.LA(2))):
-                                    pass
-                                    self.mNUM_CONST(True)
-                                    theRetToken = self._returnToken
-                                elif (self.LA(1)==u'R' or self.LA(1)==u'r') and (_tokenSet_1.member(self.LA(2))):
+                                elif (self.LA(1)==u'R' or self.LA(1)==u'r') and (_tokenSet_0.member(self.LA(2))):
                                     pass
                                     self.mRC_CELL(True)
                                     theRetToken = self._returnToken
@@ -160,11 +161,7 @@ class Lexer(antlr.CharScanner) :
                                     pass
                                     self.mGT(True)
                                     theRetToken = self._returnToken
-                                elif ((self.LA(1) >= u'0' and self.LA(1) <= u'9')) and (True):
-                                    pass
-                                    self.mINT_CONST(True)
-                                    theRetToken = self._returnToken
-                                elif (_tokenSet_2.member(self.LA(1))) and (True):
+                                elif (_tokenSet_1.member(self.LA(1))) and (True):
                                     pass
                                     self.mNAME(True)
                                     theRetToken = self._returnToken
@@ -405,11 +402,11 @@ class Lexer(antlr.CharScanner) :
         self.matchRange(u'0', u'9')
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
-    def mINT(self, _createToken):    
+    def mDIGITS(self, _createToken):    
         _ttype = 0
         _token = None
         _begin = self.text.length()
-        _ttype = INT
+        _ttype = DIGITS
         _saveIndex = 0
         pass
         _cnt38= 0
@@ -425,18 +422,6 @@ class Lexer(antlr.CharScanner) :
             self.raise_NoViableAlt(self.LA(1))
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
-    def mNUM_CONST(self, _createToken):    
-        _ttype = 0
-        _token = None
-        _begin = self.text.length()
-        _ttype = NUM_CONST
-        _saveIndex = 0
-        pass
-        self.mINT(False)
-        self.match(".")
-        self.mINT(False)
-        self.set_return_token(_createToken, _token, _ttype, _begin)
-    
     def mINT_CONST(self, _createToken):    
         _ttype = 0
         _token = None
@@ -444,7 +429,47 @@ class Lexer(antlr.CharScanner) :
         _ttype = INT_CONST
         _saveIndex = 0
         pass
-        self.mINT(False)
+        self.mDIGITS(False)
+        if (self.LA(1)==u'.'):
+            pass
+            self.match(".")
+            self.mDIGITS(False)
+            if (self.LA(1)==u'E' or self.LA(1)==u'e'):
+                pass
+                la1 = self.LA(1)
+                if False:
+                    pass
+                elif la1 and la1 in u'e':
+                    pass
+                    self.match('e')
+                elif la1 and la1 in u'E':
+                    pass
+                    self.match('E')
+                else:
+                        self.raise_NoViableAlt(self.LA(1))
+                    
+                la1 = self.LA(1)
+                if False:
+                    pass
+                elif la1 and la1 in u'+':
+                    pass
+                    self.match('+')
+                elif la1 and la1 in u'-':
+                    pass
+                    self.match('-')
+                elif la1 and la1 in u'0123456789':
+                    pass
+                else:
+                        self.raise_NoViableAlt(self.LA(1))
+                    
+                self.mDIGITS(False)
+            else: ## <m4>
+                    pass
+                
+            _ttype = NUM_CONST
+        else: ## <m4>
+                pass
+            
         self.set_return_token(_createToken, _token, _ttype, _begin)
     
     def mLOWER(self, _createToken):    
@@ -538,7 +563,7 @@ class Lexer(antlr.CharScanner) :
                 else:
                         self.raise_NoViableAlt(self.LA(1))
                     
-                self.mINT(False)
+                self.mDIGITS(False)
                 self.mRB(False)
             elif la1 and la1 in u'Cc':
                 pass
@@ -547,7 +572,7 @@ class Lexer(antlr.CharScanner) :
                 
         elif la1 and la1 in u'0123456789':
             pass
-            self.mINT(False)
+            self.mDIGITS(False)
         else:
                 self.raise_NoViableAlt(self.LA(1))
             
@@ -565,7 +590,7 @@ class Lexer(antlr.CharScanner) :
             
         if ((self.LA(1) >= u'0' and self.LA(1) <= u'9')):
             pass
-            self.mINT(False)
+            self.mDIGITS(False)
         else: ## <m4>
                 pass
                 if (self.LA(1)==u'['):
@@ -582,7 +607,7 @@ class Lexer(antlr.CharScanner) :
                     else:
                             self.raise_NoViableAlt(self.LA(1))
                         
-                    self.mINT(False)
+                    self.mDIGITS(False)
                     self.mRB(False)
                 else: ## <m4>
                         pass
@@ -618,23 +643,16 @@ class Lexer(antlr.CharScanner) :
 ### generate bit set
 def mk_tokenSet_0(): 
     ### var1
-    data = [ 288019269919178752L, 0L, 0L]
+    data = [ 287948901175001088L, 34493956104L, 0L, 0L]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
 
 ### generate bit set
 def mk_tokenSet_1(): 
     ### var1
-    data = [ 287948901175001088L, 34493956104L, 0L, 0L]
-    return data
-_tokenSet_1 = antlr.BitSet(mk_tokenSet_1())
-
-### generate bit set
-def mk_tokenSet_2(): 
-    ### var1
     data = [ 0L, 576460745995190270L, 0L, 0L]
     return data
-_tokenSet_2 = antlr.BitSet(mk_tokenSet_2())
+_tokenSet_1 = antlr.BitSet(mk_tokenSet_1())
     
 ### __main__ header action >>> 
 if __name__ == '__main__' :

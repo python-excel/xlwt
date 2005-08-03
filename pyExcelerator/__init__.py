@@ -17,3 +17,4 @@ from Formatting import Font, Alignment, Borders, Pattern, Protection
 from Style import XFStyle 
 from ImportXLS import * 
 
+from ExcelFormula import *
