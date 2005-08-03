@@ -152,15 +152,18 @@ class MulNumberCell(object):
 
 
 class FormulaCell(object):
-    __slots__ = ["__init__", "get_biff_data"]
+    __slots__ = ["__init__", "get_biff_data",
+                "__parent", "__idx", "__xf_idx", "__frmla"]
 
-    def __init__(self, parent, idx, xf_idx, number):
+    def __init__(self, parent, idx, xf_idx, frmla):
         self.__parent = parent
         self.__idx = idx
         self.__xf_idx = xf_idx
-        self.__number = number
+        self.__frmla = frmla
 
 
     def get_biff_data(self):
-        raise Exception
+        return BIFFRecords.FormulaRecord(self.__parent.get_index(), self.__idx, self.__xf_idx, self.__frmla.rpn()).get()
+
+
 

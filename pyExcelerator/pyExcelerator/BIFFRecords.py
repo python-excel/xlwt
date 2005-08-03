@@ -1434,6 +1434,29 @@ class NumberRecord(BiffRecord):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<3Hd', row, col, xf_index, number)
 
+
+class FormulaRecord(BiffRecord):
+    '''
+    Offset Size Contents
+    0      2    Index to row
+    2      2    Index to column
+    4      2    Index to XF record 
+    6      8    Result of the formula
+    14     2    Option flags:          
+                Bit Mask    Contents
+                0   0001H   1 = Recalculate always
+                1   0002H   1 = Calculate on open
+                3   0008H   1 = Part of a shared formula
+    16     4    Not used
+    20     var. Formula data (RPN token array)
+
+    '''
+    _REC_ID = 0x0006
+
+    def __init__(self, row, col, xf_index, rpn):
+        BiffRecord.__init__(self)
+        self._rec_data = struct.pack('<3HQHL', row, col, xf_index, 0xFFFF000000000003, 0, 0) + rpn
+
         
 class GutsRecord(BiffRecord):
     '''
