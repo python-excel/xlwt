@@ -42,31 +42,24 @@
 
 __rev_id__ = """$Id$"""
 
+
 import ExcelFormulaParser, ExcelFormulaLexer
 import struct
+from antlr import ANTLRException
+
 
 class Formula(object):
-    __slots__ = ["StrReader", "__init__", "text", "rpn", "__s", "__parser"]
-
-    class StrReader(object):
-        def __init__(self, s):
-            self.__s = s
-            self.__pos = 0
-
-        def read(self, c):
-            self.__pos += c
-            return self.__s[self.__pos-c:self.__pos]
+    __slots__ = ["__init__", "text", "rpn", "__s", "__parser"]
 
 
     def __init__(self, s):
-#        try:
+        try:
             self.__s = s
-            lexer = ExcelFormulaLexer.Lexer()
-            lexer.setInput(self.StrReader(s))
+            lexer = ExcelFormulaLexer.Lexer(s)
             self.__parser = ExcelFormulaParser.Parser(lexer)
             self.__parser.formula()
-#        except:
-#            raise Exception("can't understand formula " + s)
+        except ANTLRException:
+            raise Exception, "can't parse formula " + s
 
     def text(self):
         return self.__s

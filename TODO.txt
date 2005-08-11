@@ -1,3 +1,2 @@
 *Write documentation
-*Formulas support
 *BSE container for Esher layer
