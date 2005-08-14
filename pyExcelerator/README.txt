@@ -59,9 +59,7 @@ Please!
 
 0x0008. Future.
 --------------------
-Support  for  formulas  (at  present  I have pre-alpha parser generator for
-LL(1)  and  maybe  LL(k)) and (iff I can spare enough time for programming)
-charts.
+Support for Esher layer and (maybe) charts.
 
 
 0x0009. Useful links.

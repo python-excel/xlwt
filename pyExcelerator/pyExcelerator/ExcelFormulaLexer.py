@@ -55,6 +55,8 @@ flt_const_pattern = recompile(r"\d*\.\d+(?:[Ee][+-]?\d+)?")
 str_const_pattern = recompile(r'["][^"]*["]')
 #range2d_pattern   = recompile(r"\$?[A-I]?[A-Z]\$?\d+:\$?[A-I]?[A-Z]\$?\d+")
 ref2d_pattern     = recompile(r"\$?[A-I]?[A-Z]\$?\d+")
+true_pattern      = recompile(r"TRUE", IGNORECASE)
+false_pattern     = recompile(r"FALSE", IGNORECASE)
 name_pattern      = recompile(r"[\.\w]+", LOCALE)
 
 pattern_type_tuples = (
@@ -63,11 +65,19 @@ pattern_type_tuples = (
     (str_const_pattern, ExcelFormulaParser.STR_CONST),
 #    (range2d_pattern  , ExcelFormulaParser.RANGE2D),
     (ref2d_pattern    , ExcelFormulaParser.REF2D),
+    (true_pattern     , ExcelFormulaParser.TRUE_CONST),
+    (false_pattern    , ExcelFormulaParser.FALSE_CONST),
     (name_pattern     , ExcelFormulaParser.NAME)
 )
 
 
 type_text_tuples = (
+    (ExcelFormulaParser.NE, '<>'),
+    (ExcelFormulaParser.LE, '<='),
+    (ExcelFormulaParser.GE, '>='),
+    (ExcelFormulaParser.EQ, '='),
+    (ExcelFormulaParser.LT, '<'),
+    (ExcelFormulaParser.GT, '>'),
     (ExcelFormulaParser.ADD, '+'),
     (ExcelFormulaParser.SUB, '-'),
     (ExcelFormulaParser.MUL, '*'),
@@ -77,7 +87,9 @@ type_text_tuples = (
     (ExcelFormulaParser.COMMA, ','),
     (ExcelFormulaParser.LP, '('),
     (ExcelFormulaParser.RP, ')'),
-    (ExcelFormulaParser.CONCAT, '&')
+    (ExcelFormulaParser.CONCAT, '&'),
+    (ExcelFormulaParser.PERCENT, '%'),
+    (ExcelFormulaParser.POWER, '^')
 )
 
 
