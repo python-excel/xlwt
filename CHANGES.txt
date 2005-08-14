@@ -40,4 +40,4 @@
     * fixes for Big Endian CPUs
     * some refactorings
     * new examples: blanks.py, merged1.py, dates.py, numbers.py, num_formats.py, formulas.py
-    * formulas support
+    * most important change: formulas support
