@@ -136,8 +136,8 @@ def get_ole_streams(filename):
        next = msat_sector[-1]
     print 'additional MSAT sectors: \n', MSAT_2nd
 
-    sat_sectors = [x for x in MSAT if x >=0]
-    sat_sectors += [x for x in MSAT_2nd if x >=0]
+    sat_sectors = [x for x in MSAT if x >=0 and x <= total_sectors - 1]
+    sat_sectors += [x for x in MSAT_2nd if x >=0 and x <= total_sectors - 1]
 
     print 'SAT resides in following sectors:\n', sat_sectors
 

@@ -41,3 +41,8 @@
     * some refactorings
     * new examples: blanks.py, merged1.py, dates.py, numbers.py, num_formats.py, formulas.py
     * most important change: formulas support
+
+0.6.1a (29.09.2005)
+---------
+    * fixed: exception when reading OLE2 files with incorrect MSAT
+      (sector ids points to nonexistense sectors)
