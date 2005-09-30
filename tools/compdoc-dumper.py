@@ -156,7 +156,7 @@ def get_ole_streams(filename):
     print 'SSAT sectors:\n', ssat_sectors
     ssids_count = total_ssat_sectors * (sect_size >> 2)
     print 'SSID count:', ssids_count
-    SSAT = struct.unpack('<' + 'l'*ssids_count, ''.join([SECTORS[sect] for sect in ssat_sectors]))
+    SSAT = struct.unpack('<' + 'l'*ssids_count, ''.join([SECTORS[sect] for sect in ssat_sectors if sect >=0 and sect <= total_ssat_sectors - 1]))    
     print 'SSAT content:\n', SSAT
 
     dir_stream_sectors = []
