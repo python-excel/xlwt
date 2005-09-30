@@ -46,3 +46,8 @@
 ---------
     * fixed: exception when reading OLE2 files with incorrect MSAT
       (sector ids points to nonexistense sectors)
+
+0.6.2a (30.09.2005)
+---------
+    * fixed: exception when reading OLE2 files with incorrect SSAT
+      (sector ids points to nonexistense sectors)
