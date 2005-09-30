@@ -1,9 +1,10 @@
-My lovely wife Olya
-Offspring
-Lynkin Park
-Nescafe
-Python Team
-FreeBSD Team
-SF Team
+* My lovely wife Olya
+* pyExcelerator's users
+* Offspring
+* Lynkin Park
+* Nescafe
+* Python Team
+* FreeBSD Team
+* SF Team
 
 

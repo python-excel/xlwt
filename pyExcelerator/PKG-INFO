@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: pyExcelerator
-Version: 0.5.4a1
+Version: 0.6.1a1
 Summary: Library to generate Microsoft Excel (tm) spreadsheet files or to extract data from such files
 Home-page: http://www.sourceforge.net/projects/pyexcelerator
 Author: Roman V. Kiseliov
