@@ -3,29 +3,29 @@
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
-# 
+#
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
 #  are met:
-# 
+#
 #  1. Redistributions of source code must retain the above copyright
 #     notice, this list of conditions and the following disclaimer.
-# 
+#
 #  2. Redistributions in binary form must reproduce the above copyright
 #     notice, this list of conditions and the following disclaimer in
 #     the documentation and/or other materials provided with the
 #     distribution.
-# 
+#
 #  3. All advertising materials mentioning features or use of this
 #     software must display the following acknowledgment:
 #     "This product includes software developed by
 #      Roman V. Kiseliov <roman@kiseliov.ru>."
-# 
+#
 #  4. Redistributions of any form whatsoever must retain the following
 #     acknowledgment:
 #     "This product includes software developed by
 #      Roman V. Kiseliov <roman@kiseliov.ru>."
-# 
+#
 #  THIS SOFTWARE IS PROVIDED BY Roman V. Kiseliov ``AS IS'' AND ANY
 #  EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 #  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -43,73 +43,73 @@ __rev_id__ = """$Id$"""
 
 
 from struct import pack
-from UnicodeUtils import * 
+from UnicodeUtils import *
 import sys
 
 class SharedStringTable(object):
     _SST_ID = 0x00FC
     _CONTINUE_ID = 0x003C
-    
+
     def __init__(self):
         self._sst_record = ''
-        self._continues = ''
+        self._continues = []
         self._current_piece = pack('<II', 0, 0)
         self._pos = len(self._current_piece)
-        
+
         self._str_indexes = {}
         self._add_calls = 0
-        
-    def add_str(self, s):        
+
+    def add_str(self, s):
         self._add_calls += 1
         if s not in self._str_indexes:
             self._str_indexes[s] = len(self._str_indexes)
             self._add_to_sst(s)
         return self._str_indexes[s]
-             
+
     def str_index(self, s):
         return self._str_indexes[s]
-    
+
     def get_biff_record(self):
         self._new_piece()
         result = pack('<2HII', self._SST_ID, len(self._sst_record), self._add_calls, len(self._str_indexes))
         result += self._sst_record[8:]
-        result += self._continues
+        result += ''.join(self._continues)
         return result
-       
+
     def _add_to_sst(self, s):
         u_str = upack2(s)
         if len(u_str) > 0xFFFF:
             raise Exception('error: very long string.')
-            
-        is_unicode_str = u_str[2] == '\x01'                    
+
+        is_unicode_str = u_str[2] == '\x01'
         if is_unicode_str:
-            atom_len = 5 # 2 byte -- len, 
-                         # 1 byte -- options, 
+            atom_len = 5 # 2 byte -- len,
+                         # 1 byte -- options,
                          # 2 byte -- 1st sym
         else:
-            atom_len = 4 # 2 byte -- len, 
-                         # 1 byte -- options, 
+            atom_len = 4 # 2 byte -- len,
+                         # 1 byte -- options,
                          # 1 byte -- 1st sym
-                         
+
         self._save_atom(u_str[0:atom_len])
         self._save_splitted(u_str[atom_len:], is_unicode_str)
-        
+
     def _new_piece(self):
-        if self._sst_record == '':            
+        if self._sst_record == '':
             self._sst_record = self._current_piece
         else:
             curr_piece_len = len(self._current_piece)
-            self._continues += pack('<2H%ds'%curr_piece_len, self._CONTINUE_ID, curr_piece_len, self._current_piece)
+            self._continues.append(pack('<2H%ds'%curr_piece_len, self._CONTINUE_ID, curr_piece_len, self._current_piece))
         self._current_piece = ''
-        self._pos = len(self._current_piece)        
-        
+        self._pos = len(self._current_piece)
+
     def _save_atom(self, s):
         atom_len = len(s)
-        free_space = 0x2020 - len(self._current_piece)        
+        free_space = 0x2020 - len(self._current_piece)
         if free_space < atom_len:
             self._new_piece()
         self._current_piece += s
-        
+
     def _save_splitted(self, s, is_unicode_str):
         i = 0
         str_len = len(s)
@@ -118,7 +118,7 @@ class SharedStringTable(object):
             free_space = 0x2020 - piece_len
             tail_len = str_len - i
             need_more_space = free_space < tail_len
-            
+
             if not need_more_space:
                 atom_len = tail_len
             else:
@@ -126,35 +126,35 @@ class SharedStringTable(object):
                     atom_len = free_space & 0xFFFE
                 else:
                     atom_len = free_space
-                    
+
             self._current_piece += s[i:i+atom_len]
-            
+
             if need_more_space:
                 self._new_piece()
                 if is_unicode_str:
                     self._current_piece += '\x01'
                 else:
                     self._current_piece += '\x00'
-                    
+
             i += atom_len
-        
-        
+
+
 class BiffRecord(object):
     def __init__(self):
         self._rec_data = ''
-    
+
     def get_rec_id(self):
         return _REC_ID
-        
+
     def get_rec_header(self):
-        return pack('<2H', self._REC_ID, len(self._rec_data)) 
-        
+        return pack('<2H', self._REC_ID, len(self._rec_data))
+
     def get_rec_data(self):
         return self._rec_data
-        
-    def get(self):        
+
+    def get(self):
         data = self.get_rec_data()
-        
+
         if len(data) > 0x2020: # limit for BIFF7/8
             chunks = []
             pos = 0
@@ -170,13 +170,13 @@ class BiffRecord(object):
             return continues
         else:
             return self.get_rec_header() + data
-            
-            
+
+
 class Biff8BOFRecord(BiffRecord):
-    '''
+    """
     Offset Size Contents
     0      2    Version, contains 0600H for BIFF8 and BIFF8X
-    2      2    Type of the following data: 
+    2      2    Type of the following data:
                   0005H = Workbook globals
                   0006H = Visual Basic module
                   0010H = Worksheet
@@ -187,7 +187,7 @@ class Biff8BOFRecord(BiffRecord):
     6      2    Build year
     8      4    File history flags
     12     4    Lowest Excel version that can read all records in this file
-    '''
+    """
     _REC_ID      = 0x0809
     # stream types
     BOOK_GLOBAL = 0x0005
@@ -198,14 +198,14 @@ class Biff8BOFRecord(BiffRecord):
     WORKSPACE   = 0x0100
 
     def __init__(self, rec_type):
-        BiffRecord.__init__(self)          
+        BiffRecord.__init__(self)
 
         version  = 0x0600
         build    = 0x0DBB
         year     = 0x07CC
         file_hist_flags = 0x00L
         ver_can_read    = 0x06L
-        
+
         self._rec_data = pack('<4H2I', version, rec_type, build, year, file_hist_flags, ver_can_read)
 
 
@@ -214,7 +214,7 @@ class InteraceHdrRecord(BiffRecord):
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('BB', 0xB0, 0x04)
 
 
@@ -223,7 +223,7 @@ class InteraceEndRecord(BiffRecord):
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = ''
 
 
@@ -232,30 +232,30 @@ class MMSRecord(BiffRecord):
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x00)
 
 
 class WriteAccessRecord(BiffRecord):
-    '''
+    """
     This record is part of the file protection. It contains the name of the
     user  that  has  saved  the  file. The user name is always stored as an
     equal-sized  string.  All  unused  characters after the name are filled
     with space characters. It is not required to write the mentioned string
     length. Every other length will be accepted too.
-    '''
+    """
     _REC_ID = 0x005C
 
     def __init__(self, owner):
         BiffRecord.__init__(self)
-        
+
         uowner = owner[0:0x30]
         uowner_len = len(uowner)
         self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner, ' '*(0x70 - uowner_len))
 
 
 class DSFRecord(BiffRecord):
-    '''
+    """
     This  record  specifies  if the file contains an additional BIFF5/BIFF7
     workbook stream.
     Record DSF, BIFF8:
@@ -265,12 +265,12 @@ class DSFRecord(BiffRecord):
     A  double  stream file can be read by Excel 5.0 and Excel 95, and still
     contains  all  new  features  added to BIFF8 (which are left out in the
     BIFF5/BIFF7 Book stream).
-    '''
+    """
     _REC_ID = 0x0161
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x00)
 
 
@@ -279,7 +279,7 @@ class TabIDRecord(BiffRecord):
 
     def __init__(self, sheetcount):
         BiffRecord.__init__(self)
-        
+
         for i in range(sheetcount):
             self._rec_data += pack('<H', i+1)
 
@@ -289,133 +289,186 @@ class FnGroupCountRecord(BiffRecord):
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('BB', 0x0E, 0x00)
 
 
 class WindowProtectRecord(BiffRecord):
-    '''
+    """
     This record is part of the worksheet/workbook protection. It determines
     whether  the window configuration of this document is protected. Window
     protection is not active, if this record is omitted.
-    '''
+    """
     _REC_ID = 0x0019
 
     def __init__(self, wndprotect):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', wndprotect)
-        
-        
+
+
+class ObjectProtectRecord(BiffRecord):
+    """
+    This record is part of the worksheet/workbook protection.
+    It determines whether the objects of the current sheet are protected.
+    Object protection is not active, if this record is omitted.
+    """
+    _REC_ID = 0x0063
+
+
+    def __init__(self, objprotect):
+        BiffRecord.__init__(self)
+
+        self._rec_data = pack('<H', objprotect)
+
+
+class ScenProtectRecord(BiffRecord):
+    """
+    This record is part of the worksheet/workbook protection. It
+    determines whether the scenarios of the current sheet are protected.
+    Scenario protection is not active, if this record is omitted.
+    """
+    _REC_ID = 0x00DD
+
+
+    def __init__(self, scenprotect):
+        BiffRecord.__init__(self)
+
+        self._rec_data = pack('<H', scenprotect)
+
+
 class ProtectRecord(BiffRecord):
-    '''
+    """
     This  record is part of the worksheet/workbook protection. It specifies
     whether  a  worksheet  or a workbook is protected against modification.
     Protection is not active, if this record is omitted.
-    '''
+    """
 
     _REC_ID = 0x0012
 
     def __init__(self, protect):
         BiffRecord.__init__(self)
-        
-        self._rec_data = pack('<H', protect)
-        
-        
-class PasswordRecord(BiffRecord):
-    _REC_ID = 0x0013
 
-    def __init__(self):
+        self._rec_data = pack('<H', protect)
+
+
+class PasswordRecord(BiffRecord):
+    """
+    This record is part of the worksheet/workbook protection. It
+    stores a 16-bit hash value, calculated from the worksheet or workbook
+    protection password.
+    """
+    _REC_ID = 0x0013
+    def passwd_hash(self, plaintext):
+        """
+        Based on the algorithm provided by Daniel Rentz of OpenOffice.
+        """
+        if plaintext == "":
+            return 0
+
+        passwd_hash = 0x0000
+        for i, char in enumerate(plaintext):
+            c = ord(char) << (i + 1)
+            low_15 = c & 0x7fff
+            high_15 = c & 0x7fff << 15
+            high_15 = high_15 >> 15
+            c = low_15 | high_15
+            passwd_hash ^= c
+        passwd_hash ^= len(plaintext)
+        passwd_hash ^= 0xCE4B
+        return passwd_hash
+
+    def __init__(self, passwd = ""):
         BiffRecord.__init__(self)
-        
-        self._rec_data = pack('<H', 0x00)
-        
-        
+
+        self._rec_data = pack('<H', self.passwd_hash(passwd))
+
+
 class Prot4RevRecord(BiffRecord):
     _REC_ID = 0x01AF
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x00)
-        
-        
+
+
 class Prot4RevPassRecord(BiffRecord):
     _REC_ID = 0x01BC
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x00)
-        
-        
+
+
 class BackupRecord(BiffRecord):
-    '''
+    """
     This  record  contains  a Boolean value determining whether Excel makes
     a backup of the file while saving.
-    '''
+    """
     _REC_ID = 0x0040
 
     def __init__(self, backup):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', backup)
-        
+
 class HideObjRecord(BiffRecord):
-    '''
+    """
     This record specifies whether and how to show objects in the workbook.
-    
+
     Record HIDEOBJ, BIFF3-BIFF8:
     Offset  Size    Contents
     0       2       Viewing mode for objects:
                         0 = Show all objects
                         1 = Show placeholders
                         2 = Do not show objects
-    '''
+    """
     _REC_ID = 0x008D
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x00)
 
 
 
 class RefreshAllRecord(BiffRecord):
-    '''
-    '''
-    
+    """
+    """
+
     _REC_ID = 0x01B7
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x00)
 
 
 class BookBoolRecord(BiffRecord):
-    '''
+    """
     This record contains a Boolean value determining whether to save values
     linked  from external workbooks (CRN records and XCT records). In BIFF3
     and BIFF4 this option is stored in the WSBOOL record.
-    
+
     Record BOOKBOOL, BIFF5-BIFF8:
-    
+
     Offset  Size    Contents
-    0       2       0 = Save external linked values; 
-                    1 = Do not save external linked values    
-    '''
-    
+    0       2       0 = Save external linked values;
+                    1 = Do not save external linked values
+    """
+
     _REC_ID = 0x00DA
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x00)
 
 
 class CountryRecord(BiffRecord):
-    '''
+    """
     This   record   stores  two  Windows  country  identifiers.  The  first
     represents  the  user  interface language of the Excel version that has
     saved  the file, and the second represents the system regional settings
@@ -426,7 +479,7 @@ class CountryRecord(BiffRecord):
     Offset  Size    Contents
     0       2       Windows country identifier of the user interface language of Excel
     2       2       Windows country identifier of the system regional settings
-    
+
     The  following  table  shows most of the used country identifiers. Most
     of  these  identifiers  are  equal to the international country calling
     codes.
@@ -434,18 +487,18 @@ class CountryRecord(BiffRecord):
     1   USA
     2   Canada
     7   Russia
-    '''
-    
+    """
+
     _REC_ID = 0x00DA
 
     def __init__(self, ui_id, sys_settings_id):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<2H', ui_id, sys_settings_id)
 
 
 class UseSelfsRecord(BiffRecord):
-    '''
+    """
     This  record  specifies if the formulas in the workbook can use natural
     language  formulas”.  This  type  of  formula can refer to cells by its
     content or the content of the column or row header cell.
@@ -455,14 +508,14 @@ class UseSelfsRecord(BiffRecord):
     Offset  Size    Contents
     0       2       0 = Do not use natural language formulas
                     1 = Use natural language formulas
-    
-    '''
-    
+
+    """
+
     _REC_ID = 0x0160
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', 0x01)
 
 
@@ -471,12 +524,12 @@ class EOFRecord(BiffRecord):
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = ''
 
 
 class DateModeRecord(BiffRecord):
-    '''
+    """
     This  record  specifies  the  base date for displaying date values. All
     dates  are  stored as count of days past this base date. In BIFF2-BIFF4
     this   record  is  part  of  the  Calculation  Settings  Block.
@@ -487,20 +540,20 @@ class DateModeRecord(BiffRecord):
     Offset  Size    Contents
     0       2       0 = Base is 1899-Dec-31 (the cell = 1 represents 1900-Jan-01)
                     1 = Base is 1904-Jan-01 (the cell = 1 represents 1904-Jan-02)
-    '''
+    """
     _REC_ID = 0x0022
 
     def __init__(self, from1904):
         BiffRecord.__init__(self)
-        
+
         if from1904:
             self._rec_data = pack('<H', 1)
         else:
             self._rec_data = pack('<H', 0)
 
-            
+
 class PrecisionRecord(BiffRecord):
-    '''
+    """
     This record stores if formulas use the real cell values for calculation
     or  the  values  displayed  on  the screen. In BIFF2- BIFF4 this record
     is  part of the Calculation Settings Block. In BIFF5-BIFF8 it is stored
@@ -509,14 +562,14 @@ class PrecisionRecord(BiffRecord):
     Record PRECISION, BIFF2-BIFF8:
 
     Offset  Size    Contents
-    0       2       0 = Use displayed values; 
+    0       2       0 = Use displayed values;
                     1 = Use real cell values
-    '''
+    """
     _REC_ID = 0x000E
 
     def __init__(self, use_real_values):
         BiffRecord.__init__(self)
-        
+
         if use_real_values:
             self._rec_data = pack('<H', 1)
         else:
@@ -524,7 +577,7 @@ class PrecisionRecord(BiffRecord):
 
 
 class CodepageBiff8Record(BiffRecord):
-    '''
+    """
     This record stores the text encoding used to write byte strings, stored
     as MS Windows code page identifier. The CODEPAGE record in BIFF8 always
     contains  the  code  page  1200  (UTF-16).  Therefore  it is not
@@ -532,7 +585,7 @@ class CodepageBiff8Record(BiffRecord):
     not UTF-16).
 
     Record CODEPAGE, BIFF2-BIFF8:
-    
+
     Offset  Size    Contents
     0       2       Code page identifier used for byte string text encoding:
                       016FH = 367 = ASCII
@@ -572,17 +625,17 @@ class CodepageBiff8Record(BiffRecord):
                       2710H = 10000 = Apple Roman
                       8000H = 32768 = Apple Roman
                       8001H = 32769 = Windows CP-1252 (Latin I) (BIFF2-BIFF3)
-    '''
+    """
     _REC_ID = 0x0042
     UTF_16 = 0x04B0
 
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = pack('<H', self.UTF_16)
-    
+
 class Window1Record(BiffRecord):
-    '''
+    """
     Offset Size Contents
     0      2    Horizontal position of the document window (in twips = 1/20 of a point)
     2      2    Vertical position of the document window (in twips = 1/20 of a point)
@@ -600,30 +653,30 @@ class Window1Record(BiffRecord):
     14     2    Number of selected worksheets (highlighted in the worksheet tab bar)
     16     2    Width of worksheet tab bar (in 1/1000 of window width). The remaining space is used by the
                 horizontal scrollbar.
-    '''
+    """
     _REC_ID = 0x003D
     # flags
- 
-    def __init__(self, 
-                 hpos_twips, vpos_twips, 
-                 width_twips, height_twips, 
+
+    def __init__(self,
+                 hpos_twips, vpos_twips,
+                 width_twips, height_twips,
                  flags,
                  active_sheet,
                  first_tab_index, selected_tabs, tab_width):
-        BiffRecord.__init__(self)        
-        
-        self._rec_data = pack('<9H', hpos_twips, vpos_twips, 
-                                      width_twips, height_twips, 
-                                      flags,                     
-                                      active_sheet,               
+        BiffRecord.__init__(self)
+
+        self._rec_data = pack('<9H', hpos_twips, vpos_twips,
+                                      width_twips, height_twips,
+                                      flags,
+                                      active_sheet,
                                       first_tab_index, selected_tabs, tab_width)
 
 class FontRecord(BiffRecord):
-    '''
+    """
     WARNING
-        The font with index 4 is omitted in all BIFF versions. 
+        The font with index 4 is omitted in all BIFF versions.
         This means the first four fonts have zero-based indexes, and
-        the fifth font and all following fonts are referenced with one-based 
+        the fifth font and all following fonts are referenced with one-based
         indexes.
 
     Offset Size Contents
@@ -635,29 +688,29 @@ class FontRecord(BiffRecord):
                   2   0004H   1 = Characters are underlined (redundant, see below)
                   3   0008H   1 = Characters are struck out
                         0010H 1 = Outline
-                        0020H  1 = Shadow                  
+                        0020H  1 = Shadow
     4     2     Colour index
-    6     2     Font weight (100-1000). 
+    6     2     Font weight (100-1000).
                 Standard values are 0190H (400) for normal text and 02BCH
                 (700) for bold text.
-    8     2     Escapement type: 
+    8     2     Escapement type:
                   0000H = None
                   0001H = Superscript
                   0002H = Subscript
-    10    1     Underline type: 
+    10    1     Underline type:
                   00H = None
-                  01H = Single 
+                  01H = Single
                   21H = Single accounting
-                  02H = Double 
+                  02H = Double
                   22H = Double accounting
-    11    1     Font family: 
+    11    1     Font family:
                   00H = None (unknown or don't care)
                   01H = Roman (variable width, serifed)
                   02H = Swiss (variable width, sans-serifed)
                   03H = Modern (fixed width, serifed or sans-serifed)
                   04H = Script (cursive)
                   05H = Decorative (specialised, i.e. Old English, Fraktur)
-    12    1     Character set: 
+    12    1     Character set:
                   00H = 0 = ANSI Latin
                   01H = 1 = System default
                   02H = 2 = Symbol
@@ -678,30 +731,30 @@ class FontRecord(BiffRecord):
                   EEH = 238 = ANSI Latin II (Central European)
                   FFH = 255 = OEM Latin I
     13    1     Not used
-    14    var.  Font name:  
-                  BIFF5/BIFF7: Byte string, 8-bit string length 
-                  BIFF8: Unicode string, 8-bit string length 
-    The boldness and underline flags are still set in the options field, 
-    but not used on reading the font. Font weight and underline type 
+    14    var.  Font name:
+                  BIFF5/BIFF7: Byte string, 8-bit string length
+                  BIFF8: Unicode string, 8-bit string length
+    The boldness and underline flags are still set in the options field,
+    but not used on reading the font. Font weight and underline type
     are specified in separate fields instead.
-    '''
+    """
     _REC_ID = 0x0031
- 
-    def __init__(self, 
-                    height, options, colour_index, weight, escapement, 
-                    underline, family, charset, 
+
+    def __init__(self,
+                    height, options, colour_index, weight, escapement,
+                    underline, family, charset,
                     name):
         BiffRecord.__init__(self)
-        
+
         uname = upack1(name)
         uname_len = len(uname)
 
-        self._rec_data = pack('<5H4B%ds' % uname_len, height, options, colour_index, weight, escapement, 
-                                                underline, family, charset, 0x00, 
+        self._rec_data = pack('<5H4B%ds' % uname_len, height, options, colour_index, weight, escapement,
+                                                underline, family, charset, 0x00,
                                                 uname)
 
 class NumberFormatRecord(BiffRecord):
-    '''
+    """
     Record FORMAT, BIFF8:
     Offset  Size    Contents
     0       2       Format index used in other records
@@ -711,8 +764,8 @@ class NumberFormatRecord(BiffRecord):
     formats  are  dependent  on  the current regional settings of the operating
     system.  The following table shows which number formats are used by default
     in  a  US-English  environment.  All indexes from 0 to 163 are reserved for
-    built-in formats. The first user-defined format starts at 164. 
-    
+    built-in formats. The first user-defined format starts at 164.
+
     The built-in number formats, BIFF5-BIFF8
 
     Index   Type        Format string
@@ -752,20 +805,20 @@ class NumberFormatRecord(BiffRecord):
     47      Time        mm:ss.0
     48      Scientific  ##0.0E+0
     49      Text        @
-    '''
+    """
     _REC_ID = 0x041E
-    
+
     def __init__(self, idx, fmtstr):
         BiffRecord.__init__(self)
-        
+
         ufmtstr = upack2(fmtstr)
         ufmtstr_len = len(ufmtstr)
 
         self._rec_data = pack('<H%ds' % ufmtstr_len, idx, ufmtstr)
-        
+
 
 class XFRecord(BiffRecord):
-    '''
+    """
     XF Substructures
     -------------------------------------------------------------------------
     XF_TYPE_PROT  XF Type and Cell Protection (3 Bits), BIFF3-BIFF8
@@ -804,8 +857,8 @@ class XFRecord(BiffRecord):
     07H     Distributed (BIFF8X)
 
     XF_VERT_ALIGN Vertical Alignment (2 or 3 Bits), BIFF4-BIFF8
-    The vertical alignment consists of 2 bits (BIFF4) or 3 bits (BIFF5-BIFF8) 
-    and is part of a specific data byte. Vertical alignment is not available 
+    The vertical alignment consists of 2 bits (BIFF4) or 3 bits (BIFF5-BIFF8)
+    and is part of a specific data byte. Vertical alignment is not available
     in BIFF2 and BIFF3.
     Value   Vertical alignment
     00H     Top
@@ -835,23 +888,23 @@ class XFRecord(BiffRecord):
     XF_BORDER_34  Cell  Border  Style  (4  Bytes), BIFF3-BIFF4 Cell borders
     contain a line style and a line colour for each line of the border.
     Bit     Mask        Contents
-    2-0     00000007H   Top line style 
+    2-0     00000007H   Top line style
     7-3     000000F8H   Colour index for top line colour
-    10-8    00000700H   Left line style 
+    10-8    00000700H   Left line style
     15-11   0000F800H   Colour index for left line colour
-    18-16   00070000H   Bottom line style 
+    18-16   00070000H   Bottom line style
     23-19   00F80000H   Colour index for bottom line colour
-    26-24   07000000H   Right line style 
+    26-24   07000000H   Right line style
     31-27   F8000000H   Colour index for right line colour
 
     XF_AREA_34  Cell  Background  Area  Style (2 Bytes), BIFF3-BIFF4 A cell
     background  area  style  contains  an area pattern and a foreground and
     background colour.
     Bit     Mask    Contents
-    5-0     003FH   Fill pattern 
+    5-0     003FH   Fill pattern
     10-6    07C0H   Colour index for pattern colour
     15-11   F800H   Colour index for pattern background
- ---------------------------------------------------------------------------------------------   
+ ---------------------------------------------------------------------------------------------
     Record XF, BIFF8:
     Offset      Size    Contents
     0           2       Index to FONT record
@@ -876,10 +929,10 @@ class XFRecord(BiffRecord):
                         7-2     FCH     XF_USED_ATTRIB . Used attributes (see above)
     10          4       Cell border lines and background area:
                         Bit     Mask      Contents
-                        3-0     0000000FH Left line style 
+                        3-0     0000000FH Left line style
                         7-4     000000F0H Right line style
-                        11-8    00000F00H Top line style 
-                        15-12   0000F000H Bottom line style 
+                        11-8    00000F00H Top line style
+                        15-12   0000F000H Bottom line style
                         22-16   007F0000H Colour index for left line colour
                         29-23   3F800000H Colour index for right line colour
                         30      40000000H 1 = Diagonal line from top left to right bottom
@@ -893,30 +946,30 @@ class XFRecord(BiffRecord):
     18          2       Bit     Mask    Contents
                         6-0     007FH   Colour index for pattern colour
                         13-7    3F80H   Colour index for pattern background
-    
-    '''
+
+    """
     _REC_ID = 0x00E0
-    
+
     def __init__(self, xf, xftype='cell'):
-        BiffRecord.__init__(self)      
-        
+        BiffRecord.__init__(self)
+
         font_xf_idx, fmt_str_xf_idx, alignment, borders, pattern, protection = xf
         fnt = struct.pack('<H', font_xf_idx)
         fmt = struct.pack('<H', fmt_str_xf_idx)
         if xftype == 'cell':
-            prt = struct.pack('<H',      
+            prt = struct.pack('<H',
                 ((protection.cell_locked    & 0x01) << 0) |
                 ((protection.formula_hidden & 0x01) << 1)
             )
         else:
             prt = struct.pack('<H', 0xFFF5)
-        aln = struct.pack('B', 
+        aln = struct.pack('B',
             ((alignment.horz & 0x07) << 0) |
             ((alignment.wrap & 0x01) << 3) |
             ((alignment.vert & 0x07) << 4)
         )
         rot = struct.pack('B', alignment.rota)
-        txt = struct.pack('B', 
+        txt = struct.pack('B',
             ((alignment.inde & 0x0F) << 0) |
             ((alignment.shri & 0x01) << 4) |
             ((alignment.merg & 0x01) << 5) |
@@ -937,7 +990,7 @@ class XFRecord(BiffRecord):
             borders.bottom_colour = 0x00
         if borders.diag == borders.NO_LINE:
             borders.diag_colour = 0x00
-        brd1 = struct.pack('<L', 
+        brd1 = struct.pack('<L',
             ((borders.left          & 0x0F) << 0 ) |
             ((borders.right         & 0x0F) << 4 ) |
             ((borders.top           & 0x0F) << 8 ) |
@@ -947,16 +1000,16 @@ class XFRecord(BiffRecord):
             ((borders.need_diag1    & 0x01) << 30) |
             ((borders.need_diag2    & 0x01) << 31)
         )
-        brd2 = struct.pack('<L', 
+        brd2 = struct.pack('<L',
             ((borders.top_colour    & 0x7F) << 0 ) |
             ((borders.bottom_colour & 0x7F) << 7 ) |
             ((borders.diag_colour   & 0x7F) << 14) |
             ((borders.diag          & 0x0F) << 21) |
             ((pattern.pattern       & 0x0F) << 26)
         )
-        pat = struct.pack('<H', 
+        pat = struct.pack('<H',
             ((pattern.pattern_fore_colour & 0x7F) << 0 ) |
-            ((pattern.pattern_back_colour & 0x7F) << 7 ) 
+            ((pattern.pattern_back_colour & 0x7F) << 7 )
         )
         self._rec_data = fnt + fmt + prt + \
                         aln + rot + txt + used_attr + \
@@ -964,19 +1017,18 @@ class XFRecord(BiffRecord):
                         pat
 
 class StyleRecord(BiffRecord):
-    '''
+    """
     STYLE record for user-defined cell styles, BIFF3-BIFF8:
     Offset  Size    Contents
     0       2       Bit     Mask    Contents
                     11-0    0FFFH   Index to style XF record
                     15      8000H   Always 0 for user-defined styles
-    2       var.    BIFF2-BIFF7: Non-empty byte string, 8-bit string length 
-                    BIFF8: Non-empty Unicode string, 16-bit string length 
-------------------------------------------------------------------------------
+    2       var.    BIFF2-BIFF7: Non-empty byte string, 8-bit string length
+                    BIFF8: Non-empty Unicode string, 16-bit string length
     STYLE record for built-in cell styles, BIFF3-BIFF8:
     Offset  Size    Contents
     0       2       Bit     Mask    Contents
-                    11-0    0FFFH   Index to style XF record 
+                    11-0    0FFFH   Index to style XF record
                     15      8000H   Always 1 for built-in styles
     2       1       Identifier of the built-in cell style:
                         00H = Normal
@@ -995,29 +1047,29 @@ class StyleRecord(BiffRecord):
     cells  in  a specific outline level. The level is specified by the last
     field  in the STYLE record. Valid values are 0-6 for the outline levels
     1-7.
-    '''
+    """
     _REC_ID = 0x0293
-    
+
     def __init__(self):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = struct.pack('<HBB', 0x8000, 0x00, 0xFF)
         # TODO: implement user-defined styles???
 
 
 class PaletteRecord(BiffRecord):
-    '''
+    """
     This  record  contains  the  definition  of  all  user-defined  colours
     available for cell and object formatting.
 
     Record PALETTE, BIFF3-BIFF8:
- 
+
     Offset  Size    Contents
     0       2       Number of following colours (nm). Contains 16 in BIFF3-BIFF4 and 56 in BIFF5-BIFF8.
-    2       4*nm    List of nm RGB colours 
+    2       4*nm    List of nm RGB colours
 
     The following table shows how colour indexes are used in other records:
-    
+
     Colour index    Resulting colour or internal list index
     00H             Built-in Black (R = 00H, G = 00H, B = 00H)
     01H             Built-in White (R = FFH, G = FFH, B = FFH)
@@ -1032,13 +1084,13 @@ class PaletteRecord(BiffRecord):
 
     17H (BIFF3-BIFF4) Last user-defined colour from the PALETTE record (entry 15 or 55 from record colour list)
     3FH (BIFF5-BIFF8)
-    
+
     18H (BIFF3-BIFF4) System window text colour for border lines (used in records XF, CF, and
     40H (BIFF5-BIFF8) WINDOW2 (BIFF8 only))
-  
+
     19H (BIFF3-BIFF4) System window background colour for pattern background (used in records XF, and CF)
     41H (BIFF5-BIFF8)
-    
+
     43H             System face colour (dialogue background colour)
     4DH             System window text colour for chart border lines
     4EH             System window background colour for chart areas
@@ -1046,13 +1098,13 @@ class PaletteRecord(BiffRecord):
     50H             System ToolTip background colour (used in note objects)
     51H             System ToolTip text colour (used in note objects)
     7FFFH           System window text colour for fonts (used in records FONT, EFONT, and CF)
-    
-    '''
+
+    """
     _REC_ID = 0x0092
 
 
 class BoundSheetRecord(BiffRecord):
-    '''
+    """
     This  record  is  located  in  the workbook globals area and represents
     a  sheet  inside  of  the  workbook. For each sheet a BOUNDSHEET record
     is  written.  It  stores  the sheet name and a stream offset to the BOF
@@ -1074,9 +1126,9 @@ class BoundSheetRecord(BiffRecord):
     6       var.    Sheet name:
                         BIFF5/BIFF7: Byte string, 8-bit string length
                         BIFF8: Unicode string, 8-bit string length
-    '''
+    """
     _REC_ID = 0x0085
-    
+
     def __init__(self, stream_pos, visibility, sheetname):
         BiffRecord.__init__(self)
 
@@ -1084,10 +1136,10 @@ class BoundSheetRecord(BiffRecord):
         uusheetname_len = len(usheetname)
 
         self._rec_data = pack('<LBB%ds' % uusheetname_len, stream_pos, visibility, 0x00, usheetname)
-        
-        
+
+
 class ContinueRecord(BiffRecord):
-    '''
+    """
     Whenever  the content of a record exceeds the given limits (see table),
     the  record  must  be  split.  Several  CONTINUE records containing the
     additional data are added after the parent record.
@@ -1115,12 +1167,12 @@ class ContinueRecord(BiffRecord):
     runs cannot be split between their components (character index and FONT
     record  index).  If  a string is split between two formatting runs, the
     option flags field will not be repeated in the CONTINUE record.
-    '''
+    """
     _REC_ID = 0x003C
 
 
 class SSTRecord(BiffRecord):
-    '''
+    """
     This  record  contains  a  list  of  all  strings  used anywhere in the
     workbook.  Each string occurs only once. The workbook uses indexes into
     the list to reference the strings.
@@ -1135,12 +1187,12 @@ class SSTRecord(BiffRecord):
     of  strings  in  the  workbook.  For  instance,  the string AAA is used
     3  times  and  the string BBB is used 2 times. The first field contains
     5 and the second field contains 2, followed by the two strings.
-    '''
+    """
     _REC_ID = 0x00FC
-    
+
 
 class ExtSSTRecord(BiffRecord):
-    '''
+    """
     This  record  occurs  in  conjunction  with  the SST record. It is used
     by  Excel  to create a hash table with stream offsets to the SST record
     to optimise string search operations. Excel may not shorten this record
@@ -1158,13 +1210,13 @@ class ExtSSTRecord(BiffRecord):
                         4       2   Position of first string of the portion inside of current record,
                                     including record header. This counter restarts at zero, if the SST
                                     record is continued with a CONTINUE record.
-                        6       2   Not used    
-    '''
+                        6       2   Not used
+    """
     _REC_ID = 0x00FF
 
     def __init__(self, sst_stream_pos, str_placement, portions_len):
         BiffRecord.__init__(self)
-        
+
         extsst = {}
         abs_stream_pos = sst_stream_pos
         str_counter = 0
@@ -1178,16 +1230,16 @@ class ExtSSTRecord(BiffRecord):
             str_stream_pos = abs_stream_pos + pos_in_chunk + 4 # header
             extsst[str_counter] = (pos_in_chunk, str_stream_pos)
             str_counter += 1
-        
+
         exsst_str_count_delta = max(8, len(str_placement)*8/0x2000) # maybe smth else?
         self._rec_data = pack('<H', exsst_str_count_delta)
         str_counter = 0
         while str_counter < len(str_placement):
             self._rec_data += pack('<IHH', extsst[str_counter][1], extsst[str_counter][0], 0)
             str_counter += exsst_str_count_delta
-        
+
 class DimensionsRecord(BiffRecord):
-    '''
+    """
     Record DIMENSIONS, BIFF8:
 
     Offset  Size    Contents
@@ -1196,19 +1248,19 @@ class DimensionsRecord(BiffRecord):
     8       2       Index to first used column
     10      2       Index to last used column, increased by 1
     12      2       Not used
-    '''
+    """
     _REC_ID = 0x0200
     def __init__(self, first_used_row, last_used_row, first_used_col, last_used_col):
         BiffRecord.__init__(self)
-        
-        self._rec_data = struct.pack('<2L3H', 
-                                            first_used_row, last_used_row + 1, 
+
+        self._rec_data = struct.pack('<2L3H',
+                                            first_used_row, last_used_row + 1,
                                             first_used_col, last_used_col + 1,
                                             0x00)
 
 
 class Window2Record(BiffRecord):
-    '''
+    """
     Record WINDOW2, BIFF8:
 
     Offset  Size Contents
@@ -1242,86 +1294,155 @@ class Window2Record(BiffRecord):
     11 0800H 0 = Show in normal view 1 = Show in page break preview (BIFF8)
 
     The freeze flag specifies, if a following PANE record describes unfrozen or frozen panes.
-    '''
+    """
     _REC_ID = 0x023E
 
     def __init__(self, options, first_visible_row, first_visible_col, grid_colour, preview_magn, normal_magn):
         BiffRecord.__init__(self)
-        
-        self._rec_data = struct.pack('<7HL', options, 
-                                    first_visible_row, first_visible_col, 
-                                    grid_colour, 
-                                    0x00, 
-                                    preview_magn, normal_magn, 
+
+        self._rec_data = struct.pack('<7HL', options,
+                                    first_visible_row, first_visible_col,
+                                    grid_colour,
+                                    0x00,
+                                    preview_magn, normal_magn,
                                     0x00L)
 
+
+class PanesRecord(BiffRecord):
+    """
+    This record stores the position of window panes. It is part of the Sheet
+    View Settings Block. If the sheet does not contain any splits, this
+    record will not occur.
+    A sheet can be split in two different ways, with unfrozen panes or with
+    frozen panes. A flag in the WINDOW2 record specifies, if the panes are
+    frozen, which affects the contents of this record.
+
+    Record PANE, BIFF2-BIFF8:
+    Offset      Size        Contents
+    0           2           Position of the vertical split
+                            (px, 0 = No vertical split):
+                            Unfrozen pane: Width of the left pane(s)
+                            (in twips = 1/20 of a point)
+                            Frozen pane: Number of visible
+                            columns in left pane(s)
+    2           2           Position of the horizontal split
+                            (py, 0 = No horizontal split):
+                            Unfrozen pane: Height of the top pane(s)
+                            (in twips = 1/20 of a point)
+                            Frozen pane: Number of visible
+                            rows in top pane(s)
+    4           2           Index to first visible row
+                            in bottom pane(s)
+    6           2           Index to first visible column
+                            in right pane(s)
+    8           1           Identifier of pane with active
+                            cell cursor
+    [9]         1           Not used (BIFF5-BIFF8 only, not written
+                            in BIFF2-BIFF4)
+
+    If the panes are frozen, pane 0 is always active, regardless
+    of the cursor position. The correct identifiers for all possible
+    combinations of visible panes are shown in the following pictures.
+
+    px = 0, py = 0                  px = 0, py > 0
+    --------------------------      ------------|-------------
+    |                        |      |                        |
+    |                        |      |           3            |
+    |                        |      |                        |
+    -           3            -      --------------------------
+    |                        |      |                        |
+    |                        |      |           2            |
+    |                        |      |                        |
+    --------------------------      ------------|-------------
+
+    px > 0, py = 0                  px > 0, py > 0
+    ------------|-------------      ------------|-------------
+    |           |            |      |           |            |
+    |           |            |      |     3     |      2     |
+    |           |            |      |           |            |
+    -     3     |      1     -      --------------------------
+    |           |            |      |           |            |
+    |           |            |      |     1     |      0     |
+    |           |            |      |           |            |
+    ------------|-------------      ------------|-------------
+    """
+    _REC_ID = 0x0041
+    def __init__(self, px, py, first_row_bottom, first_col_right, active_pane):
+        BiffRecord.__init__(self)
+
+        self._rec_data = struct.pack('<5H',
+                                            px, py,
+                                            first_row_bottom, first_col_right,
+                                            active_pane)
+
+
 class RowRecord(BiffRecord):
-    '''
+    """
     This  record  contains  the properties of a single row in a sheet. Rows
     and cells in a sheet are divided into blocks of 32 rows.
 
     Record ROW, BIFF3-BIFF8:
-    
+
     Offset  Size    Contents
     0       2       Index of this row
     2       2       Index to column of the first cell which is described by a cell record
-    4       2       Index to column of the last cell which is described by a cell record, 
+    4       2       Index to column of the last cell which is described by a cell record,
                     increased by 1
     6       2       Bit     Mask    Contents
                     14-0    7FFFH   Height of the row, in twips = 1/20 of a point
                     15      8000H   0 = Row has custom height; 1 = Row has default height
     8       2       Not used
-    10      2       In BIFF3-BIFF4 this field contains a relative offset 
-                    to calculate stream position of the first cell record 
-                    for this row. In BIFF5-BIFF8 this field is not used 
+    10      2       In BIFF3-BIFF4 this field contains a relative offset
+                    to calculate stream position of the first cell record
+                    for this row. In BIFF5-BIFF8 this field is not used
                     anymore, but the DBCELL record instead.
     12      4       Option flags and default row formatting:
                     Bit     Mask        Contents
                     2-0     00000007H   Outline level of the row
-                    4       00000010H   1 = Outline group starts or ends here (depending 
-                                        on where the outline buttons are located, 
+                    4       00000010H   1 = Outline group starts or ends here (depending
+                                        on where the outline buttons are located,
                                         see WSBOOL record), and is collapsed
                     5       00000020H   1 = Row is hidden (manually, or by a filter or outline group)
                     6       00000040H   1 = Row height and default font height do not match
                     7       00000080H   1 = Row has explicit default format (fl)
                     8       00000100H   Always 1
                     27-16   0FFF0000H   If fl=1: Index to default XF record
-                    28      10000000H   1 = Additional space above the row. This flag is set, 
-                                        if the upper border of at least one cell in this row 
-                                        or if the lower border of at least one cell in the row 
-                                        above is formatted with a thick line style. 
+                    28      10000000H   1 = Additional space above the row. This flag is set,
+                                        if the upper border of at least one cell in this row
+                                        or if the lower border of at least one cell in the row
+                                        above is formatted with a thick line style.
                                         Thin and medium line styles are not taken into account.
-                    29      20000000H   1 = Additional space below the row. This flag is set, 
-                                        if the lower border of at least one cell in this row 
-                                        or if the upper border of at least one cell in the row 
-                                        below is formatted with a medium or thick line style. 
+                    29      20000000H   1 = Additional space below the row. This flag is set,
+                                        if the lower border of at least one cell in this row
+                                        or if the upper border of at least one cell in the row
+                                        below is formatted with a medium or thick line style.
                                         Thin line styles are not taken into account.
-    '''
-        
-    _REC_ID = 0x0208        
-        
+    """
+
+    _REC_ID = 0x0208
+
     def __init__(self, index, first_col, last_col, height_options, options):
         BiffRecord.__init__(self)
-        
-        self._rec_data = struct.pack('<6HL', index, first_col, last_col + 1, 
-                                        height_options, 
+
+        self._rec_data = struct.pack('<6HL', index, first_col, last_col + 1,
+                                        height_options,
                                         0x00, 0x00,
                                         options)
 
 class LabelSSTRecord(BiffRecord):
-    '''
-    This record represents a cell that contains a string. It replaces the 
+    """
+    This record represents a cell that contains a string. It replaces the
     LABEL record and RSTRING record used in BIFF2-BIFF7.
-    '''
+    """
     _REC_ID = 0x00FD
-    
+
     def __init__(self, row, col, xf_idx, sst_idx):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<3HL', row, col, xf_idx, sst_idx)
 
 
 class MergedCellsRecord(BiffRecord):
-    '''
+    """
     This record contains all merged cell ranges of the current sheet.
 
     Record MERGEDCELLS, BIFF8:
@@ -1349,7 +1470,7 @@ class MergedCellsRecord(BiffRecord):
     4       2       Index to first column
     6       2       Index to last column
 
-    '''
+    """
     _REC_ID = 0x00E5
 
     def __init__(self, merged_list):
@@ -1366,13 +1487,13 @@ class MergedCellsRecord(BiffRecord):
                 j += 1
             self._rec_data += struct.pack('<3H', self._REC_ID, len(merged) + 2, j) + \
                                     merged
-            
+
     # for some reason Excel doesn't use CONTINUE
     def get(self):
         return self._rec_data
 
 class MulBlankRecord(BiffRecord):
-    '''
+    """
     This  record  represents  a  cell  range  of empty cells. All cells are
     located in the same row.
 
@@ -1383,7 +1504,7 @@ class MulBlankRecord(BiffRecord):
     2       2       Index to first column (fc)
     4       2*nc    List of nc=lc-fc+1 16-bit indexes to XF records
     4+2*nc  2       Index to last column (lc)
-    '''            
+    """
     _REC_ID = 0x00BE
 
     def __init__(self, row, first_col, last_col, xf_index):
@@ -1391,10 +1512,10 @@ class MulBlankRecord(BiffRecord):
         blanks_count = last_col-first_col+1
         self._rec_data = struct.pack('%dH' % blanks_count, *([xf_index]*blanks_count))
         self._rec_data = struct.pack('<2H', row, first_col) +  self._rec_data + struct.pack('<H',  last_col)
-        
+
 
 class BlankRecord(BiffRecord):
-    '''
+    """
     This  record  represents  an empty cell.
 
     Record BLANK, BIFF5-BIFF8:
@@ -1403,7 +1524,7 @@ class BlankRecord(BiffRecord):
     0       2       Index to row
     2       2       Index to first column (fc)
     4       2       indexes to XF record
-    '''            
+    """
     _REC_ID = 0x0201
 
     def __init__(self, row, col, xf_index):
@@ -1412,22 +1533,22 @@ class BlankRecord(BiffRecord):
 
 
 class RKRecord(BiffRecord):
-    '''
-    This record represents a cell that contains an RK value (encoded integer or 
-    floating-point value). If a floating-point value cannot be encoded to an RK value, 
+    """
+    This record represents a cell that contains an RK value (encoded integer or
+    floating-point value). If a floating-point value cannot be encoded to an RK value,
     a NUMBER record will be written.
-    '''            
+    """
     _REC_ID = 0x027E
 
     def __init__(self, row, col, xf_index, rk_encoded):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<3HI', row, col, xf_index, rk_encoded)
 
-        
+
 class NumberRecord(BiffRecord):
-    '''
+    """
     This record represents a cell that contains an IEEE-754 floating-point value.
-    '''            
+    """
     _REC_ID = 0x0203
 
     def __init__(self, row, col, xf_index, number):
@@ -1436,13 +1557,13 @@ class NumberRecord(BiffRecord):
 
 
 class FormulaRecord(BiffRecord):
-    '''
+    """
     Offset Size Contents
     0      2    Index to row
     2      2    Index to column
-    4      2    Index to XF record 
+    4      2    Index to XF record
     6      8    Result of the formula
-    14     2    Option flags:          
+    14     2    Option flags:
                 Bit Mask    Contents
                 0   0001H   1 = Recalculate always
                 1   0002H   1 = Calculate on open
@@ -1450,36 +1571,36 @@ class FormulaRecord(BiffRecord):
     16     4    Not used
     20     var. Formula data (RPN token array)
 
-    '''
+    """
     _REC_ID = 0x0006
 
     def __init__(self, row, col, xf_index, rpn):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<3HQHL', row, col, xf_index, 0xFFFF000000000003, 0, 0) + rpn
 
-        
+
 class GutsRecord(BiffRecord):
-    '''
+    """
     This record contains information about the layout of outline symbols.
-    
+
     Record GUTS, BIFF3-BIFF8:
-    
+
     Offset  Size    Contents
     0       2       Width of the area to display row outlines (left of the sheet), in pixel
     2       2       Height of the area to display column outlines (above the sheet), in pixel
     4       2       Number of visible row outline levels (used row levels + 1; or 0, if not used)
     6       2       Number of visible column outline levels (used column levels + 1; or 0, if not used)
-    
-    '''
-    
+
+    """
+
     _REC_ID = 0x0080
-    
+
     def __init__(self, row_gut_width, col_gut_height, row_visible_levels, col_visible_levels):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<4H', row_gut_width, col_gut_height, row_visible_levels, col_visible_levels)
-        
+
 class WSBoolRecord(BiffRecord):
-    '''
+    """
     This  record stores a 16 bit value with Boolean options for the current
     sheet.  From BIFF5 on the "Save external linked values" option is moved
     to the record BOOKBOOL.
@@ -1505,7 +1626,7 @@ class WSBoolRecord(BiffRecord):
                     1 = Show row outline symbols
     11      0800H   0 = Do not show column outline symbols
                     1 = Show column outline symbols
-    13-12   3000H   These flags specify the arrangement of windows. 
+    13-12   3000H   These flags specify the arrangement of windows.
                     They are stored in BIFF4 only.
                     00 = Arrange windows tiled
                     01 = Arrange windows horizontal
@@ -1515,8 +1636,8 @@ class WSBoolRecord(BiffRecord):
                     1 = Alternative expression evaluation
     15      8000H   0 = Standard formula entries
                     1 = Alternative formula entries
-    
-    '''
+
+    """
     _REC_ID = 0x0081
 
     def __init__(self, options):
@@ -1524,213 +1645,213 @@ class WSBoolRecord(BiffRecord):
         self._rec_data = struct.pack('<H', options)
 
 class ColInfoRecord(BiffRecord):
-    '''
-    This record specifies the width for a given range of columns. 
-    If a column does not have a corresponding COLINFO record, 
-    the width specified in the record STANDARDWIDTH is used. If 
-    this record is also not present, the contents of the record 
+    """
+    This record specifies the width for a given range of columns.
+    If a column does not have a corresponding COLINFO record,
+    the width specified in the record STANDARDWIDTH is used. If
+    this record is also not present, the contents of the record
     DEFCOLWIDTH is used instead.
-    This record also specifies a default XF record to use for 
-    cells in the columns that are not described by any cell record 
-    (which contain the XF index for that cell). Additionally, 
-    the option flags field contains hidden, outline, and collapsed 
+    This record also specifies a default XF record to use for
+    cells in the columns that are not described by any cell record
+    (which contain the XF index for that cell). Additionally,
+    the option flags field contains hidden, outline, and collapsed
     options applied at the columns.
 
     Record COLINFO, BIFF3-BIFF8:
-    
+
     Offset  Size    Contents
     0       2       Index to first column in the range
     2       2       Index to last column in the range
-    4       2       Width of the columns in 1/256 of the width of the zero character, using default font 
+    4       2       Width of the columns in 1/256 of the width of the zero character, using default font
                     (first FONT record in the file)
     6       2       Index to XF record for default column formatting
-    8       2       Option flags:   
-                    Bits    Mask    Contents   
-                    0       0001H   1 = Columns are hidden    
+    8       2       Option flags:
+                    Bits    Mask    Contents
+                    0       0001H   1 = Columns are hidden
                     10-8    0700H   Outline level of the columns (0 = no outline)
                     12      1000H   1 = Columns are collapsed
     10      2       Not used
-        
-    '''
+
+    """
     _REC_ID = 0x007D
-    
+
     def __init__(self, first_col, last_col, width, xf_index, options):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<6H', first_col, last_col, width, xf_index, options, 0)
 
 class CalcModeRecord(BiffRecord):
-    '''
-    This record is part of the Calculation Settings Block. 
-    It specifies whether to calculate formulas manually, 
+    """
+    This record is part of the Calculation Settings Block.
+    It specifies whether to calculate formulas manually,
     automatically or automatically except for multiple table operations.
-    
+
     Record CALCMODE, BIFF2-BIFF8:
-    
+
     Offset  Size    Contents
     0       2       FFFFH = automatic except for multiple table operations
                     0000H = manually
-                    0001H = automatically (default)    
-    '''
+                    0001H = automatically (default)
+    """
     _REC_ID = 0x000D
-    
+
     def __init__(self, calc_mode):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<h', calc_mode)
-    
-    
+
+
 class CalcCountRecord(BiffRecord):
-    '''
-    This record is part of the Calculation Settings Block. It specifies the maximum 
-    number of times the formulas should be iteratively calculated. This is a fail-safe 
+    """
+    This record is part of the Calculation Settings Block. It specifies the maximum
+    number of times the formulas should be iteratively calculated. This is a fail-safe
     against mutually recursive formulas locking up a spreadsheet application.
 
     Record CALCCOUNT, BIFF2-BIFF8:
 
     Offset  Size    Contents
     0       2       Maximum number of iterations allowed in circular references
-    '''
-    
+    """
+
     _REC_ID = 0x000C
-    
+
     def __init__(self, calc_count):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', calc_count)
 
 class RefModeRecord(BiffRecord):
-    '''
-    This record is part of the Calculation Settings Block. 
+    """
+    This record is part of the Calculation Settings Block.
     It stores which method is used to show cell addresses in formulas.
-    The “RC” mode uses numeric indexes for rows and columns, 
+    The “RC” mode uses numeric indexes for rows and columns,
     i.e. “R(1)C(-1)”, or “R1C1:R2C2”.
-    The “A1” mode uses characters for columns and numbers for rows, 
+    The “A1” mode uses characters for columns and numbers for rows,
     i.e. “B1”, or “$A$1:$B$2”.
-    
+
     Record REFMODE, BIFF2-BIFF8:
 
     Offset  Size    Contents
     0       2       0 = RC mode; 1 = A1 mode
-    
-    '''
+
+    """
     _REC_ID = 0x00F
-    
+
     def __init__(self, ref_mode):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', ref_mode)
 
 class IterationRecord(BiffRecord):
-    '''
-    This record is part of the Calculation Settings Block. 
+    """
+    This record is part of the Calculation Settings Block.
     It stores if iterations are allowed while calculating recursive formulas.
 
     Record ITERATION, BIFF2-BIFF8:
-    
+
     Offset  Size    Contents
-    0       2       0 = Iterations off; 1 = Iterations on    
-    '''
+    0       2       0 = Iterations off; 1 = Iterations on
+    """
     _REC_ID = 0x011
-    
+
     def __init__(self, iterations_on):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', iterations_on)
 
 class DeltaRecord(BiffRecord):
-    '''
-    This record is part of the Calculation Settings Block. 
+    """
+    This record is part of the Calculation Settings Block.
     It stores the maximum change of the result to exit an iteration.
-    
+
     Record DELTA, BIFF2-BIFF8:
-    
+
     Offset  Size    Contents
-    0       8       Maximum change in iteration 
-                    (IEEE 754 floating-point value, 
-                     64bit double precision)    
-    '''
+    0       8       Maximum change in iteration
+                    (IEEE 754 floating-point value,
+                     64bit double precision)
+    """
     _REC_ID = 0x010
-    
+
     def __init__(self, delta):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<d', delta)
-    
+
 class SaveRecalcRecord(BiffRecord):
-    '''
-    This record is part of the Calculation Settings Block. 
-    It contains the “Recalculate before save” option in 
+    """
+    This record is part of the Calculation Settings Block.
+    It contains the “Recalculate before save” option in
     Excel's calculation settings dialogue.
-    
+
     Record SAVERECALC, BIFF3-BIFF8:
-    
+
     Offset  Size    Contents
-    0       2       0 = Do not recalculate; 
+    0       2       0 = Do not recalculate;
                     1 = Recalculate before saving the document
-    
-    '''
+
+    """
     _REC_ID = 0x05F
-    
+
     def __init__(self, recalc):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', recalc)
-    
+
 class PrintHeadersRecord(BiffRecord):
-    '''
-    This record stores if the row and column headers 
+    """
+    This record stores if the row and column headers
     (the areas with row numbers and column letters) will be printed.
 
     Record PRINTHEADERS, BIFF2-BIFF8:
-    
+
     Offset  Size    Contents
-    0       2       0 = Do not print row/column headers; 
-                    1 = Print row/column headers    
-    '''
+    0       2       0 = Do not print row/column headers;
+                    1 = Print row/column headers
+    """
     _REC_ID = 0x02A
-    
+
     def __init__(self, print_headers):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', print_headers)
-    
+
 
 class PrintGridLinesRecord(BiffRecord):
-    '''
+    """
     This record stores if sheet grid lines will be printed.
-    
+
     Record PRINTGRIDLINES, BIFF2-BIFF8:
-    
+
     Offset  Size    Contents
-    0       2       0 = Do not print sheet grid lines; 
+    0       2       0 = Do not print sheet grid lines;
                     1 = Print sheet grid lines
-    
-    '''
+
+    """
     _REC_ID = 0x02B
-    
+
     def __init__(self, print_grid):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', print_grid)
-    
+
 
 class GridSetRecord(BiffRecord):
-    '''
-    This record specifies if the option to print sheet grid lines 
+    """
+    This record specifies if the option to print sheet grid lines
     (record PRINTGRIDLINES) has ever been changed.
 
     Record GRIDSET, BIFF3-BIFF8:
 
     Offset  Size    Contents
     0       2       0 = Print grid lines option never changed
-                    1 = Print grid lines option changed    
-    '''
+                    1 = Print grid lines option changed
+    """
     _REC_ID = 0x082
-    
+
     def __init__(self, print_grid_changed):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', print_grid_changed)
-    
+
 
 class DefaultRowHeight(BiffRecord):
-    '''
-    This record specifies the default height and default flags 
+    """
+    This record specifies the default height and default flags
     for rows that do not have a corresponding ROW record.
 
     Record DEFAULTROWHEIGHT, BIFF3-BIFF8:
-    
+
     Offset  Size    Contents
     0       2       Option flags:
                     Bit Mask    Contents
@@ -1739,54 +1860,54 @@ class DefaultRowHeight(BiffRecord):
                     2   0004H   1 = Additional space above the row
                     3   0008H   1 = Additional space below the row
     2       2       Default height for unused rows, in twips = 1/20 of a point
-    
-    '''
+
+    """
     _REC_ID = 0x0225
-    
+
     def __init__(self, options, def_height):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<2H', options, def_height)
-    
+
 
 class DefColWidthRecord(BiffRecord):
-    '''
-    This record specifies the default column width for columns that 
-    do not have a specific width set using the record COLINFO or COLWIDTH. 
+    """
+    This record specifies the default column width for columns that
+    do not have a specific width set using the record COLINFO or COLWIDTH.
     This record has no effect, if a STANDARDWIDTH record is present in the file.
-    
+
     Record DEFCOLWIDTH, BIFF2-BIFF8:
-    
+
     Offset  Size    Contents
-    0       2       Column width in characters, using the width of the zero 
-                    character from default font (first FONT record in the file)    
-    '''
+    0       2       Column width in characters, using the width of the zero
+                    character from default font (first FONT record in the file)
+    """
     _REC_ID = 0x0055
-    
+
     def __init__(self, def_width):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', options, def_width)
-        
+
 class HorizontalPageBreaksRecord(BiffRecord):
-    '''
+    """
     This  record  is  part  of  the  Page  Settings  Block. It contains all
     horizontal manual page breaks.
 
     Record HORIZONTALPAGEBREAKS, BIFF8:
     Offset  Size  Contents
     0       2     Number of following row index structures (nm)
-    2       6nm   List of nm row index structures. Each row index 
+    2       6nm   List of nm row index structures. Each row index
                   structure contains:
                     Offset  Size    Contents
                     0       2       Index to first row below the page break
                     2       2       Index to first column of this page break
                     4       2       Index to last column of this page break
 
-    The row indexes in the lists must be ordered ascending. 
-    If in BIFF8 a row contains several page breaks, they must be ordered 
+    The row indexes in the lists must be ordered ascending.
+    If in BIFF8 a row contains several page breaks, they must be ordered
     ascending by start column index.
-    '''
+    """
     _REC_ID = 0x001B
-    
+
     def __init__(self, breaks_list):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', len(breaks_list))
@@ -1794,27 +1915,27 @@ class HorizontalPageBreaksRecord(BiffRecord):
             self._rec_data += struct.pack('<3H', r, c1, c2)
 
 class VerticalPageBreaksRecord(BiffRecord):
-    '''
+    """
     This  record  is  part  of  the  Page  Settings  Block. It contains all
     vertical manual page breaks.
 
     Record VERTICALPAGEBREAKS, BIFF8:
     Offset  Size  Contents
     0       2     Number of following column index structures (nm)
-    2       6nm   List of nm column index structures. Each column index 
+    2       6nm   List of nm column index structures. Each column index
                   structure contains:
                     Offset  Size    Contents
-                    0       2       Index to first column following the page 
+                    0       2       Index to first column following the page
                                     break
                     2       2       Index to first row of this page break
                     4       2       Index to last row of this page break
 
-    The column indexes in the lists must be ordered ascending. 
-    If in BIFF8 a column contains several page breaks, they must be ordered 
+    The column indexes in the lists must be ordered ascending.
+    If in BIFF8 a column contains several page breaks, they must be ordered
     ascending by start row index.
-    '''
+    """
     _REC_ID = 0x001A
-    
+
     def __init__(self, breaks_list):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', len(breaks_list))
@@ -1822,7 +1943,7 @@ class VerticalPageBreaksRecord(BiffRecord):
             self._rec_data += struct.pack('<3H', r, c1, c2)
 
 class HeaderRecord(BiffRecord):
-    '''
+    """
     This record is part of the Page Settings Block. It specifies the
     page  header  string  for  the current worksheet. If this record is not
     present  or  completely  empty  (record  size is 0), the sheet does not
@@ -1831,7 +1952,7 @@ class HeaderRecord(BiffRecord):
     Record HEADER for non-empty page header, BIFF2-BIFF8:
     Offset      Size    Contents
     0           var.    Page header string
-                        BIFF2-BIFF7:    Non-empty byte string, 8bit string 
+                        BIFF2-BIFF7:    Non-empty byte string, 8bit string
                         length
                         BIFF8: Non-empty Unicode string, 16bit string length
     The  header  string may contain special commands, i.e. placeholders for
@@ -1848,7 +1969,7 @@ class HeaderRecord(BiffRecord):
 
     The following table shows all available commands:
 
-    Command         Contents    
+    Command         Contents
     &&              The "&" character itself
     &L              Start of the left section
     &C              Start of the centred section
@@ -1870,37 +1991,37 @@ class HeaderRecord(BiffRecord):
     &Y              Subscript on/off (BIFF5-BIFF8)
     &"<fontname>"   Set new font <fontname>
     &"<fontname>,<fontstyle>"
-                    Set new font with specified style <fontstyle>. 
-                    The style <fontstyle> is in most cases one of 
-                    "Regular", "Bold", "Italic", or "Bold Italic". 
-                    But this setting is dependent on the used font, 
-                    it may differ (localised style names, or "Standard", 
+                    Set new font with specified style <fontstyle>.
+                    The style <fontstyle> is in most cases one of
+                    "Regular", "Bold", "Italic", or "Bold Italic".
+                    But this setting is dependent on the used font,
+                    it may differ (localised style names, or "Standard",
                     "Oblique", ...). (BIFF5-BIFF8)
-    &<fontheight>   Set font height in points (<fontheight> is a decimal value). 
-                    If this command is followed by a plain number to be printed 
-                    in the header, it will be separated from the font height 
+    &<fontheight>   Set font height in points (<fontheight> is a decimal value).
+                    If this command is followed by a plain number to be printed
+                    in the header, it will be separated from the font height
                     with a space character.
 
-    '''
+    """
     _REC_ID = 0x0014
-    
+
     def __init__(self, header_str):
         BiffRecord.__init__(self)
         self._rec_data = upack2(header_str)
 
 class FooterRecord(BiffRecord):
-    '''
+    """
     Semantic is equal to HEADER record
-    '''
+    """
     _REC_ID = 0x0015
-    
+
     def __init__(self, footer_str):
         BiffRecord.__init__(self)
         self._rec_data = upack2(footer_str)
 
 
 class HCenterRecord(BiffRecord):
-    '''
+    """
     This  record  is  part  of the Page Settings Block. It specifies if the
     sheet is centred horizontally when printed.
 
@@ -1910,16 +2031,16 @@ class HCenterRecord(BiffRecord):
     0       2       0 = Print sheet left aligned
                     1 = Print sheet centred horizontally
 
-    '''
+    """
     _REC_ID = 0x0083
-    
+
     def __init__(self, is_horz_center):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', is_horz_center)
 
 
 class VCenterRecord(BiffRecord):
-    '''
+    """
     This  record  is  part  of the Page Settings Block. It specifies if the
     sheet is centred vertically when printed.
 
@@ -1929,84 +2050,84 @@ class VCenterRecord(BiffRecord):
     0       2       0 = Print sheet aligned at top page border
                     1 = Print sheet vertically centred
 
-    '''
+    """
     _REC_ID = 0x0084
-    
+
     def __init__(self, is_vert_center):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<H', is_vert_center)
 
 
 class LeftMarginRecord(BiffRecord):
-    '''
+    """
     This  record  is  part of the Page Settings Block. It contains the left
     page margin of the current worksheet.
 
     Record LEFTMARGIN, BIFF2-BIFF8:
 
     Offset  Size    Contents
-    0       8       Left page margin in inches 
+    0       8       Left page margin in inches
                     (IEEE 754 floating-point value, 64bit double precision)
 
-    '''
+    """
     _REC_ID = 0x0026
-    
+
     def __init__(self, margin):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<d', margin)
 
 
 class RightMarginRecord(BiffRecord):
-    '''
+    """
     This  record  is  part of the Page Settings Block. It contains the right
     page margin of the current worksheet.
 
     Offset  Size    Contents
-    0       8       Right page margin in inches 
+    0       8       Right page margin in inches
                     (IEEE 754 floating-point value, 64?bit double precision)
 
-    '''
+    """
     _REC_ID = 0x0027
-    
+
     def __init__(self, margin):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<d', margin)
 
 class TopMarginRecord(BiffRecord):
-    '''
+    """
     This  record  is  part of the Page Settings Block. It contains the top
     page margin of the current worksheet.
 
     Offset  Size    Contents
-    0       8       Top page margin in inches 
+    0       8       Top page margin in inches
                     (IEEE 754 floating-point value, 64?bit double precision)
 
-    '''
+    """
     _REC_ID = 0x0028
-    
+
     def __init__(self, margin):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<d', margin)
 
 
 class BottomMarginRecord(BiffRecord):
-    '''
+    """
     This  record  is  part of the Page Settings Block. It contains the bottom
     page margin of the current worksheet.
 
     Offset  Size    Contents
-    0       8       Bottom page margin in inches 
+    0       8       Bottom page margin in inches
                     (IEEE 754 floating-point value, 64?bit double precision)
 
-    '''
+    """
     _REC_ID = 0x0029
-    
+
     def __init__(self, margin):
         BiffRecord.__init__(self)
         self._rec_data = struct.pack('<d', margin)
 
 class SetupPageRecord(BiffRecord):
-    '''
+    """
     This   record   is  part of the Page Settings Block. It stores the page
     format   settings   of   the  current sheet. The pages may be scaled in
     percent   or  by  using  an  absolute  number of pages. This setting is
@@ -2021,9 +2142,9 @@ class SetupPageRecord(BiffRecord):
     0           2       Paper size (see below)
     2           2       Scaling factor in percent
     4           2       Start page number
-    6           2       Fit worksheet width to this number of pages 
+    6           2       Fit worksheet width to this number of pages
                         (0 = use as many as needed)
-    8           2       Fit worksheet height to this number of pages 
+    8           2       Fit worksheet height to this number of pages
                         (0 = use as many as needed)
     10          2       Option flags:
                         Bit     Mask        Contents
@@ -2031,9 +2152,9 @@ class SetupPageRecord(BiffRecord):
                                             1 = Print pages in rows
                         1       0002H       0 = Landscape
                                             1 = Portrait
-                        2       0004H       1 = Paper size, scaling factor, 
-                                            paper orientation (portrait/landscape), 
-                                            print resolution and number of copies 
+                        2       0004H       1 = Paper size, scaling factor,
+                                            paper orientation (portrait/landscape),
+                                            print resolution and number of copies
                                             are not initialised
                         3       0008H       0 = Print coloured
                                             1 = Print black and white
@@ -2042,7 +2163,7 @@ class SetupPageRecord(BiffRecord):
                         5       0020H       0 = Do not print cell notes
                                             1 = Print cell notes
                         6       0040H       0 = Paper orientation setting is valid
-                                            1 = Paper orientation setting not 
+                                            1 = Paper orientation setting not
                                             initialised
                         7       0080H       0 = Automatic page numbers
                                             1 = Use start page number
@@ -2055,9 +2176,9 @@ class SetupPageRecord(BiffRecord):
                                             11 = Print errors as "#N/A!"
     12          2       Print resolution in dpi
     14          2       Vertical print resolution in dpi
-    16          8       Header margin (IEEE 754 floating-point value, 
+    16          8       Header margin (IEEE 754 floating-point value,
                         64bit double precision)
-    24          8       Footer margin (IEEE 754 floating-point value, 
+    24          8       Footer margin (IEEE 754 floating-point value,
                         64bit double precision)
     32          2       Number of copies to print
 
@@ -2065,7 +2186,7 @@ class SetupPageRecord(BiffRecord):
     PAPER TYPES:
 
     Index   Paper type              Paper size
-    0       Undefined   
+    0       Undefined
     1       Letter                  8 1/2" x 11"
     2       Letter small            8 1/2" x 11"
     3       Tabloid                 11" x 17"
@@ -2113,8 +2234,8 @@ class SetupPageRecord(BiffRecord):
     45      10x11                   10" x 11"
     46      15x11                   15" x 11"
     47      Envelope Invite         220mm x 220mm
-    48      Undefined   
-    49      Undefined   
+    48      Undefined
+    49      Undefined
     50      Letter Extra            9 1/2" x 12"
     51      Legal Extra             9 1/2" x 15"
     52      Tabloid Extra           11 11/16" x 18"
@@ -2136,10 +2257,10 @@ class SetupPageRecord(BiffRecord):
     68      A3 Extra Transverse     322mm x 445mm
     69      Dbl. Japanese Postcard  200mm x 148mm
     70      A6                      105mm x 148mm
-    71      
-    72      
-    73      
-    74      
+    71
+    72
+    73
+    74
     75      Letter Rotated          11" x 8 1/2"
     76      A3 Rotated              420mm x 297mm
     77      A4 Rotated              297mm x 210mm
@@ -2149,23 +2270,23 @@ class SetupPageRecord(BiffRecord):
     81      Japanese Postcard Rot.  148mm x 100mm
     82      Dbl. Jap. Postcard Rot. 148mm x 200mm
     83      A6 Rotated              148mm x 105mm
-    84      
-    85      
-    86      
-    87      
+    84
+    85
+    86
+    87
     88      B6 (JIS)                128mm x 182mm
     89      B6 (JIS) Rotated        182mm x 128mm
     90      12x11                   12" x 11"
 
-    '''
+    """
     _REC_ID = 0x00A1
-    def __init__(self, paper, scaling, start_num, fit_width_to, fit_height_to, 
+    def __init__(self, paper, scaling, start_num, fit_width_to, fit_height_to,
                     options,
                     hres, vres,
                     header_margin, footer_margin,
                     num_copies):
         BiffRecord.__init__(self)
-        
+
         self._rec_data = struct.pack('<8H2dH', paper, scaling, start_num,
                                         fit_width_to, fit_height_to, \
                                         options,

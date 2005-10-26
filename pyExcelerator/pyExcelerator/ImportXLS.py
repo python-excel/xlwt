@@ -45,7 +45,8 @@ __rev_id__ = """$Id$"""
 
 import UnicodeUtils
 import CompoundDoc
-import struct
+import ExcelMagic
+from struct import pack, unpack
 
 
 def parse_xls(filename, encoding = None):
@@ -53,11 +54,11 @@ def parse_xls(filename, encoding = None):
     ##########################################################################
 
     def process_BOUNDSHEET(biff8, rec_data):
-        sheet_stream_pos, visibility, sheet_type = struct.unpack('<I2B', rec_data[:6])
+        sheet_stream_pos, visibility, sheet_type = unpack('<I2B', rec_data[:6])
         sheet_name = rec_data[6:]
 
         if biff8:
-            chars_num, options = struct.unpack('2B', sheet_name[:2])
+            chars_num, options = unpack('2B', sheet_name[:2])
             
             chars_start = 2
             runs_num = 0
@@ -70,10 +71,10 @@ def parse_xls(filename, encoding = None):
             has_format_runs = (options & 0x08) != 0
 
             if has_format_runs:
-                runs_num , = struct.unpack('<H', sheet_name[chars_start:chars_start+2])
+                runs_num , = unpack('<H', sheet_name[chars_start:chars_start+2])
                 chars_start += 2
             if has_asian_phonetic:
-                asian_phonetic_size , = struct.unpack('<I', sheet_name[chars_start:chars_start+4])
+                asian_phonetic_size , = unpack('<I', sheet_name[chars_start:chars_start+4])
                 chars_start += 4
 
             if compressed:
@@ -90,13 +91,9 @@ def parse_xls(filename, encoding = None):
         return result
 
 
-    def process_LABEL(biff8, rec_data):
-        row_idx, col_idx, xf_idx = struct.unpack('<3H', rec_data[:6])
-
-        label_name = rec_data[6:]
-
+    def unpack2str(biff8, label_name): # 2 bytes length str
         if biff8:
-            chars_num, options = struct.unpack('<HB', label_name[:3])
+            chars_num, options = unpack('<HB', label_name[:3])
             
             chars_start = 3
             runs_num = 0
@@ -109,10 +106,10 @@ def parse_xls(filename, encoding = None):
             has_format_runs = (options & 0x08) != 0
 
             if has_format_runs:
-                runs_num , = struct.unpack('<H', label_name[chars_start:chars_start+2])
+                runs_num , = unpack('<H', label_name[chars_start:chars_start+2])
                 chars_start += 2
             if has_asian_phonetic:
-                asian_phonetic_size , = struct.unpack('<I', label_name[chars_start:chars_start+4])
+                asian_phonetic_size , = unpack('<I', label_name[chars_start:chars_start+4])
                 chars_start += 4
 
             if compressed:
@@ -126,11 +123,18 @@ def parse_xls(filename, encoding = None):
         else:
             result = label_name[2:].decode(encoding, 'replace')
 
+        return result
+
+
+    def process_LABEL(biff8, rec_data):
+        row_idx, col_idx, xf_idx = unpack('<3H', rec_data[:6])
+        label_name = rec_data[6:]
+        result = unpack2str(biff8, label_name)
         return (row_idx, col_idx, result)
 
 
     def process_LABELSST(rec_data):
-        row_idx, col_idx, xf_idx, sst_idx = struct.unpack('<3HI', rec_data)
+        row_idx, col_idx, xf_idx, sst_idx = unpack('<3HI', rec_data)
         return (row_idx, col_idx, sst_idx)
 
 
@@ -138,23 +142,23 @@ def parse_xls(filename, encoding = None):
         if biff8:
             return process_LABEL(biff8, rec_data)
         else:
-            row_idx, col_idx, xf_idx, length = struct.unpack('<4H', rec_data[:8])
+            row_idx, col_idx, xf_idx, length = unpack('<4H', rec_data[:8])
             result = rec_data[8:8+length].decode(encoding, 'replace')
 
         return (row_idx, col_idx, result)
         
 
     def decode_rk(encoded):
-        b0, b1, b2, b3 = struct.unpack('4B', encoded)
+        b0, b1, b2, b3 = unpack('4B', encoded)
         is_multed_100 = (b0 & 0x01) != 0
         is_integer = (b0 & 0x02) != 0
 
         if is_integer:
-            result , = struct.unpack('<i', encoded)
+            result , = unpack('<i', encoded)
             result >>= 2
         else:
             ieee754 = struct.pack('8B', 0, 0, 0, 0, b0 & 0xFC, b1, b2, b3)
-            result , = struct.unpack('<d', ieee754)
+            result , = unpack('<d', ieee754)
         if is_multed_100:
             result /= 100.0
         
@@ -162,32 +166,32 @@ def parse_xls(filename, encoding = None):
 
 
     def process_RK(rec_data):
-        row_idx, col_idx, xf_idx, encoded = struct.unpack('<3H4s', rec_data)
+        row_idx, col_idx, xf_idx, encoded = unpack('<3H4s', rec_data)
         result = decode_rk(encoded)
         return (row_idx, col_idx, result)
 
 
     def process_MULRK(rec_data):
-        row_idx, first_col_idx = struct.unpack('<2H', rec_data[:4])
-        last_col_idx , = struct.unpack('<H', rec_data[-2:])
+        row_idx, first_col_idx = unpack('<2H', rec_data[:4])
+        last_col_idx , = unpack('<H', rec_data[-2:])
         xf_rk_num = last_col_idx - first_col_idx + 1
 
         results = []
         for i in range(xf_rk_num):
-            xf_idx, encoded = struct.unpack('<H4s', rec_data[4+6*i : 4+6*(i+1)])
+            xf_idx, encoded = unpack('<H4s', rec_data[4+6*i : 4+6*(i+1)])
             results.append(decode_rk(encoded))
 
         return zip([row_idx]*xf_rk_num, range(first_col_idx, last_col_idx+1), results)
 
 
     def process_NUMBER(rec_data):
-        row_idx, col_idx, xf_idx, result = struct.unpack('<3Hd', rec_data)
+        row_idx, col_idx, xf_idx, result = unpack('<3Hd', rec_data)
         return (row_idx, col_idx, result)
 
     
     def process_SST(rec_data, sst_continues):
         # 0x00FC
-        total_refs, total_str = struct.unpack('<2I', rec_data[:8])
+        total_refs, total_str = unpack('<2I', rec_data[:8])
         #print total_refs, str_num
 
         pos = 8
@@ -202,7 +206,7 @@ def parse_xls(filename, encoding = None):
                 curr_block = sst_continues[curr_block_num]
                 pos = 0
 
-            chars_num, options = struct.unpack('<HB', curr_block[pos:pos+3])
+            chars_num, options = unpack('<HB', curr_block[pos:pos+3])
             #print chars_num, options
             pos += 3
 
@@ -211,10 +215,10 @@ def parse_xls(filename, encoding = None):
             has_asian_phonetic = (options & 0x04) != 0
             has_format_runs = (options & 0x08) != 0
             if has_format_runs:
-                runs_num , = struct.unpack('<H', curr_block[pos:pos+2])
+                runs_num , = unpack('<H', curr_block[pos:pos+2])
                 pos += 2
             if has_asian_phonetic:
-                asian_phonetic_size , = struct.unpack('<I', curr_block[pos:pos+4])
+                asian_phonetic_size , = unpack('<I', curr_block[pos:pos+4])
                 pos += 4
 
             curr_char = 0
@@ -320,7 +324,7 @@ def parse_xls(filename, encoding = None):
 
     # Inside MS Office document looks like filesystem
     # We need extract stream named 'Workbook' or 'Book'
-    ole_streams = CompoundDoc.get_ole_streams(filename)
+    ole_streams = CompoundDoc.Reader(filename).STREAMS
 
     if 'Workbook' in ole_streams:
         workbook_stream = ole_streams['Workbook']
@@ -337,7 +341,7 @@ def parse_xls(filename, encoding = None):
     # In addition, if record size grows to some limit
     # Excel writes CONTINUE records
     while stream_pos < workbook_stream_len and EOFs <= ws_num:
-        rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+        rec_id, data_size = unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
         stream_pos += 4
         
         rec_data = workbook_stream[stream_pos:stream_pos+data_size]
@@ -346,7 +350,7 @@ def parse_xls(filename, encoding = None):
         if rec_id == 0x0809: # BOF
             #print 'BOF', 
             BOFs += 1
-            ver, substream_type = struct.unpack('<2H', rec_data[:4])
+            ver, substream_type = unpack('<2H', rec_data[:4])
             if substream_type == 0x0005:
                 # workbook global substream
                 biff8 = ver >= 0x0600
@@ -355,12 +359,12 @@ def parse_xls(filename, encoding = None):
                 pass
             else: # skip chart stream or unknown stream
             # stream offsets may be used from BOUNDSHEET record
-                rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+                rec_id, data_size = unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
                 while rec_id != 0x000A: # EOF
                     #print 'SST CONTINUE'
                     stream_pos += 4
                     stream_pos += data_size
-                    rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+                    rec_id, data_size = unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
             #print 'BIFF8 == ', biff8
         elif rec_id == 0x000A: # EOF
             #print 'EOF'
@@ -369,7 +373,7 @@ def parse_xls(filename, encoding = None):
                 values = {}
             EOFs += 1
         elif rec_id == 0x0042: # CODEPAGE
-            cp ,  = struct.unpack('<H', rec_data)
+            cp ,  = unpack('<H', rec_data)
             #print 'CODEPAGE', hex(cp)
             if not encoding:
                 encoding = encodings[cp]
@@ -384,14 +388,14 @@ def parse_xls(filename, encoding = None):
             #print 'SST'
             sst_data = rec_data
             sst_continues = []
-            rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+            rec_id, data_size = unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
             while rec_id == 0x003C: # CONTINUE
                 #print 'SST CONTINUE'
                 stream_pos += 4
                 rec_data = workbook_stream[stream_pos:stream_pos+data_size]
                 sst_continues.extend([rec_data])
                 stream_pos += data_size
-                rec_id, data_size = struct.unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+                rec_id, data_size = unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
             SST = process_SST(sst_data, sst_continues)
         elif rec_id == 0x00FD: # LABELSST
             #print 'LABELSST',
@@ -423,6 +427,50 @@ def parse_xls(filename, encoding = None):
             r, c, b = process_NUMBER(rec_data)
             values[(r, c)] = b
             #print r, c, b
+        elif rec_id == 0x0006: # FORMULA
+            #print 'FORMULA',
+            r, c, x = unpack('<3H', rec_data[0:6])
+            if rec_data[12] == '\xFF' and rec_data[13] == '\xFF':
+                if rec_data[6] == '\x00':
+                    got_str = False
+                    if ord(rec_data[14]) & 8:
+                        # part of shared formula
+                        rec_id, data_size = unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+                        stream_pos += 4                      
+                        rec_data = workbook_stream[stream_pos:stream_pos+data_size]
+                        stream_pos += data_size
+                        if rec_id == 0x0207: # STRING
+                            got_str = True
+                        elif rec_id not in (0x0221, 0x04BC, 0x0236, 0x0037, 0x0036):
+                            raise Exception("Expected ARRAY, SHRFMLA, TABLEOP* or STRING record")
+                    if not got_str:
+                        rec_id, data_size = unpack('<2H', workbook_stream[stream_pos:stream_pos+4])
+                        stream_pos += 4                      
+                        rec_data = workbook_stream[stream_pos:stream_pos+data_size]
+                        stream_pos += data_size
+                        if rec_id != 0x0207: # STRING
+                            raise Exception("Expected STRING record")
+                    values[(r, c)] = unpack2str(biff8, rec_data)
+                elif rec_data[6] == '\x01':
+                    # boolean 
+                    v = ord(rec_data[8])
+                    values[(r, c)] = bool(v)
+                elif rec_data[6] == '\x02':
+                    # error
+                    v = ord(rec_data[8])
+                    if v in ExcelMagic.error_msg_by_code:
+                        values[(r, c)] = ExcelMagic.error_msg_by_code[v]
+                    else:
+                        values[(r, c)] = u'#UNKNOWN ERROR!'
+                elif rec_data[6] == '\x03':
+                    # empty
+                    values[(r, c)] = u''
+                else:
+                    raise Exception("Unknown value for formula result")
+            else:
+                # 64-bit float
+                d, = unpack("<d", rec_data[6:14])
+                values[(r, c)] = d
 
     encoding = None
     return zip(sheet_names, sheets)

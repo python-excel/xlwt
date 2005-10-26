@@ -27,6 +27,11 @@ ws.write(2, 2, Formula("A3*B3"))
 ws.write(3, 2, Formula("A4*B4*sin(pi()/4)"))
 ws.write(4, 2, Formula("A5%*B5*pi()/1000"))
 
+##############
+## NOTE: parameters are separated by semicolon!!!
+##############
+
+
 ws.write(5, 2, Formula("C1+C2+C3+C4+C5/(C1+C2+C3+C4/(C1+C2+C3+C4/(C1+C2+C3+C4)+C5)+C5)-20.3e-2"))
 ws.write(5, 3, Formula("C1^2"))
 ws.write(6, 2, Formula("SUM(C1;C2;;;;;C3;;;C4)"))

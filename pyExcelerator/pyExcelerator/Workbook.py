@@ -100,6 +100,7 @@ class Workbook(object):
         self.__owner = 'None'       
         self.__country_code = 0x07 
         self.__wnd_protect = 0
+        self.__obj_protect = 0
         self.__protect = 0        
         self.__backup_on_save = 0
         # for WINDOW1 record
@@ -162,6 +163,17 @@ class Workbook(object):
         return bool(self.__wnd_protect)
 
     wnd_protect = property(get_wnd_protect, set_wnd_protect)
+
+    #################################################################
+
+    @accepts(object, bool)
+    def set_obj_protect(self, value):
+        self.__obj_protect = int(value)
+
+    def get_obj_protect(self):
+        return bool(self.__obj_protect)
+
+    obj_protect = property(get_obj_protect, set_obj_protect)
 
     #################################################################
 
@@ -387,6 +399,9 @@ class Workbook(object):
     def __wnd_protect_rec(self):
         return BIFFRecords.WindowProtectRecord(self.__wnd_protect).get()
 
+    def __obj_protect_rec(self):
+        return BIFFRecords.ObjectProtectRecord(self.__obj_protect).get()
+
     def __protect_rec(self):
         return BIFFRecords.ProtectRecord(self.__protect).get()
 
@@ -502,6 +517,7 @@ class Workbook(object):
         before += self.__fngroupcount_rec()
         before += self.__wnd_protect_rec()
         before += self.__protect_rec()
+        before += self.__obj_protect_rec()
         before += self.__password_rec()
         before += self.__prot4rev_rec()
         before += self.__prot4rev_pass_rec()
