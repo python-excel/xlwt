@@ -1048,3 +1048,14 @@ PtgNames = {
     ptgRefErr3dA   : "ptgRefErr3dA",
     ptgAreaErr3dA  : "ptgAreaErr3dA"
 }
+
+
+error_msg_by_code = {
+    0x00: u"#NULL!",  # intersection of two cell ranges is empty
+    0x07: u"#DIV/0!", # division by zero
+    0x0F: u"#VALUE!", # wrong type of operand
+    0x17: u"#REF!",   # illegal or deleted cell reference
+    0x1D: u"#NAME?",  # wrong function or range name
+    0x24: u"#NUM!",   # value range overflow
+    0x2A: u"#N/A!"    # argument or function not available
+}

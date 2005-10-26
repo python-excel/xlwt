@@ -51,3 +51,18 @@
 ---------
     * fixed: exception when reading OLE2 files with incorrect SSAT
       (sector ids points to nonexistense sectors)
+
+0.6.3a (25.10.2005)
+---------
+    * slightly new algorithm for reading OLE2 files. I hope it is
+      more robust
+    * splitting and frozing
+    * worksheet protection
+    * protection password
+    * workbook protection
+    * new example: protection.py, hyperlinks.py, panes.py
+    * extracting formula results
+    * speed optmizations(for example, benchmark big-35Mb.py runs about 
+      20-30% faster)
+    * updated THANKS file
+    * xls2csv, xls2txt, xls2html now resides in ./tools
