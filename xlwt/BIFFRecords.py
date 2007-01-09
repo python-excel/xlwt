@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: cp1252 -*-
+# -*- coding: cp1251 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -41,6 +41,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2001-01-10 SJM RK record struct.pack format changed I to i (signed)
 
 from struct import pack
 from UnicodeUtils import *
@@ -1542,7 +1543,7 @@ class RKRecord(BiffRecord):
 
     def __init__(self, row, col, xf_index, rk_encoded):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<3HI', row, col, xf_index, rk_encoded)
+        self._rec_data = struct.pack('<3Hi', row, col, xf_index, rk_encoded)
 
 
 class NumberRecord(BiffRecord):
