@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: ascii -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -48,15 +48,15 @@ DESCRIPTION = \
 'generating Excel 97+ files; importing Excel 95+ files; Excel files dumper; OLE2 files dumper; xls2txt, xls2csv, xls2html'
 
 LONG_DESCRIPTION = \
-'''pyExcelerator  is a   library  for  generating  Excel  97/2000/XP/2003  and
-OpenOffice    Calc   compatible     spreadsheets.     pyExcelerator     has
+'''xlwt  is a   library  for  generating  Excel  97/2000/XP/2003  and
+OpenOffice    Calc   compatible     spreadsheets.     xlwt     has
 full-blown   support   for  UNICODE  in Excel and Calc spreadsheets, allows
 using variety of formatting features,   provides   interface   to  printing
-options   of   Excel   and OpenOffice  Calc.  pyExcelerator  contains  also
+options   of   Excel   and OpenOffice  Calc.  xlwt  contains  also
 Excel BIFF8 dumper and MS compound  documents  dumper.  Main  advantage  is
 possibility  of generating Excel  spreadsheets  without  COM  servers.  The
-only requirement -- Python 2.4b2 or higher.
-From version 0.5 pyExcelerator can import data from Excel spreadsheets.'''
+only requirement -- Python 2.4 or higher.
+'''
 
 CLASSIFIERS = \
 [
@@ -74,8 +74,9 @@ CLASSIFIERS = \
 KEYWORDS = \
 'xls openoffice excel spreadsheet workbook database table unicode'
 
-setup(name = 'pyExcelerator',
-      version = '0.6.3a',
+setup(name = 'xlwt',
+      version = '0.7.0a',
+      #### fix me ###
       author = 'Roman V. Kiseliov',
       author_email = 'roman@kiseliov.ru',
       url = 'http://sourceforge.net/projects/pyexcelerator/',
@@ -84,7 +85,7 @@ setup(name = 'pyExcelerator',
       long_description = LONG_DESCRIPTION,
       license = 'BSD',
       platforms = 'Platform Independent',
-      packages = ['pyExcelerator'],
+      packages = ['xlwt'],
       keywords = KEYWORDS,
       classifiers = CLASSIFIERS
       )

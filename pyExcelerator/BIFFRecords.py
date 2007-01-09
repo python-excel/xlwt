@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: cp1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -489,7 +489,7 @@ class CountryRecord(BiffRecord):
     7   Russia
     """
 
-    _REC_ID = 0x00DA
+    _REC_ID = 0x008C
 
     def __init__(self, ui_id, sys_settings_id):
         BiffRecord.__init__(self)
@@ -500,7 +500,7 @@ class CountryRecord(BiffRecord):
 class UseSelfsRecord(BiffRecord):
     """
     This  record  specifies if the formulas in the workbook can use natural
-    language  formulas”.  This  type  of  formula can refer to cells by its
+    language  formulas.  This  type  of  formula can refer to cells by its
     content or the content of the column or row header cell.
 
     Record USESELFS, BIFF8:

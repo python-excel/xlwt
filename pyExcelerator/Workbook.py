@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -98,7 +98,7 @@ class Workbook(object):
     @accepts(object)
     def __init__(self):
         self.__owner = 'None'       
-        self.__country_code = 0x07 
+        self.__country_code = None # 0x07 is Russia :-)
         self.__wnd_protect = 0
         self.__obj_protect = 0
         self.__protect = 0        
@@ -438,6 +438,8 @@ class Workbook(object):
         return BIFFRecords.CodepageBiff8Record().get()
         
     def __country_rec(self):
+        if not self.__country_code:
+            return ''
         return BIFFRecords.CountryRecord(self.__country_code, self.__country_code).get()
         
     def __dsf_rec(self):

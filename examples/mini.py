@@ -4,8 +4,8 @@
 __rev_id__ = """$Id$"""
 
 
-from pyExcelerator import *
+from xlwt import *
 
 w = Workbook()
-ws = w.add_sheet('Hey, Dude')
+ws = w.add_sheet('xlwt was here')
 w.save('mini.xls')
