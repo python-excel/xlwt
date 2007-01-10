@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -42,6 +42,8 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-10 SJM Added set_style() method
+
 
 from BIFFRecords import ColInfoRecord
 from Deco import *
@@ -61,6 +63,8 @@ class Column(object):
         self.level = 0
         self.collapse = 0
 
+    def set_style(self, style):
+        self._xf_index = self._parent_wb.add_style(style)
 
     def get_biff_record(self):
         options =  (self.hidden & 0x01) << 0

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -46,24 +46,34 @@ __rev_id__ = """$Id$"""
 import Formatting
 from BIFFRecords import *
 
-
-_default_num_format = 'general'
-_default_font = Formatting.Font()
-_default_alignment = Formatting.Alignment()
-_default_borders = Formatting.Borders()
-_default_pattern = Formatting.Pattern()
-_default_protection = Formatting.Protection()
+if 0:
+    _default_num_format = 'general'
+    _default_font = Formatting.Font()
+    _default_alignment = Formatting.Alignment()
+    _default_borders = Formatting.Borders()
+    _default_pattern = Formatting.Pattern()
+    _default_protection = Formatting.Protection()
 
 class XFStyle(object):
     
     def __init__(self):
-        self.num_format_str  = _default_num_format
-        self.font            = _default_font 
-        self.alignment       = _default_alignment
-        self.borders         = _default_borders
-        self.pattern         = _default_pattern 
-        self.protection      = _default_protection
-
+        if 0:
+            self.num_format_str  = _default_num_format
+            self.font            = _default_font 
+            self.alignment       = _default_alignment
+            self.borders         = _default_borders
+            self.pattern         = _default_pattern 
+            self.protection      = _default_protection
+        else:
+            self.num_format_str  = 'General'
+            self.font            = Formatting.Font() 
+            self.alignment       = Formatting.Alignment()
+            self.borders         = Formatting.Borders()
+            self.pattern         = Formatting.Pattern()
+            self.protection      = Formatting.Protection()
+            
+default_style = XFStyle()            
+            
 class StyleCollection(object):
     _std_num_fmt_list = [
             'general',

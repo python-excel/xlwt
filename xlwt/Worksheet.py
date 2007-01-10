@@ -92,7 +92,7 @@ class Worksheet(object):
     #################################################################
     ## Constructor
     #################################################################
-    @accepts(object, (str, unicode), Workbook)
+    # @accepts(object, (str, unicode), Workbook)
     def __init__(self, sheetname, parent_book):
         import Row
         self.Row = Row.Row
@@ -198,7 +198,7 @@ class Worksheet(object):
     ## Properties, "getters", "setters"
     #################################################################
 
-    @accepts(object, (str, unicode))
+    # @accepts(object, (str, unicode))
     def set_name(self, value):
         self.__name = value
 
@@ -244,7 +244,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_formulas(self, value):
         self.__show_formulas = int(value)
 
@@ -255,7 +255,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_grid(self, value):
         self.__show_grid = int(value)
 
@@ -266,7 +266,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_headers(self, value):
         self.__show_headers = int(value)
 
@@ -277,7 +277,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_panes_frozen(self, value):
         self.__panes_frozen = int(value)
 
@@ -288,7 +288,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_empty_as_zero(self, value):
         self.__show_empty_as_zero = int(value)
 
@@ -299,7 +299,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_auto_colour_grid(self, value):
         self.__auto_colour_grid = int(value)
 
@@ -310,7 +310,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_cols_right_to_left(self, value):
         self.__cols_right_to_left = int(value)
 
@@ -321,7 +321,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_outline(self, value):
         self.__show_outline = int(value)
 
@@ -332,7 +332,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_remove_splits(self, value):
         self.__remove_splits = int(value)
 
@@ -343,7 +343,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_selected(self, value):
         self.__selected = int(value)
 
@@ -354,7 +354,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_hidden(self, value):
         self.__hidden = int(value)
 
@@ -365,7 +365,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_page_preview(self, value):
         self.__page_preview = int(value)
 
@@ -376,7 +376,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_first_visible_row(self, value):
         self.__first_visible_row = value
 
@@ -387,7 +387,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_first_visible_col(self, value):
         self.__first_visible_col = value
 
@@ -398,7 +398,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_grid_colour(self, value):
         self.__grid_colour = value
 
@@ -409,7 +409,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_preview_magn(self, value):
         self.__preview_magn = value
 
@@ -420,7 +420,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_normal_magn(self, value):
         self.__normal_magn = value
 
@@ -431,7 +431,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_vert_split_pos(self, value):
         self.__vert_split_pos = abs(value)
 
@@ -442,7 +442,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_horz_split_pos(self, value):
         self.__horz_split_pos = abs(value)
 
@@ -453,7 +453,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_vert_split_first_visible(self, value):
         self.__vert_split_first_visible = abs(value)
 
@@ -464,7 +464,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_horz_split_first_visible(self, value):
         self.__horz_split_first_visible = abs(value)
 
@@ -508,7 +508,7 @@ class Worksheet(object):
     #
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_auto_page_breaks(self, value):
         self.__show_auto_page_breaks = int(value)
 
@@ -519,7 +519,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_dialogue_sheet(self, value):
         self.__dialogue_sheet = int(value)
 
@@ -530,7 +530,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_auto_style_outline(self, value):
         self.__auto_style_outline = int(value)
 
@@ -541,7 +541,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_outline_below(self, value):
         self.__outline_below = int(value)
 
@@ -552,7 +552,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_outline_right(self, value):
         self.__outline_right = int(value)
 
@@ -563,7 +563,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_fit_num_pages(self, value):
         self.__fit_num_pages = value
 
@@ -574,7 +574,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_row_outline(self, value):
         self.__show_row_outline = int(value)
 
@@ -585,7 +585,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_show_col_outline(self, value):
         self.__show_col_outline = int(value)
 
@@ -596,7 +596,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_alt_expr_eval(self, value):
         self.__alt_expr_eval = int(value)
 
@@ -607,7 +607,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_alt_formula_entries(self, value):
         self.__alt_formula_entries = int(value)
 
@@ -618,7 +618,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_row_default_height(self, value):
         self.__row_default_height = value
 
@@ -629,7 +629,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_col_default_width(self, value):
         self.__col_default_width = value
 
@@ -640,7 +640,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_calc_mode(self, value):
         self.__calc_mode = value & 0x03
 
@@ -651,7 +651,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_calc_count(self, value):
         self.__calc_count = value
 
@@ -662,7 +662,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_RC_ref_mode(self, value):
         self.__RC_ref_mode = int(value)
 
@@ -673,7 +673,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_iterations_on(self, value):
         self.__iterations_on = int(value)
 
@@ -684,7 +684,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, float)
+    # @accepts(object, float)
     def set_delta(self, value):
         self.__delta = value
 
@@ -695,7 +695,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_save_recalc(self, value):
         self.__save_recalc = int(value)
 
@@ -706,7 +706,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_headers(self, value):
         self.__print_headers = int(value)
 
@@ -717,7 +717,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_grid(self, value):
         self.__print_grid = int(value)
 
@@ -739,7 +739,7 @@ class Worksheet(object):
     #
     #################################################################
 
-    @accepts(object, list)
+    # @accepts(object, list)
     def set_vert_page_breaks(self, value):
         self.__vert_page_breaks = value
 
@@ -750,7 +750,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, list)
+    # @accepts(object, list)
     def set_horz_page_breaks(self, value):
         self.__horz_page_breaks = value
 
@@ -761,7 +761,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, (str, unicode))
+    # @accepts(object, (str, unicode))
     def set_header_str(self, value):
         self.__header_str = value
 
@@ -772,7 +772,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, (str, unicode))
+    # @accepts(object, (str, unicode))
     def set_footer_str(self, value):
         self.__footer_str = value
 
@@ -783,7 +783,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_centered_vert(self, value):
         self.__print_centered_vert = int(value)
 
@@ -794,7 +794,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_centered_horz(self, value):
         self.__print_centered_horz = int(value)
 
@@ -805,7 +805,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, float)
+    # @accepts(object, float)
     def set_left_margin(self, value):
         self.__left_margin = value
 
@@ -816,7 +816,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, float)
+    # @accepts(object, float)
     def set_right_margin(self, value):
         self.__right_margin = value
 
@@ -827,7 +827,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, float)
+    # @accepts(object, float)
     def set_top_margin(self, value):
         self.__top_margin = value
 
@@ -838,7 +838,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, float)
+    # @accepts(object, float)
     def set_bottom_margin(self, value):
         self.__bottom_margin = value
 
@@ -849,7 +849,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_paper_size_code(self, value):
         self.__paper_size_code = value
 
@@ -860,7 +860,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_print_scaling(self, value):
         self.__print_scaling = value
 
@@ -871,7 +871,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_start_page_number(self, value):
         self.__start_page_number = value
 
@@ -882,7 +882,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_fit_width_to_pages(self, value):
         self.__fit_width_to_pages = value
 
@@ -893,7 +893,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_fit_height_to_pages(self, value):
         self.__fit_height_to_pages = value
 
@@ -904,7 +904,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_in_rows(self, value):
         self.__print_in_rows = int(value)
 
@@ -915,7 +915,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_portrait(self, value):
         self.__portrait = int(value)
 
@@ -926,7 +926,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_colour(self, value):
         self.__print_not_colour = int(not value)
 
@@ -937,7 +937,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_draft(self, value):
         self.__print_draft = int(value)
 
@@ -948,7 +948,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_notes(self, value):
         self.__print_notes = int(value)
 
@@ -959,7 +959,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_notes_at_end(self, value):
         self.__print_notes_at_end = int(value)
 
@@ -970,7 +970,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_print_omit_errors(self, value):
         self.__print_omit_errors = int(value)
 
@@ -981,7 +981,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_print_hres(self, value):
         self.__print_hres = value
 
@@ -992,7 +992,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_print_vres(self, value):
         self.__print_vres = value
 
@@ -1003,7 +1003,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, float)
+    # @accepts(object, float)
     def set_header_margin(self, value):
         self.__header_margin = value
 
@@ -1014,7 +1014,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, float)
+    # @accepts(object, float)
     def set_footer_margin(self, value):
         self.__footer_margin = value
 
@@ -1025,7 +1025,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_copies_num(self, value):
         self.__copies_num = value
 
@@ -1036,7 +1036,7 @@ class Worksheet(object):
 
     ##################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_wnd_protect(self, value):
         self.__wnd_protect = int(value)
 
@@ -1047,7 +1047,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_obj_protect(self, value):
         self.__obj_protect = int(value)
 
@@ -1058,7 +1058,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_protect(self, value):
         self.__protect = int(value)
 
@@ -1069,7 +1069,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_scen_protect(self, value):
         self.__scen_protect = int(value)
 
@@ -1080,7 +1080,7 @@ class Worksheet(object):
 
     #################################################################
 
-    @accepts(object, str)
+    # @accepts(object, str)
     def set_password(self, value):
         self.__password = value
 
@@ -1096,7 +1096,7 @@ class Worksheet(object):
     def get_parent(self):
         return self.__parent
 
-    def write(self, r, c, label="", style=Style.XFStyle()):
+    def write(self, r, c, label="", style=Style.default_style):
         self.row(r).write(c, label, style)
 
     if 0: # old 
@@ -1113,7 +1113,7 @@ class Worksheet(object):
             
     else:
 
-        def merge(self, r1, r2, c1, c2, style=Style.XFStyle()):
+        def merge(self, r1, r2, c1, c2, style=Style.default_style):
             # Stand-alone merge of previously written cells.
             # Problems: (1) style to be used should be existing style of
             # the top-left cell, not an arg.
@@ -1130,7 +1130,7 @@ class Worksheet(object):
                 self.row(r).write_blanks(c1, c2,  style)
             self.__merged_ranges.append((r1, r2, c1, c2))
 
-        def write_merge(self, r1, r2, c1, c2, label="", style=Style.XFStyle()):
+        def write_merge(self, r1, r2, c1, c2, label="", style=Style.default_style):
             self.write(r1, c1, label, style)
             self.row(r1).write_blanks(c1 + 1, c2,  style) # skip (r1, c1)
             for r in range(r1+1, r2+1):
