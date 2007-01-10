@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -77,6 +77,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-10 SJM Improvements & comments on merged cells.
 
 import BIFFRecords
 import Bitmap
@@ -1098,15 +1099,44 @@ class Worksheet(object):
     def write(self, r, c, label="", style=Style.XFStyle()):
         self.row(r).write(c, label, style)
 
-    def merge(self, r1, r2, c1, c2, style=Style.XFStyle()):
-        self.row(r1).write_blanks(c1, c2,  style)
-        for r in range(r1+1, r2+1):
-            self.row(r).write_blanks(c1, c2,  style)
-        self.__merged_ranges.append((r1, r2, c1, c2))
+    if 0: # old 
+    
+        def merge(self, r1, r2, c1, c2, style=Style.XFStyle()):
+            self.row(r1).write_blanks(c1, c2,  style)
+            for r in range(r1+1, r2+1):
+                self.row(r).write_blanks(c1, c2,  style)
+            self.__merged_ranges.append((r1, r2, c1, c2))
 
-    def write_merge(self, r1, r2, c1, c2, label="", style=Style.XFStyle()):
-        self.merge(r1, r2, c1, c2, style)
-        self.write(r1, c1,  label, style)
+        def write_merge(self, r1, r2, c1, c2, label="", style=Style.XFStyle()):
+            self.merge(r1, r2, c1, c2, style)
+            self.write(r1, c1,  label, style)
+            
+    else:
+
+        def merge(self, r1, r2, c1, c2, style=Style.XFStyle()):
+            # Stand-alone merge of previously written cells.
+            # Problems: (1) style to be used should be existing style of
+            # the top-left cell, not an arg.
+            # (2) should ensure that any previous data value in
+            # non-top-left cells is nobbled.
+            # Note: if a cell is set by a data record then later
+            # is referenced by a [MUL]BLANK record, Excel will blank
+            # out the cell on the screen, but OOo & Gnu will not
+            # blank it out. Need to do something better than writing
+            # multiple records. In the meantime, avoid this method and use 
+            # write_merge() instead.
+            self.row(r1).write_blanks(c1 + 1, c2,  style)
+            for r in range(r1+1, r2+1):
+                self.row(r).write_blanks(c1, c2,  style)
+            self.__merged_ranges.append((r1, r2, c1, c2))
+
+        def write_merge(self, r1, r2, c1, c2, label="", style=Style.XFStyle()):
+            self.write(r1, c1, label, style)
+            self.row(r1).write_blanks(c1 + 1, c2,  style) # skip (r1, c1)
+            for r in range(r1+1, r2+1):
+                self.row(r).write_blanks(c1, c2,  style)
+            self.__merged_ranges.append((r1, r2, c1, c2))
+    
 
     def insert_bitmap(self, filename, row, col, x = 0, y = 0, scale_x = 1, scale_y = 1):
         bmp = Bitmap.ImDataBmpRecord(filename)
