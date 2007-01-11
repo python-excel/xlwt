@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: cp1251 -*-
+# -*- coding: cp1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -41,10 +41,11 @@
 
 __rev_id__ = """$Id$"""
 
-# 2001-01-10 SJM RK record struct.pack format changed I to i (signed)
+# 2007-01-11 SJM (1) s/struct.pack/pack/ (2) fix name of DefaultRowHeightRecord
+# 2007-01-10 SJM RK record pack format changed I to i (signed)
 
 from struct import pack
-from UnicodeUtils import *
+from UnicodeUtils import upack1, upack2
 import sys
 
 class SharedStringTable(object):
@@ -955,31 +956,31 @@ class XFRecord(BiffRecord):
         BiffRecord.__init__(self)
 
         font_xf_idx, fmt_str_xf_idx, alignment, borders, pattern, protection = xf
-        fnt = struct.pack('<H', font_xf_idx)
-        fmt = struct.pack('<H', fmt_str_xf_idx)
+        fnt = pack('<H', font_xf_idx)
+        fmt = pack('<H', fmt_str_xf_idx)
         if xftype == 'cell':
-            prt = struct.pack('<H',
+            prt = pack('<H',
                 ((protection.cell_locked    & 0x01) << 0) |
                 ((protection.formula_hidden & 0x01) << 1)
             )
         else:
-            prt = struct.pack('<H', 0xFFF5)
-        aln = struct.pack('B',
+            prt = pack('<H', 0xFFF5)
+        aln = pack('B',
             ((alignment.horz & 0x07) << 0) |
             ((alignment.wrap & 0x01) << 3) |
             ((alignment.vert & 0x07) << 4)
         )
-        rot = struct.pack('B', alignment.rota)
-        txt = struct.pack('B',
+        rot = pack('B', alignment.rota)
+        txt = pack('B',
             ((alignment.inde & 0x0F) << 0) |
             ((alignment.shri & 0x01) << 4) |
             ((alignment.merg & 0x01) << 5) |
             ((alignment.dire & 0x03) << 6)
         )
         if xftype == 'cell':
-            used_attr = struct.pack('B', 0xF8)
+            used_attr = pack('B', 0xF8)
         else:
-            used_attr = struct.pack('B', 0xF4)
+            used_attr = pack('B', 0xF4)
 
         if borders.left == borders.NO_LINE:
             borders.left_colour = 0x00
@@ -991,7 +992,7 @@ class XFRecord(BiffRecord):
             borders.bottom_colour = 0x00
         if borders.diag == borders.NO_LINE:
             borders.diag_colour = 0x00
-        brd1 = struct.pack('<L',
+        brd1 = pack('<L',
             ((borders.left          & 0x0F) << 0 ) |
             ((borders.right         & 0x0F) << 4 ) |
             ((borders.top           & 0x0F) << 8 ) |
@@ -1001,14 +1002,14 @@ class XFRecord(BiffRecord):
             ((borders.need_diag1    & 0x01) << 30) |
             ((borders.need_diag2    & 0x01) << 31)
         )
-        brd2 = struct.pack('<L',
+        brd2 = pack('<L',
             ((borders.top_colour    & 0x7F) << 0 ) |
             ((borders.bottom_colour & 0x7F) << 7 ) |
             ((borders.diag_colour   & 0x7F) << 14) |
             ((borders.diag          & 0x0F) << 21) |
             ((pattern.pattern       & 0x0F) << 26)
         )
-        pat = struct.pack('<H',
+        pat = pack('<H',
             ((pattern.pattern_fore_colour & 0x7F) << 0 ) |
             ((pattern.pattern_back_colour & 0x7F) << 7 )
         )
@@ -1054,7 +1055,7 @@ class StyleRecord(BiffRecord):
     def __init__(self):
         BiffRecord.__init__(self)
 
-        self._rec_data = struct.pack('<HBB', 0x8000, 0x00, 0xFF)
+        self._rec_data = pack('<HBB', 0x8000, 0x00, 0xFF)
         # TODO: implement user-defined styles???
 
 
@@ -1254,7 +1255,7 @@ class DimensionsRecord(BiffRecord):
     def __init__(self, first_used_row, last_used_row, first_used_col, last_used_col):
         BiffRecord.__init__(self)
 
-        self._rec_data = struct.pack('<2L3H',
+        self._rec_data = pack('<2L3H',
                                             first_used_row, last_used_row + 1,
                                             first_used_col, last_used_col + 1,
                                             0x00)
@@ -1301,7 +1302,7 @@ class Window2Record(BiffRecord):
     def __init__(self, options, first_visible_row, first_visible_col, grid_colour, preview_magn, normal_magn):
         BiffRecord.__init__(self)
 
-        self._rec_data = struct.pack('<7HL', options,
+        self._rec_data = pack('<7HL', options,
                                     first_visible_row, first_visible_col,
                                     grid_colour,
                                     0x00,
@@ -1371,7 +1372,7 @@ class PanesRecord(BiffRecord):
     def __init__(self, px, py, first_row_bottom, first_col_right, active_pane):
         BiffRecord.__init__(self)
 
-        self._rec_data = struct.pack('<5H',
+        self._rec_data = pack('<5H',
                                             px, py,
                                             first_row_bottom, first_col_right,
                                             active_pane)
@@ -1425,7 +1426,7 @@ class RowRecord(BiffRecord):
     def __init__(self, index, first_col, last_col, height_options, options):
         BiffRecord.__init__(self)
 
-        self._rec_data = struct.pack('<6HL', index, first_col, last_col + 1,
+        self._rec_data = pack('<6HL', index, first_col, last_col + 1,
                                         height_options,
                                         0x00, 0x00,
                                         options)
@@ -1439,7 +1440,7 @@ class LabelSSTRecord(BiffRecord):
 
     def __init__(self, row, col, xf_idx, sst_idx):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<3HL', row, col, xf_idx, sst_idx)
+        self._rec_data = pack('<3HL', row, col, xf_idx, sst_idx)
 
 
 class MergedCellsRecord(BiffRecord):
@@ -1483,10 +1484,10 @@ class MergedCellsRecord(BiffRecord):
             merged = ''
             while (i >= 0) and (j < 0x403):
                 r1, r2, c1, c2 = merged_list[i]
-                merged += struct.pack('<4H', r1, r2, c1, c2)
+                merged += pack('<4H', r1, r2, c1, c2)
                 i -= 1
                 j += 1
-            self._rec_data += struct.pack('<3H', self._REC_ID, len(merged) + 2, j) + \
+            self._rec_data += pack('<3H', self._REC_ID, len(merged) + 2, j) + \
                                     merged
 
     # for some reason Excel doesn't use CONTINUE
@@ -1511,8 +1512,8 @@ class MulBlankRecord(BiffRecord):
     def __init__(self, row, first_col, last_col, xf_index):
         BiffRecord.__init__(self)
         blanks_count = last_col-first_col+1
-        self._rec_data = struct.pack('%dH' % blanks_count, *([xf_index]*blanks_count))
-        self._rec_data = struct.pack('<2H', row, first_col) +  self._rec_data + struct.pack('<H',  last_col)
+        self._rec_data = pack('%dH' % blanks_count, *([xf_index]*blanks_count))
+        self._rec_data = pack('<2H', row, first_col) +  self._rec_data + pack('<H',  last_col)
 
 
 class BlankRecord(BiffRecord):
@@ -1530,7 +1531,7 @@ class BlankRecord(BiffRecord):
 
     def __init__(self, row, col, xf_index):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<3H', row, col, xf_index)
+        self._rec_data = pack('<3H', row, col, xf_index)
 
 
 class RKRecord(BiffRecord):
@@ -1543,7 +1544,7 @@ class RKRecord(BiffRecord):
 
     def __init__(self, row, col, xf_index, rk_encoded):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<3Hi', row, col, xf_index, rk_encoded)
+        self._rec_data = pack('<3Hi', row, col, xf_index, rk_encoded)
 
 
 class NumberRecord(BiffRecord):
@@ -1554,7 +1555,7 @@ class NumberRecord(BiffRecord):
 
     def __init__(self, row, col, xf_index, number):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<3Hd', row, col, xf_index, number)
+        self._rec_data = pack('<3Hd', row, col, xf_index, number)
 
 
 class FormulaRecord(BiffRecord):
@@ -1577,7 +1578,7 @@ class FormulaRecord(BiffRecord):
 
     def __init__(self, row, col, xf_index, rpn):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<3HQHL', row, col, xf_index, 0xFFFF000000000003, 0, 0) + rpn
+        self._rec_data = pack('<3HQHL', row, col, xf_index, 0xFFFF000000000003, 0, 0) + rpn
 
 
 class GutsRecord(BiffRecord):
@@ -1598,7 +1599,7 @@ class GutsRecord(BiffRecord):
 
     def __init__(self, row_gut_width, col_gut_height, row_visible_levels, col_visible_levels):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<4H', row_gut_width, col_gut_height, row_visible_levels, col_visible_levels)
+        self._rec_data = pack('<4H', row_gut_width, col_gut_height, row_visible_levels, col_visible_levels)
 
 class WSBoolRecord(BiffRecord):
     """
@@ -1643,7 +1644,7 @@ class WSBoolRecord(BiffRecord):
 
     def __init__(self, options):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', options)
+        self._rec_data = pack('<H', options)
 
 class ColInfoRecord(BiffRecord):
     """
@@ -1678,7 +1679,7 @@ class ColInfoRecord(BiffRecord):
 
     def __init__(self, first_col, last_col, width, xf_index, options):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<6H', first_col, last_col, width, xf_index, options, 0)
+        self._rec_data = pack('<6H', first_col, last_col, width, xf_index, options, 0)
 
 class CalcModeRecord(BiffRecord):
     """
@@ -1697,7 +1698,7 @@ class CalcModeRecord(BiffRecord):
 
     def __init__(self, calc_mode):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<h', calc_mode)
+        self._rec_data = pack('<h', calc_mode)
 
 
 class CalcCountRecord(BiffRecord):
@@ -1716,7 +1717,7 @@ class CalcCountRecord(BiffRecord):
 
     def __init__(self, calc_count):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', calc_count)
+        self._rec_data = pack('<H', calc_count)
 
 class RefModeRecord(BiffRecord):
     """
@@ -1737,7 +1738,7 @@ class RefModeRecord(BiffRecord):
 
     def __init__(self, ref_mode):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', ref_mode)
+        self._rec_data = pack('<H', ref_mode)
 
 class IterationRecord(BiffRecord):
     """
@@ -1753,7 +1754,7 @@ class IterationRecord(BiffRecord):
 
     def __init__(self, iterations_on):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', iterations_on)
+        self._rec_data = pack('<H', iterations_on)
 
 class DeltaRecord(BiffRecord):
     """
@@ -1771,7 +1772,7 @@ class DeltaRecord(BiffRecord):
 
     def __init__(self, delta):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<d', delta)
+        self._rec_data = pack('<d', delta)
 
 class SaveRecalcRecord(BiffRecord):
     """
@@ -1790,7 +1791,7 @@ class SaveRecalcRecord(BiffRecord):
 
     def __init__(self, recalc):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', recalc)
+        self._rec_data = pack('<H', recalc)
 
 class PrintHeadersRecord(BiffRecord):
     """
@@ -1807,7 +1808,7 @@ class PrintHeadersRecord(BiffRecord):
 
     def __init__(self, print_headers):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', print_headers)
+        self._rec_data = pack('<H', print_headers)
 
 
 class PrintGridLinesRecord(BiffRecord):
@@ -1825,7 +1826,7 @@ class PrintGridLinesRecord(BiffRecord):
 
     def __init__(self, print_grid):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', print_grid)
+        self._rec_data = pack('<H', print_grid)
 
 
 class GridSetRecord(BiffRecord):
@@ -1843,10 +1844,10 @@ class GridSetRecord(BiffRecord):
 
     def __init__(self, print_grid_changed):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', print_grid_changed)
+        self._rec_data = pack('<H', print_grid_changed)
 
 
-class DefaultRowHeight(BiffRecord):
+class DefaultRowHeightRecord(BiffRecord):
     """
     This record specifies the default height and default flags
     for rows that do not have a corresponding ROW record.
@@ -1867,7 +1868,7 @@ class DefaultRowHeight(BiffRecord):
 
     def __init__(self, options, def_height):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<2H', options, def_height)
+        self._rec_data = pack('<2H', options, def_height)
 
 
 class DefColWidthRecord(BiffRecord):
@@ -1886,7 +1887,7 @@ class DefColWidthRecord(BiffRecord):
 
     def __init__(self, def_width):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', options, def_width)
+        self._rec_data = pack('<H', options, def_width)
 
 class HorizontalPageBreaksRecord(BiffRecord):
     """
@@ -1911,9 +1912,9 @@ class HorizontalPageBreaksRecord(BiffRecord):
 
     def __init__(self, breaks_list):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', len(breaks_list))
+        self._rec_data = pack('<H', len(breaks_list))
         for r, c1, c2 in breaks_list:
-            self._rec_data += struct.pack('<3H', r, c1, c2)
+            self._rec_data += pack('<3H', r, c1, c2)
 
 class VerticalPageBreaksRecord(BiffRecord):
     """
@@ -1939,9 +1940,9 @@ class VerticalPageBreaksRecord(BiffRecord):
 
     def __init__(self, breaks_list):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', len(breaks_list))
+        self._rec_data = pack('<H', len(breaks_list))
         for r, c1, c2 in breaks_list:
-            self._rec_data += struct.pack('<3H', r, c1, c2)
+            self._rec_data += pack('<3H', r, c1, c2)
 
 class HeaderRecord(BiffRecord):
     """
@@ -2037,7 +2038,7 @@ class HCenterRecord(BiffRecord):
 
     def __init__(self, is_horz_center):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', is_horz_center)
+        self._rec_data = pack('<H', is_horz_center)
 
 
 class VCenterRecord(BiffRecord):
@@ -2056,7 +2057,7 @@ class VCenterRecord(BiffRecord):
 
     def __init__(self, is_vert_center):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<H', is_vert_center)
+        self._rec_data = pack('<H', is_vert_center)
 
 
 class LeftMarginRecord(BiffRecord):
@@ -2075,7 +2076,7 @@ class LeftMarginRecord(BiffRecord):
 
     def __init__(self, margin):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<d', margin)
+        self._rec_data = pack('<d', margin)
 
 
 class RightMarginRecord(BiffRecord):
@@ -2092,7 +2093,7 @@ class RightMarginRecord(BiffRecord):
 
     def __init__(self, margin):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<d', margin)
+        self._rec_data = pack('<d', margin)
 
 class TopMarginRecord(BiffRecord):
     """
@@ -2108,7 +2109,7 @@ class TopMarginRecord(BiffRecord):
 
     def __init__(self, margin):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<d', margin)
+        self._rec_data = pack('<d', margin)
 
 
 class BottomMarginRecord(BiffRecord):
@@ -2125,7 +2126,7 @@ class BottomMarginRecord(BiffRecord):
 
     def __init__(self, margin):
         BiffRecord.__init__(self)
-        self._rec_data = struct.pack('<d', margin)
+        self._rec_data = pack('<d', margin)
 
 class SetupPageRecord(BiffRecord):
     """
@@ -2288,7 +2289,7 @@ class SetupPageRecord(BiffRecord):
                     num_copies):
         BiffRecord.__init__(self)
 
-        self._rec_data = struct.pack('<8H2dH', paper, scaling, start_num,
+        self._rec_data = pack('<8H2dH', paper, scaling, start_num,
                                         fit_width_to, fit_height_to, \
                                         options,
                                         hres, vres,

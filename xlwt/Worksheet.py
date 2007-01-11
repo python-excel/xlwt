@@ -77,6 +77,9 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-11 SJM Fixes for row height mismatch
+# 2007-01-11 SJM Fixes for sheet visibility
+# 2007-01-11 SJM Commented out @accepts
 # 2007-01-10 SJM Improvements & comments on merged cells.
 
 import BIFFRecords
@@ -118,7 +121,13 @@ class Worksheet(object):
         self.__show_outline = 1
         self.__remove_splits = 0
         self.__selected = 0
-        self.__hidden = 0
+        # RED HERRING ALERT: "sheet_visible" is a clone of the "selected" attribute.
+        # Typically a workbook created by the Excel UI will have one sheet
+        # (the sheet that was selected when the user saved it)
+        # with both bits set to 1, and all other sheets will have both 
+        # bits set to 0. The true visibility of the sheet is found in the "visibility" 
+        # attribute obtained from the BOUNDSHEET record.
+        self.__sheet_visible = 0 
         self.__page_preview = 0
 
         self.__first_visible_row = 0
@@ -126,6 +135,8 @@ class Worksheet(object):
         self.__grid_colour = 0x40
         self.__preview_magn = 0
         self.__normal_magn = 0
+        
+        self.visibility = 0 # from/to BOUNDSHEET record.
 
         self.__vert_split_pos = None
         self.__horz_split_pos = None
@@ -148,6 +159,11 @@ class Worksheet(object):
         self.__alt_formula_entries = 0
 
         self.__row_default_height = 0x00FF
+        self.row_default_height_mismatch = 0
+        self.row_default_hidden = 0
+        self.row_default_space_above = 0
+        self.row_default_space_below = 0
+        
         self.__col_default_width = 0x0008
 
         self.__calc_mode = 1
@@ -355,13 +371,13 @@ class Worksheet(object):
     #################################################################
 
     # @accepts(object, bool)
-    def set_hidden(self, value):
-        self.__hidden = int(value)
+    def set_sheet_visible(self, value):
+        self.__sheet_visible = int(value)
 
-    def get_hidden(self):
-        return bool(self.__hidden)
+    def get_sheet_visible(self):
+        return bool(self.__sheet_visible)
 
-    hidden = property(get_hidden, set_hidden)
+    sheet_visible = property(get_sheet_visible, set_sheet_visible)
 
     #################################################################
 
@@ -475,7 +491,7 @@ class Worksheet(object):
 
     #################################################################
 
-    #@accepts(object, int)
+    ## @accepts(object, int)
     #def set_split_active_pane(self, value):
     #    self.__split_active_pane = abs(value) & 0x03
     #
@@ -486,7 +502,7 @@ class Worksheet(object):
 
     #################################################################
 
-    #@accepts(object, int)
+    ## @accepts(object, int)
     #def set_row_gut_width(self, value):
     #    self.__row_gut_width = value
     #
@@ -497,7 +513,7 @@ class Worksheet(object):
     #
     #################################################################
     #
-    #@accepts(object, int)
+    ## @accepts(object, int)
     #def set_col_gut_height(self, value):
     #    self.__col_gut_height = value
     #
@@ -728,7 +744,7 @@ class Worksheet(object):
 
     #################################################################
     #
-    #@accepts(object, bool)
+    ## @accepts(object, bool)
     #def set_grid_set(self, value):
     #    self.__grid_set = int(value)
     #
@@ -1190,6 +1206,15 @@ class Worksheet(object):
 
         return BIFFRecords.GutsRecord(self.__row_gut_width, self.__col_gut_height, row_visible_levels, col_visible_levels).get()
 
+    def __defaultrowheight_rec(self):
+        options = 0x0000
+        options |= (self.row_default_height_mismatch & 1) << 0
+        options |= (self.row_default_hidden & 1) << 1
+        options |= (self.row_default_space_above & 1) << 2
+        options |= (self.row_default_space_below & 1) << 3
+        defht = self.__row_default_height
+        return BIFFRecords.DefaultRowHeightRecord(options, defht).get()
+
     def __wsbool_rec(self):
         options = 0x00
         options |= (self.__show_auto_page_breaks & 0x01) << 0
@@ -1246,7 +1271,7 @@ class Worksheet(object):
         options |= (self.__show_outline         & 0x01) << 7
         options |= (self.__remove_splits        & 0x01) << 8
         options |= (self.__selected             & 0x01) << 9
-        options |= (self.__hidden               & 0x01) << 10
+        options |= (self.__sheet_visible        & 0x01) << 10
         options |= (self.__page_preview         & 0x01) << 11
 
         return BIFFRecords.Window2Record(options, self.__first_visible_row, self.__first_visible_col,
@@ -1379,6 +1404,7 @@ class Worksheet(object):
         result += self.__bof_rec()
         result += self.__calc_settings_rec()
         result += self.__guts_rec()
+        result += self.__defaultrowheight_rec()
         result += self.__wsbool_rec()
         result += self.__colinfo_rec()
         result += self.__dimensions_rec()

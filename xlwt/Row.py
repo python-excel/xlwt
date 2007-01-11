@@ -42,6 +42,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-11 SJM Fixes for row height mismatch flag
 # 2007-01-10 SJM Added new set_cell_xxxxx APIs.
 # 2007-01-10 SJM Removed methods from __slots__
 
@@ -69,6 +70,7 @@ class Row(object):
                  # public variables
                  "height",
                  "has_default_height",
+                 "height_mismatch",
                  "level",
                  "collapse",
                  "hidden",
@@ -92,6 +94,7 @@ class Row(object):
         
         self.height = 0x00FF
         self.has_default_height = 0x00
+        self.height_mismatch = 0
         self.level = 0
         self.collapse = 0
         self.hidden = 0
@@ -169,7 +172,7 @@ class Row(object):
         options =  (self.level & 0x07) << 0
         options |= (self.collapse & 0x01) << 4
         options |= (self.hidden & 0x01) << 5
-        options |= (0x00 & 0x01) << 6
+        options |= (self.height_mismatch & 0x01) << 6
         options |= (0x01 & 0x01) << 8
         if self.__xf_index != 0x0F:
             options |= (0x01 & 0x01) << 7
@@ -179,7 +182,8 @@ class Row(object):
         options |= (0x00 & self.space_above) << 28
         options |= (0x00 & self.space_below) << 29
         
-        return BIFFRecords.RowRecord(self.__idx, self.__min_col_idx, self.__max_col_idx, height_options, options).get()                                              
+        return BIFFRecords.RowRecord(self.__idx, self.__min_col_idx,
+            self.__max_col_idx, height_options, options).get()                                              
                         
 
     def get_cells_biff_data(self):

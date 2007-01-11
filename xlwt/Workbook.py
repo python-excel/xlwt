@@ -84,6 +84,7 @@ Record Order in BIFF8
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-11 SJM Fixes for sheet.visibility (BOUNDSHEET record)
 
 import BIFFRecords
 import Style
@@ -484,13 +485,13 @@ class Workbook(object):
         # WORKSHEET2
         boundsheets_len = 0
         for sheet in self.__worksheets:
-            boundsheets_len += len(BIFFRecords.BoundSheetRecord(0x00L, sheet.hidden, sheet.name).get())
+            boundsheets_len += len(BIFFRecords.BoundSheetRecord(0x00L, sheet.visibility, sheet.name).get())
         
         start = data_len_before + boundsheets_len + data_len_after
         
         result = ''
         for sheet_biff_len,  sheet in zip(sheet_biff_lens, self.__worksheets):
-            result += BIFFRecords.BoundSheetRecord(start, sheet.hidden, sheet.name).get()
+            result += BIFFRecords.BoundSheetRecord(start, sheet.visibility, sheet.name).get()
             start += sheet_biff_len            
         return result
 
