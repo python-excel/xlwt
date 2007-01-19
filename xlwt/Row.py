@@ -42,6 +42,9 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-14 SJM Add assertions on type & range of row index.
+# 2007-01-12 SJM space_above and space_below flags were ignored (options |= 0x00 & flag ???)
+# 2007-01-12 SJM has_default_xf_index flag wasn't being set correctly.
 # 2007-01-11 SJM Fixes for row height mismatch flag
 # 2007-01-10 SJM Added new set_cell_xxxxx APIs.
 # 2007-01-10 SJM Removed methods from __slots__
@@ -65,6 +68,7 @@ class Row(object):
                  "__max_col_idx",
                  "__total_str",
                  "__xf_index",
+                 "__has_default_xf_index",
                  "__has_default_format",
                  "__height_in_pixels",
                  # public variables
@@ -77,11 +81,10 @@ class Row(object):
                  "space_above",
                  "space_below"]
 
-    #################################################################
-    ## Constructor
-    #################################################################
-    def __init__(self, index, parent_sheet):
-        self.__idx = index
+    def __init__(self, rowx, parent_sheet):
+        if not (isinstance(rowx, int) and 0 <= rowx <= 65535):
+            raise ValueError("row index (%r) not an int in range(65536)" % rowx)
+        self.__idx = rowx
         self.__parent = parent_sheet
         self.__parent_wb = parent_sheet.get_parent()
         self.__cells = []
@@ -89,6 +92,7 @@ class Row(object):
         self.__max_col_idx = 0
         self.__total_str = 0
         self.__xf_index = 0x0F
+        self.__has_default_xf_index = 0
         self.__has_default_format = 0
         self.__height_in_pixels = 0x11
         
@@ -143,6 +147,7 @@ class Row(object):
     def set_style(self, style):
         self.__adjust_height(style)
         self.__xf_index = self.__parent_wb.add_style(style)
+        self.__has_default_xf_index = 1
 
             
     def get_xf_index(self):
@@ -173,14 +178,11 @@ class Row(object):
         options |= (self.collapse & 0x01) << 4
         options |= (self.hidden & 0x01) << 5
         options |= (self.height_mismatch & 0x01) << 6
+        options |= (self.__has_default_xf_index & 0x01) << 7
         options |= (0x01 & 0x01) << 8
-        if self.__xf_index != 0x0F:
-            options |= (0x01 & 0x01) << 7
-        else:
-            options |= (0x00 & 0x01) << 7
         options |= (self.__xf_index & 0x0FFF) << 16 
-        options |= (0x00 & self.space_above) << 28
-        options |= (0x00 & self.space_below) << 29
+        options |= (self.space_above & 1) << 28
+        options |= (self.space_below & 1) << 29
         
         return BIFFRecords.RowRecord(self.__idx, self.__min_col_idx,
             self.__max_col_idx, height_options, options).get()                                              

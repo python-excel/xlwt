@@ -42,22 +42,25 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-14 SJM Added assertions on type & range of column index; removed @accepts
 # 2007-01-10 SJM Added set_style() method
 
 
 from BIFFRecords import ColInfoRecord
-from Deco import *
-from Worksheet import Worksheet
+# from Deco import *
+# from Worksheet import Worksheet
 
 
 class Column(object):
-    @accepts(object, int, Worksheet)
-    def __init__(self, indx, parent_sheet):
-        self._index = indx
+    # @accepts(object, int, Worksheet)
+    def __init__(self, colx, parent_sheet):
+        if not(isinstance(colx, int) and 0 <= colx <= 255):
+            raise ValueError("column index (%r) not an int in range(256)" % colx)
+        self._index = colx
         self._parent = parent_sheet
         self._parent_wb = parent_sheet.get_parent()
         self._xf_index = 0x0F
-        
+
         self.width = 0x0B92
         self.hidden = 0
         self.level = 0
