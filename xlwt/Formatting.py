@@ -72,6 +72,8 @@ is not set), it repeats the attributes of its style XF record.
 
 __rev_id__ = """$Id$"""
 
+# 2007-01-21 SJM Changed default font charset from ANSI_CYRILLIC to SYS_DEFAULT
+# 2007-01-21 SJM Fixed spelling of DECORATIVE
 
 import BIFFRecords
 
@@ -91,7 +93,7 @@ class Font(object):
     FAMILY_SWISS        = 0x02
     FAMILY_MODERN       = 0x03
     FAMILY_SCRIPT       = 0x04
-    FAMILY_DECORARTIVE  = 0x05
+    FAMILY_DECORATIVE   = 0x05
     
     CHARSET_ANSI_LATIN          = 0x00
     CHARSET_SYS_DEFAULT         = 0x01
@@ -129,7 +131,7 @@ class Font(object):
         self.escapement = self.ESCAPEMENT_NONE
         self.underline = self.UNDERLINE_NONE
         self.family = self.FAMILY_NONE
-        self.charset = self.CHARSET_ANSI_CYRILLIC       
+        self.charset = self.CHARSET_SYS_DEFAULT       
         self.name = 'Arial'
                 
     def get_biff_record(self):

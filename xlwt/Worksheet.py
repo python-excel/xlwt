@@ -77,6 +77,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-20 SJM Apply encoding to header & footer strings
 # 2007-01-11 SJM Fixes for row height mismatch
 # 2007-01-11 SJM Fixes for sheet visibility
 # 2007-01-11 SJM Commented out @accepts
@@ -779,6 +780,8 @@ class Worksheet(object):
 
     # @accepts(object, (str, unicode))
     def set_header_str(self, value):
+        if isinstance(value, str):
+            value = unicode(value, self.__parent.encoding)
         self.__header_str = value
 
     def get_header_str(self):
@@ -790,6 +793,8 @@ class Worksheet(object):
 
     # @accepts(object, (str, unicode))
     def set_footer_str(self, value):
+        if isinstance(value, str):
+            value = unicode(value, self.__parent.encoding)
         self.__footer_str = value
 
     def get_footer_str(self):

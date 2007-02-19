@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -82,54 +82,47 @@ var.     ln or
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-19 SJM Fixed Unicode packing functions.
+#                Corrected test for max string length.
+#                Removed hard-coded default encoding (cp1253).
+#                Added optional encoding, default='ascii'.
 
-import struct
+from struct import pack
 
-
-DEFAULT_ENCODING = 'cp1251'
-
-def u2ints(ustr):
-    ints = [ord(uchr) for uchr in ustr]
-    return ints
-
-def u2bytes(ustr):
-    ints = u2ints(ustr)
-    return struct.pack('<' + 'H'*len(ints), *ints)
-
-def upack2(_str):
+def upack2(s, encoding='ascii'):
+    # If not unicode, make it so.
+    if isinstance(s, unicode):
+        us = s
+    else:
+        us = unicode(s, encoding)
+    # Limit is based on number of content characters
+    # (not on number of bytes in packed result)
+    len_us = len(us)
+    if len_us > 65535:
+        raise Exception('String longer than 65535 characters')
     try:
-        ustr = u2bytes(unicode(_str, 'ascii'))
-        return struct.pack('<HB', len(_str), 0) + _str    
-    except:
-        if isinstance(_str, unicode):
-            ustr = u2bytes(_str)
-        else:
-            ustr = u2bytes(unicode(_str, DEFAULT_ENCODING))
-        return struct.pack('<HB', len(_str), 1) + ustr
+        encs = us.encode('latin1')
+        # Success here means all chars are in U+0000 to U+00FF
+        # inclusive, meaning that we can use "compressed format".
+        flag = 0
+    except UnicodeEncodeError:
+        encs = us.encode('utf_16_le')
+        flag = 1
+    return pack('<HB', len_us, flag) + encs
 
-def upack1(_str):
+def upack1(s, encoding='ascii'):
+    # Same as upack2(), but with a one-byte length field.
+    if isinstance(s, unicode):
+        us = s
+    else:
+        us = unicode(s, encoding)
+    len_us = len(us)
+    if len_us > 255:
+        raise Exception('String longer than 255 characters')
     try:
-        ustr = u2bytes(unicode(_str, 'ascii'))
-        return struct.pack('BB', len(_str), 0) + _str    
-    except:
-        if isinstance(_str, unicode):
-            ustr = u2bytes(_str)
-        else:
-            ustr = u2bytes(unicode(_str, DEFAULT_ENCODING))
-        return struct.pack('BB', len(_str), 1) + ustr
-
-if __name__ == '__main__':   
-    f = file('out0.bin', 'wb')
-    f.write(u2bytes('юникод: unicode'))
-    f.close()
-
-    f = file('out1.bin', 'wb')
-    f.write(upack1('юникод: unicode'))
-    f.close()
-
-    f = file('out2.bin', 'wb')
-    f.write(upack2('юникод: unicode'))
-    f.close()
-
-
-
+        encs = us.encode('latin1')
+        flag = 0
+    except UnicodeEncodeError:
+        encs = us.encode('utf_16_le')
+        flag = 1
+    return pack('<BB', len_us, flag) + encs

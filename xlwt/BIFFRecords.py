@@ -41,6 +41,8 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-19 SJM Pass encoding through for SST, sheet_name
+# 2007-01-21 SJM Corrected mask for pattern index (range(19) but saved modulo 16)
 # 2007-01-11 SJM (1) s/struct.pack/pack/ (2) fix name of DefaultRowHeightRecord
 # 2007-01-10 SJM RK record pack format changed I to i (signed)
 
@@ -52,7 +54,8 @@ class SharedStringTable(object):
     _SST_ID = 0x00FC
     _CONTINUE_ID = 0x003C
 
-    def __init__(self):
+    def __init__(self, encoding):
+        self.encoding = encoding
         self._sst_record = ''
         self._continues = []
         self._current_piece = pack('<II', 0, 0)
@@ -79,9 +82,7 @@ class SharedStringTable(object):
         return result
 
     def _add_to_sst(self, s):
-        u_str = upack2(s)
-        if len(u_str) > 0xFFFF:
-            raise Exception('error: very long string.')
+        u_str = upack2(s, self.encoding)
 
         is_unicode_str = u_str[2] == '\x01'
         if is_unicode_str:
@@ -1007,7 +1008,7 @@ class XFRecord(BiffRecord):
             ((borders.bottom_colour & 0x7F) << 7 ) |
             ((borders.diag_colour   & 0x7F) << 14) |
             ((borders.diag          & 0x0F) << 21) |
-            ((pattern.pattern       & 0x0F) << 26)
+            ((pattern.pattern       & 0x3F) << 26)
         )
         pat = pack('<H',
             ((pattern.pattern_fore_colour & 0x7F) << 0 ) |
@@ -1131,10 +1132,10 @@ class BoundSheetRecord(BiffRecord):
     """
     _REC_ID = 0x0085
 
-    def __init__(self, stream_pos, visibility, sheetname):
+    def __init__(self, stream_pos, visibility, sheetname, encoding='ascii'):
         BiffRecord.__init__(self)
 
-        usheetname = upack1(sheetname)
+        usheetname = upack1(sheetname, encoding)
         uusheetname_len = len(usheetname)
 
         self._rec_data = pack('<LBB%ds' % uusheetname_len, stream_pos, visibility, 0x00, usheetname)
