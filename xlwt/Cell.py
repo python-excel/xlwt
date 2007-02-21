@@ -41,6 +41,8 @@
 
 __rev_id__ = """$Id$"""
 
+# SJM 2007-02-20 Added support for boolean & error cells
+
 # SJM 2007-01-10 Fixed RK encoding bug
 # SJM 2007-01-10 Having method names in __slots__ is a WOFTAM. Removed.
 # SJM 2007-01-10 Unused & unuseable MulNumber class removed.
@@ -149,6 +151,52 @@ class NumberCell(object):
         #print
         return BIFFRecords.NumberRecord(self.__parent.get_index(),
             self.__idx, self.__xf_idx, num).get()
+
+class BooleanCell(object):
+    __slots__ = ["__parent", "__idx", "__xf_idx", "__number"]
+
+    def __init__(self, parent, idx, xf_idx, number):
+        self.__parent = parent
+        self.__idx = idx
+        self.__xf_idx = xf_idx
+        self.__number = number
+
+    def get_biff_data(self):
+        return BIFFRecords.BoolErrRecord(self.__parent.get_index(),
+            self.__idx, self.__xf_idx, self.__number, 0).get()
+
+error_code_map = {
+    0x00:  0, # Intersection of two cell ranges is empty
+    0x07:  7, # Division by zero
+    0x0F: 15, # Wrong type of operand
+    0x17: 23, # Illegal or deleted cell reference
+    0x1D: 29, # Wrong function or range name
+    0x24: 36, # Value range overflow
+    0x2A: 42, # Argument or function not available
+    '#NULL!' :  0, # Intersection of two cell ranges is empty
+    '#DIV/0!':  7, # Division by zero
+    '#VALUE!': 36, # Wrong type of operand
+    '#REF!'  : 23, # Illegal or deleted cell reference
+    '#NAME?' : 29, # Wrong function or range name
+    '#NUM!'  : 36, # Value range overflow
+    '#N/A!'  : 42, # Argument or function not available
+}
+
+class ErrorCell(object):
+    __slots__ = ["__parent", "__idx", "__xf_idx", "__number"]
+
+    def __init__(self, parent, idx, xf_idx, error_string_or_code):
+        self.__parent = parent
+        self.__idx = idx
+        self.__xf_idx = xf_idx
+        try:
+            self.__number = error_code_map[error_string_or_code]
+        except KeyError:
+            raise Exception('Illegal error value (%r)' % error_string_or_code)
+
+    def get_biff_data(self):
+        return BIFFRecords.BoolErrRecord(self.__parent.get_index(),
+            self.__idx, self.__xf_idx, self.__number, 1).get()
 
 class FormulaCell(object):
     __slots__ = ["__parent", "__idx", "__xf_idx", "__frmla"]

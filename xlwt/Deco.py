@@ -23,6 +23,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Removed __main__ section to avoid sysntax errors with Python 2.3
 
 def accepts(*types):
     #print types
@@ -48,14 +49,3 @@ def returns(rtype):
         return new_f
     return check_returns
 
-
-if __name__ == '__main__':
-    import types 
-
-    @returns(types.NoneType)
-    @accepts(int, (int,float))
-    def func(arg1, arg2):
-        #return str(arg1 * arg2)
-        pass
-
-    func(1, 2)      

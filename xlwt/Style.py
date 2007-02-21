@@ -42,35 +42,25 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Remove debris from earlier fix
+# 2007-02-21 SJM "The first user-defined format starts at 164" (not 163)
+# 2007-02-21 SJM Make it work with Python 2.3
+# 2007-01-10 SJM Fix XFStyle() always returning the same object.
 
 import Formatting
 from BIFFRecords import *
 
-if 0:
-    _default_num_format = 'general'
-    _default_font = Formatting.Font()
-    _default_alignment = Formatting.Alignment()
-    _default_borders = Formatting.Borders()
-    _default_pattern = Formatting.Pattern()
-    _default_protection = Formatting.Protection()
+FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
 
 class XFStyle(object):
     
     def __init__(self):
-        if 0:
-            self.num_format_str  = _default_num_format
-            self.font            = _default_font 
-            self.alignment       = _default_alignment
-            self.borders         = _default_borders
-            self.pattern         = _default_pattern 
-            self.protection      = _default_protection
-        else:
-            self.num_format_str  = 'General'
-            self.font            = Formatting.Font() 
-            self.alignment       = Formatting.Alignment()
-            self.borders         = Formatting.Borders()
-            self.pattern         = Formatting.Pattern()
-            self.protection      = Formatting.Protection()
+        self.num_format_str  = 'General'
+        self.font            = Formatting.Font() 
+        self.alignment       = Formatting.Alignment()
+        self.borders         = Formatting.Borders()
+        self.pattern         = Formatting.Pattern()
+        self.protection      = Formatting.Protection()
             
 default_style = XFStyle()            
             
@@ -143,7 +133,11 @@ class StyleCollection(object):
         if num_format_str in self._num_formats:
             num_format_idx = self._num_formats[num_format_str]
         else:
-            num_format_idx = 163 + len(self._num_formats) - len(StyleCollection._std_num_fmt_list)
+            num_format_idx = (
+                FIRST_USER_DEFINED_NUM_FORMAT_IDX
+                + len(self._num_formats)
+                - len(StyleCollection._std_num_fmt_list)
+                )
             self._num_formats[num_format_str] = num_format_idx
             
         font = style.font
@@ -173,15 +167,21 @@ class StyleCollection(object):
             
     def _all_fonts(self):
         result = ''
-        i = sorted([(v, k) for k, v in self._fonts.items()])
-        for font_idx, font in i:
+        alist = [(v, k) for k, v in self._fonts.items()]
+        alist.sort()
+        for font_idx, font in alist:
             result += font.get_biff_record().get()
         return result
     
     def _all_num_formats(self):
         result = ''
-        i = sorted([(v, k) for k, v in self._num_formats.items() if v>=163])
-        for fmtidx, fmtstr in i:
+        alist = [
+            (v, k)
+            for k, v in self._num_formats.items()
+            if v >= FIRST_USER_DEFINED_NUM_FORMAT_IDX
+            ]
+        alist.sort()
+        for fmtidx, fmtstr in alist:
             result += NumberFormatRecord(fmtidx, fmtstr).get()
         return result
     
@@ -190,8 +190,9 @@ class StyleCollection(object):
         for i in range(0, 16):
             result += XFRecord(self._default_xf, 'style').get()
             
-        i = sorted([(v, k) for k, v in self._xf.items()])                            
-        for xf_idx, xf in i:
+        alist = [(v, k) for k, v in self._xf.items()]
+        alist.sort()
+        for xf_idx, xf in alist:
             result += XFRecord(xf).get()
         return result
         

@@ -41,6 +41,9 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Removed pointless calls to do-nothing superclass __init__()
+# 2007-02-21 SJM Removed pointless method get_rec_data()
+# 2007-02-20 SJM Added class BoolErrRecord
 # 2007-02-19 SJM Pass encoding through for SST, sheet_name
 # 2007-01-21 SJM Corrected mask for pattern index (range(19) but saved modulo 16)
 # 2007-01-11 SJM (1) s/struct.pack/pack/ (2) fix name of DefaultRowHeightRecord
@@ -143,8 +146,12 @@ class SharedStringTable(object):
 
 
 class BiffRecord(object):
-    def __init__(self):
-        self._rec_data = ''
+
+    _rec_data = '' # class attribute; child classes need to set this.
+    
+    # Sheer waste.
+    # def __init__(self):
+    #     self._rec_data = ''
 
     def get_rec_id(self):
         return _REC_ID
@@ -152,11 +159,13 @@ class BiffRecord(object):
     def get_rec_header(self):
         return pack('<2H', self._REC_ID, len(self._rec_data))
 
-    def get_rec_data(self):
-        return self._rec_data
+    # Not over-ridden by any child classes, never called (except by "get"; see below).
+    # def get_rec_data(self):
+    #     return self._rec_data
 
     def get(self):
-        data = self.get_rec_data()
+        # data = self.get_rec_data()
+        data = self._rec_data
 
         if len(data) > 0x2020: # limit for BIFF7/8
             chunks = []
@@ -201,8 +210,6 @@ class Biff8BOFRecord(BiffRecord):
     WORKSPACE   = 0x0100
 
     def __init__(self, rec_type):
-        BiffRecord.__init__(self)
-
         version  = 0x0600
         build    = 0x0DBB
         year     = 0x07CC
@@ -216,8 +223,6 @@ class InteraceHdrRecord(BiffRecord):
     _REC_ID = 0x00E1
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('BB', 0xB0, 0x04)
 
 
@@ -225,8 +230,6 @@ class InteraceEndRecord(BiffRecord):
     _REC_ID = 0x00E2
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = ''
 
 
@@ -234,8 +237,6 @@ class MMSRecord(BiffRecord):
     _REC_ID = 0x00C1
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x00)
 
 
@@ -250,8 +251,6 @@ class WriteAccessRecord(BiffRecord):
     _REC_ID = 0x005C
 
     def __init__(self, owner):
-        BiffRecord.__init__(self)
-
         uowner = owner[0:0x30]
         uowner_len = len(uowner)
         self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner, ' '*(0x70 - uowner_len))
@@ -272,8 +271,6 @@ class DSFRecord(BiffRecord):
     _REC_ID = 0x0161
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x00)
 
 
@@ -281,8 +278,6 @@ class TabIDRecord(BiffRecord):
     _REC_ID = 0x013D
 
     def __init__(self, sheetcount):
-        BiffRecord.__init__(self)
-
         for i in range(sheetcount):
             self._rec_data += pack('<H', i+1)
 
@@ -291,8 +286,6 @@ class FnGroupCountRecord(BiffRecord):
     _REC_ID = 0x009C
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('BB', 0x0E, 0x00)
 
 
@@ -305,8 +298,6 @@ class WindowProtectRecord(BiffRecord):
     _REC_ID = 0x0019
 
     def __init__(self, wndprotect):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', wndprotect)
 
 
@@ -320,8 +311,6 @@ class ObjectProtectRecord(BiffRecord):
 
 
     def __init__(self, objprotect):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', objprotect)
 
 
@@ -335,8 +324,6 @@ class ScenProtectRecord(BiffRecord):
 
 
     def __init__(self, scenprotect):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', scenprotect)
 
 
@@ -350,8 +337,6 @@ class ProtectRecord(BiffRecord):
     _REC_ID = 0x0012
 
     def __init__(self, protect):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', protect)
 
 
@@ -382,8 +367,6 @@ class PasswordRecord(BiffRecord):
         return passwd_hash
 
     def __init__(self, passwd = ""):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', self.passwd_hash(passwd))
 
 
@@ -391,8 +374,6 @@ class Prot4RevRecord(BiffRecord):
     _REC_ID = 0x01AF
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x00)
 
 
@@ -400,8 +381,6 @@ class Prot4RevPassRecord(BiffRecord):
     _REC_ID = 0x01BC
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x00)
 
 
@@ -413,8 +392,6 @@ class BackupRecord(BiffRecord):
     _REC_ID = 0x0040
 
     def __init__(self, backup):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', backup)
 
 class HideObjRecord(BiffRecord):
@@ -431,8 +408,6 @@ class HideObjRecord(BiffRecord):
     _REC_ID = 0x008D
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x00)
 
 
@@ -444,8 +419,6 @@ class RefreshAllRecord(BiffRecord):
     _REC_ID = 0x01B7
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x00)
 
 
@@ -465,8 +438,6 @@ class BookBoolRecord(BiffRecord):
     _REC_ID = 0x00DA
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x00)
 
 
@@ -495,8 +466,6 @@ class CountryRecord(BiffRecord):
     _REC_ID = 0x008C
 
     def __init__(self, ui_id, sys_settings_id):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<2H', ui_id, sys_settings_id)
 
 
@@ -517,8 +486,6 @@ class UseSelfsRecord(BiffRecord):
     _REC_ID = 0x0160
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', 0x01)
 
 
@@ -526,8 +493,6 @@ class EOFRecord(BiffRecord):
     _REC_ID = 0x000A
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = ''
 
 
@@ -547,8 +512,6 @@ class DateModeRecord(BiffRecord):
     _REC_ID = 0x0022
 
     def __init__(self, from1904):
-        BiffRecord.__init__(self)
-
         if from1904:
             self._rec_data = pack('<H', 1)
         else:
@@ -571,8 +534,6 @@ class PrecisionRecord(BiffRecord):
     _REC_ID = 0x000E
 
     def __init__(self, use_real_values):
-        BiffRecord.__init__(self)
-
         if use_real_values:
             self._rec_data = pack('<H', 1)
         else:
@@ -633,8 +594,6 @@ class CodepageBiff8Record(BiffRecord):
     UTF_16 = 0x04B0
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<H', self.UTF_16)
 
 class Window1Record(BiffRecord):
@@ -666,8 +625,6 @@ class Window1Record(BiffRecord):
                  flags,
                  active_sheet,
                  first_tab_index, selected_tabs, tab_width):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<9H', hpos_twips, vpos_twips,
                                       width_twips, height_twips,
                                       flags,
@@ -747,8 +704,6 @@ class FontRecord(BiffRecord):
                     height, options, colour_index, weight, escapement,
                     underline, family, charset,
                     name):
-        BiffRecord.__init__(self)
-
         uname = upack1(name)
         uname_len = len(uname)
 
@@ -812,8 +767,6 @@ class NumberFormatRecord(BiffRecord):
     _REC_ID = 0x041E
 
     def __init__(self, idx, fmtstr):
-        BiffRecord.__init__(self)
-
         ufmtstr = upack2(fmtstr)
         ufmtstr_len = len(ufmtstr)
 
@@ -954,8 +907,6 @@ class XFRecord(BiffRecord):
     _REC_ID = 0x00E0
 
     def __init__(self, xf, xftype='cell'):
-        BiffRecord.__init__(self)
-
         font_xf_idx, fmt_str_xf_idx, alignment, borders, pattern, protection = xf
         fnt = pack('<H', font_xf_idx)
         fmt = pack('<H', fmt_str_xf_idx)
@@ -1054,8 +1005,6 @@ class StyleRecord(BiffRecord):
     _REC_ID = 0x0293
 
     def __init__(self):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<HBB', 0x8000, 0x00, 0xFF)
         # TODO: implement user-defined styles???
 
@@ -1133,8 +1082,6 @@ class BoundSheetRecord(BiffRecord):
     _REC_ID = 0x0085
 
     def __init__(self, stream_pos, visibility, sheetname, encoding='ascii'):
-        BiffRecord.__init__(self)
-
         usheetname = upack1(sheetname, encoding)
         uusheetname_len = len(usheetname)
 
@@ -1218,8 +1165,6 @@ class ExtSSTRecord(BiffRecord):
     _REC_ID = 0x00FF
 
     def __init__(self, sst_stream_pos, str_placement, portions_len):
-        BiffRecord.__init__(self)
-
         extsst = {}
         abs_stream_pos = sst_stream_pos
         str_counter = 0
@@ -1254,8 +1199,6 @@ class DimensionsRecord(BiffRecord):
     """
     _REC_ID = 0x0200
     def __init__(self, first_used_row, last_used_row, first_used_col, last_used_col):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<2L3H',
                                             first_used_row, last_used_row + 1,
                                             first_used_col, last_used_col + 1,
@@ -1301,8 +1244,6 @@ class Window2Record(BiffRecord):
     _REC_ID = 0x023E
 
     def __init__(self, options, first_visible_row, first_visible_col, grid_colour, preview_magn, normal_magn):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<7HL', options,
                                     first_visible_row, first_visible_col,
                                     grid_colour,
@@ -1371,8 +1312,6 @@ class PanesRecord(BiffRecord):
     """
     _REC_ID = 0x0041
     def __init__(self, px, py, first_row_bottom, first_col_right, active_pane):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<5H',
                                             px, py,
                                             first_row_bottom, first_col_right,
@@ -1425,8 +1364,6 @@ class RowRecord(BiffRecord):
     _REC_ID = 0x0208
 
     def __init__(self, index, first_col, last_col, height_options, options):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<6HL', index, first_col, last_col + 1,
                                         height_options,
                                         0x00, 0x00,
@@ -1440,7 +1377,6 @@ class LabelSSTRecord(BiffRecord):
     _REC_ID = 0x00FD
 
     def __init__(self, row, col, xf_idx, sst_idx):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<3HL', row, col, xf_idx, sst_idx)
 
 
@@ -1477,8 +1413,6 @@ class MergedCellsRecord(BiffRecord):
     _REC_ID = 0x00E5
 
     def __init__(self, merged_list):
-        BiffRecord.__init__(self)
-
         i = len(merged_list) - 1
         while i >= 0:
             j = 0
@@ -1511,7 +1445,6 @@ class MulBlankRecord(BiffRecord):
     _REC_ID = 0x00BE
 
     def __init__(self, row, first_col, last_col, xf_index):
-        BiffRecord.__init__(self)
         blanks_count = last_col-first_col+1
         self._rec_data = pack('%dH' % blanks_count, *([xf_index]*blanks_count))
         self._rec_data = pack('<2H', row, first_col) +  self._rec_data + pack('<H',  last_col)
@@ -1531,7 +1464,6 @@ class BlankRecord(BiffRecord):
     _REC_ID = 0x0201
 
     def __init__(self, row, col, xf_index):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<3H', row, col, xf_index)
 
 
@@ -1544,7 +1476,6 @@ class RKRecord(BiffRecord):
     _REC_ID = 0x027E
 
     def __init__(self, row, col, xf_index, rk_encoded):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<3Hi', row, col, xf_index, rk_encoded)
 
 
@@ -1555,8 +1486,16 @@ class NumberRecord(BiffRecord):
     _REC_ID = 0x0203
 
     def __init__(self, row, col, xf_index, number):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<3Hd', row, col, xf_index, number)
+
+class BoolErrRecord(BiffRecord):
+    """
+    This record represents a cell that contains a boolean or error value.
+    """
+    _REC_ID = 0x0205
+
+    def __init__(self, row, col, xf_index, number, is_error):
+        self._rec_data = pack('<3HBB', row, col, xf_index, number, is_error)
 
 
 class FormulaRecord(BiffRecord):
@@ -1578,7 +1517,6 @@ class FormulaRecord(BiffRecord):
     _REC_ID = 0x0006
 
     def __init__(self, row, col, xf_index, rpn):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<3HQHL', row, col, xf_index, 0xFFFF000000000003, 0, 0) + rpn
 
 
@@ -1599,7 +1537,6 @@ class GutsRecord(BiffRecord):
     _REC_ID = 0x0080
 
     def __init__(self, row_gut_width, col_gut_height, row_visible_levels, col_visible_levels):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<4H', row_gut_width, col_gut_height, row_visible_levels, col_visible_levels)
 
 class WSBoolRecord(BiffRecord):
@@ -1644,7 +1581,6 @@ class WSBoolRecord(BiffRecord):
     _REC_ID = 0x0081
 
     def __init__(self, options):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', options)
 
 class ColInfoRecord(BiffRecord):
@@ -1679,7 +1615,6 @@ class ColInfoRecord(BiffRecord):
     _REC_ID = 0x007D
 
     def __init__(self, first_col, last_col, width, xf_index, options):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<6H', first_col, last_col, width, xf_index, options, 0)
 
 class CalcModeRecord(BiffRecord):
@@ -1698,7 +1633,6 @@ class CalcModeRecord(BiffRecord):
     _REC_ID = 0x000D
 
     def __init__(self, calc_mode):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<h', calc_mode)
 
 
@@ -1717,7 +1651,6 @@ class CalcCountRecord(BiffRecord):
     _REC_ID = 0x000C
 
     def __init__(self, calc_count):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', calc_count)
 
 class RefModeRecord(BiffRecord):
@@ -1738,7 +1671,6 @@ class RefModeRecord(BiffRecord):
     _REC_ID = 0x00F
 
     def __init__(self, ref_mode):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', ref_mode)
 
 class IterationRecord(BiffRecord):
@@ -1754,7 +1686,6 @@ class IterationRecord(BiffRecord):
     _REC_ID = 0x011
 
     def __init__(self, iterations_on):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', iterations_on)
 
 class DeltaRecord(BiffRecord):
@@ -1772,7 +1703,6 @@ class DeltaRecord(BiffRecord):
     _REC_ID = 0x010
 
     def __init__(self, delta):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<d', delta)
 
 class SaveRecalcRecord(BiffRecord):
@@ -1791,7 +1721,6 @@ class SaveRecalcRecord(BiffRecord):
     _REC_ID = 0x05F
 
     def __init__(self, recalc):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', recalc)
 
 class PrintHeadersRecord(BiffRecord):
@@ -1808,7 +1737,6 @@ class PrintHeadersRecord(BiffRecord):
     _REC_ID = 0x02A
 
     def __init__(self, print_headers):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', print_headers)
 
 
@@ -1826,7 +1754,6 @@ class PrintGridLinesRecord(BiffRecord):
     _REC_ID = 0x02B
 
     def __init__(self, print_grid):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', print_grid)
 
 
@@ -1844,7 +1771,6 @@ class GridSetRecord(BiffRecord):
     _REC_ID = 0x082
 
     def __init__(self, print_grid_changed):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', print_grid_changed)
 
 
@@ -1868,7 +1794,6 @@ class DefaultRowHeightRecord(BiffRecord):
     _REC_ID = 0x0225
 
     def __init__(self, options, def_height):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<2H', options, def_height)
 
 
@@ -1887,7 +1812,6 @@ class DefColWidthRecord(BiffRecord):
     _REC_ID = 0x0055
 
     def __init__(self, def_width):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', options, def_width)
 
 class HorizontalPageBreaksRecord(BiffRecord):
@@ -1912,7 +1836,6 @@ class HorizontalPageBreaksRecord(BiffRecord):
     _REC_ID = 0x001B
 
     def __init__(self, breaks_list):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', len(breaks_list))
         for r, c1, c2 in breaks_list:
             self._rec_data += pack('<3H', r, c1, c2)
@@ -1940,7 +1863,6 @@ class VerticalPageBreaksRecord(BiffRecord):
     _REC_ID = 0x001A
 
     def __init__(self, breaks_list):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', len(breaks_list))
         for r, c1, c2 in breaks_list:
             self._rec_data += pack('<3H', r, c1, c2)
@@ -2009,7 +1931,6 @@ class HeaderRecord(BiffRecord):
     _REC_ID = 0x0014
 
     def __init__(self, header_str):
-        BiffRecord.__init__(self)
         self._rec_data = upack2(header_str)
 
 class FooterRecord(BiffRecord):
@@ -2019,7 +1940,6 @@ class FooterRecord(BiffRecord):
     _REC_ID = 0x0015
 
     def __init__(self, footer_str):
-        BiffRecord.__init__(self)
         self._rec_data = upack2(footer_str)
 
 
@@ -2038,7 +1958,6 @@ class HCenterRecord(BiffRecord):
     _REC_ID = 0x0083
 
     def __init__(self, is_horz_center):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', is_horz_center)
 
 
@@ -2057,7 +1976,6 @@ class VCenterRecord(BiffRecord):
     _REC_ID = 0x0084
 
     def __init__(self, is_vert_center):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<H', is_vert_center)
 
 
@@ -2076,7 +1994,6 @@ class LeftMarginRecord(BiffRecord):
     _REC_ID = 0x0026
 
     def __init__(self, margin):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<d', margin)
 
 
@@ -2093,7 +2010,6 @@ class RightMarginRecord(BiffRecord):
     _REC_ID = 0x0027
 
     def __init__(self, margin):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<d', margin)
 
 class TopMarginRecord(BiffRecord):
@@ -2109,7 +2025,6 @@ class TopMarginRecord(BiffRecord):
     _REC_ID = 0x0028
 
     def __init__(self, margin):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<d', margin)
 
 
@@ -2126,7 +2041,6 @@ class BottomMarginRecord(BiffRecord):
     _REC_ID = 0x0029
 
     def __init__(self, margin):
-        BiffRecord.__init__(self)
         self._rec_data = pack('<d', margin)
 
 class SetupPageRecord(BiffRecord):
@@ -2288,8 +2202,6 @@ class SetupPageRecord(BiffRecord):
                     hres, vres,
                     header_margin, footer_margin,
                     num_copies):
-        BiffRecord.__init__(self)
-
         self._rec_data = pack('<8H2dH', paper, scaling, start_num,
                                         fit_width_to, fit_height_to, \
                                         options,

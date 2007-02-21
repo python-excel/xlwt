@@ -84,12 +84,13 @@ Record Order in BIFF8
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Make it run with Python 2.3
 # 2007-02-19 SJM Allow specifying the encoding of input strings
 # 2007-01-11 SJM Fixes for sheet.visibility (BOUNDSHEET record)
 
 import BIFFRecords
 import Style
-from Deco import accepts, returns
+# from Deco import accepts, returns
 
 
 class Workbook(object):
@@ -97,7 +98,7 @@ class Workbook(object):
     #################################################################
     ## Constructor
     #################################################################
-    @accepts(object, str)
+    # @accepts(object, str)
     def __init__(self, encoding='ascii'):
         self.encoding = encoding
         self.__owner = 'None'       
@@ -136,7 +137,7 @@ class Workbook(object):
     ## Properties, "getters", "setters"
     #################################################################
 
-    @accepts(object, str)
+    # @accepts(object, str)
     def set_owner(self, value):
         self.__owner = value
 
@@ -147,7 +148,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_country_code(self, value):
         self.__country_code = value
 
@@ -158,7 +159,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_wnd_protect(self, value):
         self.__wnd_protect = int(value)
 
@@ -169,7 +170,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_obj_protect(self, value):
         self.__obj_protect = int(value)
 
@@ -180,7 +181,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_protect(self, value):
         self.__protect = int(value)
 
@@ -191,7 +192,7 @@ class Workbook(object):
     
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_backup_on_save(self, value):
         self.__backup_on_save = int(value)
 
@@ -202,7 +203,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_hpos(self, value):
         self.__hpos_twips = value & 0xFFFF
 
@@ -213,7 +214,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_vpos(self, value):
         self.__vpos_twips = value & 0xFFFF
 
@@ -224,7 +225,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_width(self, value):
         self.__width_twips = value & 0xFFFF
 
@@ -235,7 +236,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_height(self, value):
         self.__height_twips = value & 0xFFFF
 
@@ -246,7 +247,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_active_sheet(self, value):
         self.__active_sheet = value & 0xFFFF
         self.__first_tab_index = self.__active_sheet
@@ -258,7 +259,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, int)
+    # @accepts(object, int)
     def set_tab_width(self, value):
         self.__tab_width_twips = value & 0xFFFF
 
@@ -269,7 +270,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_wnd_visible(self, value):
         self.__wnd_hidden = int(not value)
 
@@ -280,7 +281,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_wnd_mini(self, value):
         self.__wnd_mini = int(value)
 
@@ -291,7 +292,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_hscroll_visible(self, value):
         self.__hscroll_visible = int(value)
 
@@ -302,7 +303,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_vscroll_visible(self, value):
         self.__vscroll_visible = int(value)
 
@@ -313,7 +314,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_tabs_visible(self, value):
         self.__tabs_visible = int(value)
 
@@ -324,7 +325,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_dates_1904(self, value):
         self.__dates_1904 = int(value)
 
@@ -335,7 +336,7 @@ class Workbook(object):
 
     #################################################################
 
-    @accepts(object, bool)
+    # @accepts(object, bool)
     def set_use_cell_values(self, value):
         self.__use_cell_values = int(value)
 
@@ -355,25 +356,25 @@ class Workbook(object):
     ## Methods
     ##################################################################
 
-    @accepts(object, Style.XFStyle)
+    # @accepts(object, Style.XFStyle)
     def add_style(self, style):
         return self.__styles.add(style)
 
-    @accepts(object, (str, unicode))    
+    # @accepts(object, (str, unicode))    
     def add_str(self, s):
         return self.__sst.add_str(s)
         
-    @accepts(object, str)    
+    # @accepts(object, str)    
     def str_index(self, s):
         return self.__sst.str_index(s)
         
-    @accepts(object, (str, unicode))    
+    # @accepts(object, (str, unicode))    
     def add_sheet(self, sheetname):
         import Worksheet
         self.__worksheets.append(Worksheet.Worksheet(sheetname, self))
         return self.__worksheets[-1]
 
-    @accepts(object, int)    
+    # @accepts(object, int)    
     def get_sheet(self, sheetnum):
         return self.__worksheets[sheetnum]
         

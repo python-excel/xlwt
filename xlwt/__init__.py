@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Make it work with Python 2.3
+
 import sys
-if sys.version_info[:2] < (2, 4):
-    print >>sys.stderr, "Sorry, pyExcelerator requires Python 2.4 or later"
+if sys.version_info[:2] < (2, 3):
+    print >> sys.stderr, "Sorry, xlwt requires Python 2.3 or later"
     sys.exit(1)
 
 

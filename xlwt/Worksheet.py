@@ -77,6 +77,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Make it run with Python 2.3
 # 2007-02-20 SJM Apply encoding to header & footer strings
 # 2007-01-11 SJM Fixes for row height mismatch
 # 2007-01-11 SJM Fixes for sheet visibility
@@ -1252,7 +1253,9 @@ class Worksheet(object):
         if len(self.__rows) > 0:
             first_used_row = min(self.__rows)
             last_used_row = max(self.__rows)
-            first_used_col = 0xFFFFFFFF
+            first_used_col = 0x7FFFFFF
+            # Avoid 2.3 deprecation msg when using 0xFFFFFFFF
+            # Note: max cols is only 256 in BIFF8 anyway ...
             last_used_col = 0
             for r in self.__rows:
                 _min = self.__rows[r].get_min_col()

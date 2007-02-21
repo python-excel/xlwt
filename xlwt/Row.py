@@ -42,6 +42,13 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Fixed typo causing bad DIMENSIONS record
+# 2007-02-21 SJM Fixed set_cell_formula() misleading arg name
+# 2007-02-20 SJM Decorators commented out. Guard code added where needed.
+# 2007-02-20 SJM Changed a_list.extend([expr]) to a_list.append(expr)
+# 2007-02-20 SJM Fixed copy/paste bug in set_cell_formula()
+# 2007-02-20 SJM Added set_cell_boolean() and set_cell_error()
+
 # 2007-01-14 SJM Add assertions on type & range of row index.
 # 2007-01-12 SJM space_above and space_below flags were ignored (options |= 0x00 & flag ???)
 # 2007-01-12 SJM has_default_xf_index flag wasn't being set correctly.
@@ -50,10 +57,10 @@ __rev_id__ = """$Id$"""
 # 2007-01-10 SJM Removed methods from __slots__
 
 import BIFFRecords
-from Deco import *
+# from Deco import *
 from Worksheet import Worksheet
 import Style
-from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell
+from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell
 import ExcelFormula
 import datetime as dt
 
@@ -143,7 +150,7 @@ class Row(object):
         return self.__height_in_pixels
 
 
-    @accepts(object, Style.XFStyle)
+    # @accepts(object, Style.XFStyle)
     def set_style(self, style):
         self.__adjust_height(style)
         self.__xf_index = self.__parent_wb.add_style(style)
@@ -163,7 +170,7 @@ class Row(object):
 
         
     def get_max_col(self):
-        return self.__min_col_idx
+        return self.__max_col_idx
 
         
     def get_str_count(self):
@@ -229,34 +236,53 @@ class Row(object):
         self.__cells.append(
             NumberCell(self, colx, xf_index, self.__excel_date_dt(datetime_obj)))
 
-    def set_cell_formula(self, colx, formula_text, style=Style.default_style):
+    def set_cell_formula(self, colx, formula, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(NumberCell(self, colx, xf_index, formula_text))
+        self.__cells.append(FormulaCell(self, colx, xf_index, formula))
+        
+    def set_cell_boolean(self, colx, value, style=Style.default_style):
+        self.__adjust_height(style)
+        self.__adjust_bound_col_idx(colx)
+        xf_index = self.__parent_wb.add_style(style)
+        self.__cells.append(BooleanCell(self, colx, xf_index, bool(value)))
 
-    @accepts(object, int, (str, unicode, int, float, dt.datetime, dt.time, dt.date, ExcelFormula.Formula), Style.XFStyle)
+    def set_cell_error(self, colx, error_string_or_code, style=Style.default_style):
+        self.__adjust_height(style)
+        self.__adjust_bound_col_idx(colx)
+        xf_index = self.__parent_wb.add_style(style)
+        self.__cells.append(ErrorCell(self, colx, xf_index, error_string_or_code))
+
+    # @accepts(object, int, (str, unicode, int, long, float, dt.datetime, dt.time, dt.date, ExcelFormula.Formula), Style.XFStyle)
     def write(self, col, label, style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
-        if isinstance(label, (str, unicode)):
+        style_index = self.__parent_wb.add_style(style)
+        if isinstance(label, basestring):
             if len(label) > 0:
-                self.__cells.extend([ StrCell(self, col, self.__parent_wb.add_style(style), self.__parent_wb.add_str(label)) ])
+                self.__cells.append(
+                    StrCell(self, col, style_index, self.__parent_wb.add_str(label))
+                    )
                 self.__total_str += 1
             else:
-                self.__cells.extend([ BlankCell(self, col, self.__parent_wb.add_style(style)) ])
-        elif isinstance(label, (int, float)):
-            self.__cells.extend([ NumberCell(self, col, self.__parent_wb.add_style(style), label) ])            
+                self.__cells.append(BlankCell(self, col, style_index))
+        elif isinstance(label, (float, int, long)):
+            self.__cells.append(NumberCell(self, col, style_index, label))            
         elif isinstance(label, (dt.datetime, dt.time)):
-            self.__cells.extend([ NumberCell(self, col, self.__parent_wb.add_style(style), self.__excel_date_dt(label)) ])
+            date_number = self.__excel_date_dt(label)
+            self.__cells.append(NumberCell(self, col, style_index, date_number))
+        elif isinstance(label, ExcelFormula.Formula):
+            self.__cells.append(FormulaCell(self, col, style_index, label))
         else:
-            self.__cells.extend([ FormulaCell(self, col, self.__parent_wb.add_style(style), label) ])
-
-    @accepts(object, int, int, Style.XFStyle)                        
+            raise Exception("Unexpected data type %r" % type(label))
+            
+    # @accepts(object, int, int, Style.XFStyle)                        
     def write_blanks(self, c1, c2, style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(c1, c2)
-        self.__cells.extend([ MulBlankCell(self, c1, c2, self.__parent_wb.add_style(style)) ])
+        style_index = self.__parent_wb.add_style(style)
+        self.__cells.extend([ MulBlankCell(self, c1, c2, style_index) ])
 
         
         
