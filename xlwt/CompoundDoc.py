@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 #  Copyright (C) 2005 Roman V. Kiseliov
 #  All rights reserved.
@@ -47,6 +47,7 @@ import struct
 
 __rev_id__ = """$Id$"""
 
+# 2007-02-21 SJM Support an open file or file-like object as arg to Workbook.save()
         
 class Reader:
     def __init__(self, filename, dump = False):
@@ -537,7 +538,7 @@ class XlsDoc:
                                     ])
                                         
 
-    def save(self, filename, stream):
+    def save(self, file_name_or_filelike_obj, stream):
         # 1. Align stream on 0x1000 boundary (and therefore on sector boundary)
         padding = '\x00' * (0x1000 - (len(stream) % 0x1000))
         self.book_stream_len = len(stream) + len(padding)
@@ -546,7 +547,10 @@ class XlsDoc:
         self.__build_sat()
         self.__build_header()
         
-        f = file(filename, 'wb')
+        f = file_name_or_filelike_obj
+        we_own_it = not hasattr(f, 'write')
+        if we_own_it:
+            f = open(file_name_or_filelike_obj, 'wb')
         f.write(self.header)
         f.write(self.packed_MSAT_1st)
         f.write(stream)
@@ -554,7 +558,8 @@ class XlsDoc:
         f.write(self.packed_MSAT_2nd)
         f.write(self.packed_SAT)
         f.write(self.dir_stream)
-        f.close()
+        if we_own_it:
+            f.close()
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-### $ANTLR 2.7.5 (20050128): "excel-formula.g" -> "ExcelFormulaParser.py"$
+### $ANTLR 2.7.7 (20060930): "excel-formula.g" -> "ExcelFormulaParser.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -54,8 +54,9 @@ RB = 25
 COLON = 26
 COMMA = 27
 SEMICOLON = 28
-CONCAT = 29
-REF2D = 30
+REF2D = 29
+REF2D_R1C1 = 30
+CONCAT = 31
 
 class Parser(antlr.LLkParser):
     ### user action >>>
@@ -96,7 +97,7 @@ class Parser(antlr.LLkParser):
                 elif la1 and la1 in [GT]:
                     pass
                     self.match(GT)
-                    op = struct.pack('B', ptgGE)
+                    op = struct.pack('B', ptgGT)
                 elif la1 and la1 in [LT]:
                     pass
                     self.match(LT)
@@ -443,15 +444,15 @@ _tokenNames = [
     "COLON", 
     "COMMA", 
     "SEMICOLON", 
-    "CONCAT", 
-    "REF2D"
+    "REF2D", 
+    "REF2D_R1C1", 
+    "CONCAT"
 ]
     
 
 ### generate bit set
 def mk_tokenSet_0(): 
     ### var1
-    data = [ 817888258L, 0L]
+    data = [ 2428500994L, 0L]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
-    
