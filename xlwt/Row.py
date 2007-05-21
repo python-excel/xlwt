@@ -42,6 +42,9 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-04-16 SJM Writing bool instance -> a BOOLERR cell
+# 2007-03-01 SJM Writing None -> a BLANK cell
+
 # 2007-02-21 SJM Fixed typo causing bad DIMENSIONS record
 # 2007-02-21 SJM Fixed set_cell_formula() misleading arg name
 # 2007-02-20 SJM Decorators commented out. Guard code added where needed.
@@ -267,11 +270,15 @@ class Row(object):
                 self.__total_str += 1
             else:
                 self.__cells.append(BlankCell(self, col, style_index))
+        elif isinstance(label, bool): # bool is subclass of int; test bool first
+            self.__cells.append(BooleanCell(self, col, style_index, label))
         elif isinstance(label, (float, int, long)):
             self.__cells.append(NumberCell(self, col, style_index, label))            
         elif isinstance(label, (dt.datetime, dt.time)):
             date_number = self.__excel_date_dt(label)
             self.__cells.append(NumberCell(self, col, style_index, date_number))
+        elif label is None:
+            self.__cells.append(BlankCell(self, col, style_index))
         elif isinstance(label, ExcelFormula.Formula):
             self.__cells.append(FormulaCell(self, col, style_index, label))
         else:
