@@ -41,11 +41,13 @@
 
 __rev_id__ = """$Id$"""
 
-# SJM 2007-02-20 Added support for boolean & error cells
+# 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
 
-# SJM 2007-01-10 Fixed RK encoding bug
-# SJM 2007-01-10 Having method names in __slots__ is a WOFTAM. Removed.
-# SJM 2007-01-10 Unused & unuseable MulNumber class removed.
+# 2007-02-20 SJM Added support for boolean & error cells
+
+# 2007-01-10 SJM Fixed RK encoding bug
+# 2007-01-10 SJM Having method names in __slots__ is a WOFTAM. Removed.
+# 2007-01-10 SJM Unused & unuseable MulNumber class removed.
 
 from struct import unpack, pack
 import BIFFRecords
@@ -199,14 +201,15 @@ class ErrorCell(object):
             self.__idx, self.__xf_idx, self.__number, 1).get()
 
 class FormulaCell(object):
-    __slots__ = ["__parent", "__idx", "__xf_idx", "__frmla"]
+    __slots__ = ["__parent", "__idx", "__xf_idx", "__frmla", "__calc_flags"]
 
-    def __init__(self, parent, idx, xf_idx, frmla):
+    def __init__(self, parent, idx, xf_idx, frmla, calc_flags=0):
         self.__parent = parent
         self.__idx = idx
         self.__xf_idx = xf_idx
         self.__frmla = frmla
+        self.__calc_flags = calc_flags
 
     def get_biff_data(self):
         return BIFFRecords.FormulaRecord(self.__parent.get_index(),
-            self.__idx, self.__xf_idx, self.__frmla.rpn()).get()
+            self.__idx, self.__xf_idx, self.__frmla.rpn(), self.__calc_flags).get()

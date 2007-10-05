@@ -41,6 +41,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
 # 2007-02-21 SJM Removed pointless calls to do-nothing superclass __init__()
 # 2007-02-21 SJM Removed pointless method get_rec_data()
 # 2007-02-20 SJM Added class BoolErrRecord
@@ -1516,8 +1517,8 @@ class FormulaRecord(BiffRecord):
     """
     _REC_ID = 0x0006
 
-    def __init__(self, row, col, xf_index, rpn):
-        self._rec_data = pack('<3HQHL', row, col, xf_index, 0xFFFF000000000003, 0, 0) + rpn
+    def __init__(self, row, col, xf_index, rpn, calc_flags=0):
+        self._rec_data = pack('<3HQHL', row, col, xf_index, 0xFFFF000000000003, calc_flags & 3, 0) + rpn
 
 
 class GutsRecord(BiffRecord):

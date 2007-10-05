@@ -47,6 +47,7 @@ import struct
 
 __rev_id__ = """$Id$"""
 
+# 2007-06-02 SJM Fix bug in Reader.get_stream_data causing mangled stream to be returned when sector IDs validly not monotonically increasing.
 # 2007-02-21 SJM Support an open file or file-like object as arg to Workbook.save()
         
 class Reader:
@@ -267,7 +268,7 @@ class Reader:
         while SAT[sid] >= 0:
             next_in_chain = SAT[sid]
             last_chunk_start, last_chunk_finish = chunks[-1]
-            if next_in_chain - last_chunk_finish <= 1:
+            if next_in_chain == last_chunk_finish + 1:
                 chunks[-1] = last_chunk_start, next_in_chain
             else:
                 chunks.extend([(next_in_chain, next_in_chain)]) 

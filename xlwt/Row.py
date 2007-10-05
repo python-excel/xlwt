@@ -42,6 +42,13 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
+
+# 2007-08-19 SJM Row.write (and hence Worksheet.write) was rejecting datetime.date objects.
+
+# 2007-06-02 SJM Column indexes checked for range and type
+# 2007-06-02 SJM Cleaned up write_blanks method
+
 # 2007-04-16 SJM Writing bool instance -> a BOOLERR cell
 # 2007-03-01 SJM Writing None -> a BLANK cell
 
@@ -129,10 +136,13 @@ class Row(object):
 
     def __adjust_bound_col_idx(self, *args):
         for arg in args:
-            if arg < self.__min_col_idx:
-                self.__min_col_idx = arg
-            elif arg > self.__max_col_idx:
-                self.__max_col_idx = arg
+            iarg = int(arg)
+            if not ((0 <= iarg <= 255) and arg == iarg):
+                raise ValueError("column index (%r) not an int in range(256)" % arg)
+            if iarg < self.__min_col_idx:
+                self.__min_col_idx = iarg
+            elif iarg > self.__max_col_idx:
+                self.__max_col_idx = iarg
 
     def __excel_date_dt(self, date):
         if isinstance(date, dt.date) and (not isinstance(date, dt.datetime)):
@@ -239,11 +249,11 @@ class Row(object):
         self.__cells.append(
             NumberCell(self, colx, xf_index, self.__excel_date_dt(datetime_obj)))
 
-    def set_cell_formula(self, colx, formula, style=Style.default_style):
+    def set_cell_formula(self, colx, formula, style=Style.default_style, calc_flags=0):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(FormulaCell(self, colx, xf_index, formula))
+        self.__cells.append(FormulaCell(self, colx, xf_index, formula, calc_flags=0))
         
     def set_cell_boolean(self, colx, value, style=Style.default_style):
         self.__adjust_height(style)
@@ -274,7 +284,7 @@ class Row(object):
             self.__cells.append(BooleanCell(self, col, style_index, label))
         elif isinstance(label, (float, int, long)):
             self.__cells.append(NumberCell(self, col, style_index, label))            
-        elif isinstance(label, (dt.datetime, dt.time)):
+        elif isinstance(label, (dt.datetime, dt.date, dt.time)):
             date_number = self.__excel_date_dt(label)
             self.__cells.append(NumberCell(self, col, style_index, date_number))
         elif label is None:
@@ -286,10 +296,11 @@ class Row(object):
             
     # @accepts(object, int, int, Style.XFStyle)                        
     def write_blanks(self, c1, c2, style):
+        assert c1 <= c2
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(c1, c2)
         style_index = self.__parent_wb.add_style(style)
-        self.__cells.extend([ MulBlankCell(self, c1, c2, style_index) ])
+        self.__cells.append(MulBlankCell(self, c1, c2, style_index))
 
         
         
