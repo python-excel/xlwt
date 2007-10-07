@@ -72,12 +72,14 @@ is not set), it repeats the attributes of its style XF record.
 
 __rev_id__ = """$Id$"""
 
+# 2007-10-06 SJM Optional compression of duplicate fonts and XFs
 # 2007-01-21 SJM Changed default font charset from ANSI_CYRILLIC to SYS_DEFAULT
 # 2007-01-21 SJM Fixed spelling of DECORATIVE
 
 import BIFFRecords
 
 class Font(object):
+
     ESCAPEMENT_NONE         = 0x00
     ESCAPEMENT_SUPERSCRIPT  = 0x01
     ESCAPEMENT_SUBSCRIPT    = 0x02
@@ -164,6 +166,23 @@ class Font(object):
                     underline, family, charset, 
                     name)
 
+    def _search_key(self):
+        return (
+            self.height,
+            self.italic,
+            self.struck_out,
+            self.outline,
+            self.shadow,
+            self.colour_index,
+            self.bold,
+            self._weight,
+            self.escapement,
+            self.underline,
+            self.family,
+            self.charset,
+            self.name,
+            )
+
 class Alignment(object):
     HORZ_GENERAL                = 0x00
     HORZ_LEFT                   = 0x01
@@ -209,6 +228,12 @@ class Alignment(object):
         self.inde = 0
         self.merg = 0
 
+    def _search_key(self):
+        return (
+            self.horz, self.vert, self.dire, self.orie, self.rota,
+            self.wrap, self.shri, self.inde, self.merg,
+            )
+
 class Borders(object):
     NO_LINE = 0x00
     THIN    = 0x01
@@ -247,6 +272,14 @@ class Borders(object):
         self.need_diag1 = self.NO_NEED_DIAG1
         self.need_diag2 = self.NO_NEED_DIAG2
 
+    def _search_key(self):
+        return (
+             self.left, self.right, self.top, self.bottom, self.diag,
+             self.left_colour, self.right_colour, self.top_colour,
+             self.bottom_colour, self.diag_colour,
+             self.need_diag1, self.need_diag2,
+            )
+
 class Pattern(object):
     # patterns 0x00 - 0x12
     NO_PATTERN      = 0x00 
@@ -256,13 +289,25 @@ class Pattern(object):
         self.pattern = self.NO_PATTERN
         self.pattern_fore_colour = 0x40
         self.pattern_back_colour = 0x41
+
+    def _search_key(self):
+        return (
+            self.pattern,
+            self.pattern_fore_colour,
+            self.pattern_back_colour,
+            )
         
 class Protection(object):
     def __init__(self):
         self.cell_locked = 1
         self.formula_hidden = 0
-        
-        
+
+    def _search_key(self):
+        return (
+            self.cell_locked,
+            self.formula_hidden,        
+            )
+            
 if __name__ == '__main__':
     font0 = Font()
     font0.name = 'Arial'

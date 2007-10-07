@@ -84,6 +84,7 @@ Record Order in BIFF8
 
 __rev_id__ = """$Id$"""
 
+# 2007-10-06 SJM Optional compression of duplicate fonts and XFs
 # 2007-02-21 SJM Make it run with Python 2.3
 # 2007-02-19 SJM Allow specifying the encoding of input strings
 # 2007-01-11 SJM Fixes for sheet.visibility (BOUNDSHEET record)
@@ -99,7 +100,7 @@ class Workbook(object):
     ## Constructor
     #################################################################
     # @accepts(object, str)
-    def __init__(self, encoding='ascii'):
+    def __init__(self, encoding='ascii', style_compression=0):
         self.encoding = encoding
         self.__owner = 'None'       
         self.__country_code = None # 0x07 is Russia :-)
@@ -124,7 +125,7 @@ class Workbook(object):
         self.__vscroll_visible = 1
         self.__tabs_visible = 1
 
-        self.__styles = Style.StyleCollection()
+        self.__styles = Style.StyleCollection(style_compression)
          
         self.__dates_1904 = 0
         self.__use_cell_values = 1
@@ -136,6 +137,9 @@ class Workbook(object):
     #################################################################
     ## Properties, "getters", "setters"
     #################################################################
+    
+    def get_style_stats(self):
+        return self.__styles.stats[:]
 
     # @accepts(object, str)
     def set_owner(self, value):

@@ -42,6 +42,7 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-10-06 SJM Optional compression of duplicate fonts and XFs
 # 2007-02-21 SJM Remove debris from earlier fix
 # 2007-02-21 SJM "The first user-defined format starts at 164" (not 163)
 # 2007-02-21 SJM Make it work with Python 2.3
@@ -104,14 +105,23 @@ class StyleCollection(object):
             '@'   
     ]
 
-    def __init__(self):
-        self._fonts = {}
-        self._fonts[Formatting.Font()] = 0
-        self._fonts[Formatting.Font()] = 1
-        self._fonts[Formatting.Font()] = 2
-        self._fonts[Formatting.Font()] = 3
-        # The font with index 4 is omitted in all BIFF versions
-        self._fonts[Formatting.Font()] = 5
+    def __init__(self, style_compression=0):
+        self.style_compression = style_compression
+        self.stats = [0, 0, 0, 0, 0, 0]
+        self._font_id2x = {}
+        self._font_x2id = {}
+        self._font_val2x = {}
+        
+        for x in (0, 1, 2, 3, 5): # The font with index 4 is omitted in all BIFF versions
+            font = Formatting.Font()
+            search_key = font._search_key()
+            self._font_id2x[font] = x
+            self._font_x2id[x] = font
+            self._font_val2x[search_key] = x
+        
+        self._xf_id2x = {}
+        self._xf_x2id = {}
+        self._xf_val2x = {}
         
         self._num_formats = {}
         for fmtidx, fmtstr in zip(range(0, 23), StyleCollection._std_num_fmt_list[0:23]):
@@ -119,7 +129,6 @@ class StyleCollection(object):
         for fmtidx, fmtstr in zip(range(37, 50), StyleCollection._std_num_fmt_list[23:]):
             self._num_formats[fmtstr] = fmtidx 
 
-        self._xf = {}
         self.default_style = XFStyle()
         self._default_xf = self._add_style(self.default_style)[0]
         
@@ -141,19 +150,51 @@ class StyleCollection(object):
             self._num_formats[num_format_str] = num_format_idx
             
         font = style.font
-        if font in self._fonts:
-            font_idx = self._fonts[font]
+        if font in self._font_id2x:
+            font_idx = self._font_id2x[font]
+            self.stats[0] += 1
+        elif self.style_compression:
+            search_key = font._search_key()
+            font_idx = self._font_val2x.get(search_key)
+            if font_idx is not None:
+                self._font_id2x[font] = font_idx
+                self.stats[1] += 1
+            else:
+                font_idx = len(self._font_x2id) + 1 # Why plus 1? Font 4 is missing
+                self._font_id2x[font] = font_idx
+                self._font_val2x[search_key] = font_idx
+                self._font_x2id[font_idx] = font
+                self.stats[2] += 1
         else:
-            font_idx = len(self._fonts) + 1
-            self._fonts[font] = font_idx
-            
-        xf = (font_idx, num_format_idx, style.alignment, style.borders, style.pattern, style.protection)
+            font_idx = len(self._font_id2x) + 1
+            self._font_id2x[font] = font_idx
+            self.stats[2] += 1
         
-        if xf in self._xf:
-            xf_index = self._xf[xf]
+        gof = (style.alignment, style.borders, style.pattern, style.protection)
+        xf = (font_idx, num_format_idx) + gof
+        if xf in self._xf_id2x:
+            xf_index = self._xf_id2x[xf]
+            self.stats[3] += 1
+        elif self.style_compression == 2:
+            xf_key = (font_idx, num_format_idx) + tuple([obj._search_key() for obj in gof])
+            xf_index = self._xf_val2x.get(xf_key)
+            if xf_index is not None:
+                self._xf_id2x[xf] = xf_index
+                self.stats[4] += 1
+            else:
+                xf_index = 0x10 + len(self._xf_x2id)
+                self._xf_id2x[xf] = xf_index
+                self._xf_val2x[xf_key] = xf_index
+                self._xf_x2id[xf_index] = xf
+                self.stats[5] += 1
         else:
-            xf_index = 0x10 + len(self._xf)
-            self._xf[xf] = xf_index
+            xf_index = 0x10 + len(self._xf_id2x)
+            self._xf_id2x[xf] = xf_index
+            self.stats[5] += 1
+
+        if xf_index >= 0xFFF: 
+            # 12 bits allowed, 0xFFF is a sentinel value
+            raise ValueError("More than 4094 XFs (styles)")
             
         return xf, xf_index
         
@@ -167,7 +208,10 @@ class StyleCollection(object):
             
     def _all_fonts(self):
         result = ''
-        alist = [(v, k) for k, v in self._fonts.items()]
+        if self.style_compression:
+            alist = self._font_x2id.items()
+        else: 
+            alist = [(x, o) for o, x in self._font_id2x.items()]
         alist.sort()
         for font_idx, font in alist:
             result += font.get_biff_record().get()
@@ -189,8 +233,10 @@ class StyleCollection(object):
         result = ''
         for i in range(0, 16):
             result += XFRecord(self._default_xf, 'style').get()
-            
-        alist = [(v, k) for k, v in self._xf.items()]
+        if self.style_compression == 2:            
+            alist = self._xf_x2id.items()
+        else:
+            alist = [(x, o) for o, x in self._xf_id2x.items()]
         alist.sort()
         for xf_idx, xf in alist:
             result += XFRecord(xf).get()
