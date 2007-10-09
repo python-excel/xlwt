@@ -2,7 +2,9 @@
 # -*- coding: windows-1252 -*-
 
 __rev_id__ = """$Id$"""
+__VERSION__ = '0.7.0a4'
 
+# 2007-10-09 SJM Added __VERSION__; version 0.7.0a4
 # 2007-02-21 SJM Make it work with Python 2.3
 
 import sys
