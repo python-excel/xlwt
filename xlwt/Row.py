@@ -42,6 +42,8 @@
 
 __rev_id__ = """$Id$"""
 
+# 2007-10-09 SJM Added support for decimal.Decimal objects to Row.write (and hence Worksheet.write) 
+
 # 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
 
 # 2007-08-19 SJM Row.write (and hence Worksheet.write) was rejecting datetime.date objects.
@@ -73,7 +75,7 @@ import Style
 from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell
 import ExcelFormula
 import datetime as dt
-
+from decimal import Decimal
 
 class Row(object):
     __slots__ = [# private variables
@@ -282,7 +284,7 @@ class Row(object):
                 self.__cells.append(BlankCell(self, col, style_index))
         elif isinstance(label, bool): # bool is subclass of int; test bool first
             self.__cells.append(BooleanCell(self, col, style_index, label))
-        elif isinstance(label, (float, int, long)):
+        elif isinstance(label, (float, int, long, Decimal)):
             self.__cells.append(NumberCell(self, col, style_index, label))            
         elif isinstance(label, (dt.datetime, dt.date, dt.time)):
             date_number = self.__excel_date_dt(label)
