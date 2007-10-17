@@ -45,17 +45,15 @@ import sys
 from distutils.core import setup
 
 DESCRIPTION = \
-'generating Excel 97+ files; importing Excel 95+ files; Excel files dumper; OLE2 files dumper; xls2txt, xls2csv, xls2html'
+'Library to create spreadsheet files compatible with MS Excel 97/2000/XP/2003 XLS files, ' \
+'on any platform, with Python 2.3 or later'
+
 
 LONG_DESCRIPTION = \
-'''xlwt  is a   library  for  generating  Excel  97/2000/XP/2003  and
-OpenOffice    Calc   compatible     spreadsheets.     xlwt     has
-full-blown   support   for  UNICODE  in Excel and Calc spreadsheets, allows
-using variety of formatting features,   provides   interface   to  printing
-options   of   Excel   and OpenOffice  Calc.  xlwt  contains  also
-Excel BIFF8 dumper and MS compound  documents  dumper.  Main  advantage  is
-possibility  of generating Excel  spreadsheets  without  COM  servers.  The
-only requirement -- Python 2.4 or higher.
+'''xlwt is a library for generating spreadsheet files that are compatible with
+Excel 97/2000/XP/2003, OpenOffice.org Calc, and Gnumeric. xlwt has
+full support for Unicode. Excel spreadsheets can be generated on any platform
+without needing Excel or a COM server. The only requirement is Python 2.3 or higher. 
 '''
 
 CLASSIFIERS = \
@@ -72,15 +70,15 @@ CLASSIFIERS = \
 ]
 
 KEYWORDS = \
-'xls openoffice excel spreadsheet workbook database table unicode'
+'xls excel spreadsheet workbook worksheet'
 
 setup(name = 'xlwt',
-      version = '0.7.0a',
-      #### fix me ###
-      author = 'Roman V. Kiseliov',
-      author_email = 'roman@kiseliov.ru',
-      url = 'http://sourceforge.net/projects/pyexcelerator/',
-      download_url='http://sourceforge.net/projects/pyexcelerator/',    
+      version = '0.7.0a4',
+      # author = 'Roman V. Kiseliov',
+      # author_email = 'roman@kiseliov.ru',
+      maintainer = 'John Machin',
+      maintainer_email = 'sjmachin@lexicon.net',
+      url = 'https://secure.simplistix.co.uk/svn/xlwt/trunk',
       description = DESCRIPTION,
       long_description = LONG_DESCRIPTION,
       license = 'BSD',

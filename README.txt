@@ -1,4 +1,26 @@
 
+xlwt is a fork of the pyExcelerator package, which was developed by
+Roman V. Kiseliov.
+
+It is very definitely a work in progress, and has no documentation. The
+(intended) current state is that xlwt will do what the 0.6.3 release 
+of pyExcelerator did, with bugs fixed and enhancements as documented in
+the source, and will work on Python 2.3 as well as 2.4 and 2.5. This
+minimal distribution (0.7.0a4) is being made available for those who are
+brave enough to try it but eschew SVN.
+
+If you have a problem, try the following in this order:
+(1) Read the source
+(2) Ask a question on http://groups.google.com/group/python-excel/
+(3) E-mail the xlwt maintainer (sjmachin at lexicon.net), including
+    "[xlwt]" as part of the message subject.
+    
+John Machin, 2007-10-18    
+    
+    
+=== Following is Roman's README for pyExcelerator ========================
+
+
                         pyExcelerator
                     --------------------
 
