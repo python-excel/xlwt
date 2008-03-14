@@ -40,11 +40,6 @@ var.     ln or
 '''
 
 
-# 2007-02-19 SJM Fixed Unicode packing functions.
-#                Corrected test for max string length.
-#                Removed hard-coded default encoding (cp1253).
-#                Added optional encoding, default='ascii'.
-
 from struct import pack
 
 def upack2(s, encoding='ascii'):
