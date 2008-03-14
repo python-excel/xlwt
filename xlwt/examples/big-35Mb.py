@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # tries stress SST, SAT and MSAT
-__rev_id__ = """$Id$"""
-
 
 from time import *
-from pyExcelerator import *
+from xlwt import *
 
 style = XFStyle()
 

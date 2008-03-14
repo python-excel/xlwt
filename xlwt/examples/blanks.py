@@ -2,10 +2,7 @@
 # -*- coding: windows-1251 -*-
 # Copyright (C) 2005 Kiseliov Roman
 
-__rev_id__ = """$Id$"""
-
-
-from pyExcelerator import *
+from xlwt import *
 
 font0 = Font()
 font0.name = 'Times New Roman'

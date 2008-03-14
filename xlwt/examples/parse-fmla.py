@@ -1,4 +1,4 @@
-from pyExcelerator import ExcelFormulaParser, ExcelFormula
+from xlwt import ExcelFormulaParser, ExcelFormula
 import sys
 
 f = ExcelFormula.Formula(

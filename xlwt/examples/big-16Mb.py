@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 # tries stress SST, SAT and MSAT
-__rev_id__ = """$Id$"""
-
 
 from time import *
-from pyExcelerator.Workbook import *
-from pyExcelerator.Style import *
+from xlwt.Workbook import *
+from xlwt.Style import *
 
 style = XFStyle()
 

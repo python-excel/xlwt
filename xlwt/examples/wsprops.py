@@ -1,5 +1,3 @@
-__rev_id__ = """$Id$"""
-
 props = \
 [
         'name',
@@ -77,7 +75,7 @@ props = \
         'copies_num',
 ]
 
-from pyExcelerator import *
+from xlwt import *
 
 wb = Workbook()
 ws = wb.add_sheet('sheet')
@@ -98,7 +96,7 @@ print ws.cols_right_to_left
 print ws.show_outline
 print ws.remove_splits
 print ws.selected
-print ws.hidden
+# print ws.hidden
 print ws.page_preview
 print ws.first_visible_row
 print ws.first_visible_col
