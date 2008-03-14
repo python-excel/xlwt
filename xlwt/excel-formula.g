@@ -1,10 +1,4 @@
-/*
- *  $Id$
- */
-
 header {
-    __rev_id__ = """$Id$"""
-
     import struct
     import Utils
     from UnicodeUtils import upack1

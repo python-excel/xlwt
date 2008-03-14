@@ -1,66 +1,18 @@
-#!/usr/bin/env python
 # -*- coding: windows-1252 -*-
 
-#  Copyright (C) 2005 Roman V. Kiseliov
-#  All rights reserved.
-# 
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions
-#  are met:
-# 
-#  1. Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-# 
-#  2. Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-# 
-#  3. All advertising materials mentioning features or use of this
-#     software must display the following acknowledgment:
-#     "This product includes software developed by
-#      Roman V. Kiseliov <roman@kiseliov.ru>."
-# 
-#  4. Redistributions of any form whatsoever must retain the following
-#     acknowledgment:
-#     "This product includes software developed by
-#      Roman V. Kiseliov <roman@kiseliov.ru>."
-# 
-#  THIS SOFTWARE IS PROVIDED BY Roman V. Kiseliov ``AS IS'' AND ANY
-#  EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-#  PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL Roman V. Kiseliov OR
-#  ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-#  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-#  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-#  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-#  OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-__rev_id__ = """$Id$"""
-
 # 2007-10-09 SJM Added support for decimal.Decimal objects to Row.write (and hence Worksheet.write) 
-
 # 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
-
 # 2007-08-19 SJM Row.write (and hence Worksheet.write) was rejecting datetime.date objects.
-
 # 2007-06-02 SJM Column indexes checked for range and type
 # 2007-06-02 SJM Cleaned up write_blanks method
-
 # 2007-04-16 SJM Writing bool instance -> a BOOLERR cell
 # 2007-03-01 SJM Writing None -> a BLANK cell
-
 # 2007-02-21 SJM Fixed typo causing bad DIMENSIONS record
 # 2007-02-21 SJM Fixed set_cell_formula() misleading arg name
 # 2007-02-20 SJM Decorators commented out. Guard code added where needed.
 # 2007-02-20 SJM Changed a_list.extend([expr]) to a_list.append(expr)
 # 2007-02-20 SJM Fixed copy/paste bug in set_cell_formula()
 # 2007-02-20 SJM Added set_cell_boolean() and set_cell_error()
-
 # 2007-01-14 SJM Add assertions on type & range of row index.
 # 2007-01-12 SJM space_above and space_below flags were ignored (options |= 0x00 & flag ???)
 # 2007-01-12 SJM has_default_xf_index flag wasn't being set correctly.
