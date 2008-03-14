@@ -16,7 +16,7 @@ class Formula(object):
             self.__parser = ExcelFormulaParser.Parser(lexer)
             self.__parser.formula()
         except ANTLRException:
-            raise Exception, "can't parse formula " + s
+            raise ExcelFormulaParser.FormulaParseException, "can't parse formula " + s
 
     def text(self):
         return self.__s

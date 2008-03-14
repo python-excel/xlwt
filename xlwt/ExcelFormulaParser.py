@@ -58,6 +58,11 @@ REF2D = 29
 REF2D_R1C1 = 30
 CONCAT = 31
 
+class FormulaParseException(Exception):
+    """
+    An exception indicating that a Formula could not be successfully parsed.
+    """
+    
 class Parser(antlr.LLkParser):
     ### user action >>>
     ### user action <<<
@@ -335,12 +340,14 @@ class Parser(antlr.LLkParser):
                    arg_type_list,
                    volatile_func) = std_func_by_name[func_tok.text.upper()]
                 else:
-                   raise Exception, "unknown function: %s" % func_tok.text
+                   raise FormulaParseException, "unknown function: %s" % func_tok.text
                 self.match(LP)
                 arg_count=self.expr_list(arg_type_list, min_argc, max_argc)
                 self.match(RP)
                 if arg_count > max_argc or arg_count < min_argc:
-                   raise Exception, "%d parameters for function: %s" % (arg_count, func_tok.text)
+                   raise FormulaParseException, "%d parameters for function %s, should have been between %i and %i" % (
+                       arg_count, func_tok.text, min_argc, max_argc
+                       )
                 if min_argc == max_argc:
                    if func_type == "V":
                        func_ptg = ptgFuncV
@@ -349,7 +356,7 @@ class Parser(antlr.LLkParser):
                    elif func_type == "A":
                        func_ptg = ptgFuncA
                    else:
-                       raise Exception, "wrong function type"
+                       raise FormulaParseException, "wrong function type"
                    self.rpn += struct.pack("<BH", func_ptg, opcode)
                 else:
                    if func_type == "V":
@@ -359,7 +366,7 @@ class Parser(antlr.LLkParser):
                    elif func_type == "A":
                        func_ptg = ptgFuncVarA
                    else:
-                       raise Exception, "wrong function type"
+                       raise FormulaParseException, "wrong function type"
                    self.rpn += struct.pack("<2BH", func_ptg, arg_count, opcode)
             else:
                 raise antlr.NoViableAltException(self.LT(1), self.getFilename())
