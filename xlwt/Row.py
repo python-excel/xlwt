@@ -69,7 +69,6 @@ __rev_id__ = """$Id$"""
 # 2007-01-10 SJM Removed methods from __slots__
 
 import BIFFRecords
-# from Deco import *
 from Worksheet import Worksheet
 import Style
 from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell
@@ -165,7 +164,6 @@ class Row(object):
         return self.__height_in_pixels
 
 
-    # @accepts(object, Style.XFStyle)
     def set_style(self, style):
         self.__adjust_height(style)
         self.__xf_index = self.__parent_wb.add_style(style)
@@ -269,7 +267,6 @@ class Row(object):
         xf_index = self.__parent_wb.add_style(style)
         self.__cells.append(ErrorCell(self, colx, xf_index, error_string_or_code))
 
-    # @accepts(object, int, (str, unicode, int, long, float, dt.datetime, dt.time, dt.date, ExcelFormula.Formula), Style.XFStyle)
     def write(self, col, label, style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
@@ -296,7 +293,6 @@ class Row(object):
         else:
             raise Exception("Unexpected data type %r" % type(label))
             
-    # @accepts(object, int, int, Style.XFStyle)                        
     def write_blanks(self, c1, c2, style):
         assert c1 <= c2
         self.__adjust_height(style)

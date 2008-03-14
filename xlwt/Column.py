@@ -47,12 +47,8 @@ __rev_id__ = """$Id$"""
 
 
 from BIFFRecords import ColInfoRecord
-# from Deco import *
-# from Worksheet import Worksheet
-
 
 class Column(object):
-    # @accepts(object, int, Worksheet)
     def __init__(self, colx, parent_sheet):
         if not(isinstance(colx, int) and 0 <= colx <= 255):
             raise ValueError("column index (%r) not an int in range(256)" % colx)
