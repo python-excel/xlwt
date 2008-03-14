@@ -40,11 +40,6 @@ Record Order in BIFF8
       EOF
 '''
 
-# 2007-10-06 SJM Optional compression of duplicate fonts and XFs
-# 2007-02-21 SJM Make it run with Python 2.3
-# 2007-02-19 SJM Allow specifying the encoding of input strings
-# 2007-01-11 SJM Fixes for sheet.visibility (BOUNDSHEET record)
-
 import BIFFRecords
 import Style
 

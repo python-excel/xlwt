@@ -1,25 +1,5 @@
 # -*- coding: windows-1252 -*-
 
-# 2007-10-09 SJM Added support for decimal.Decimal objects to Row.write (and hence Worksheet.write) 
-# 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
-# 2007-08-19 SJM Row.write (and hence Worksheet.write) was rejecting datetime.date objects.
-# 2007-06-02 SJM Column indexes checked for range and type
-# 2007-06-02 SJM Cleaned up write_blanks method
-# 2007-04-16 SJM Writing bool instance -> a BOOLERR cell
-# 2007-03-01 SJM Writing None -> a BLANK cell
-# 2007-02-21 SJM Fixed typo causing bad DIMENSIONS record
-# 2007-02-21 SJM Fixed set_cell_formula() misleading arg name
-# 2007-02-20 SJM Decorators commented out. Guard code added where needed.
-# 2007-02-20 SJM Changed a_list.extend([expr]) to a_list.append(expr)
-# 2007-02-20 SJM Fixed copy/paste bug in set_cell_formula()
-# 2007-02-20 SJM Added set_cell_boolean() and set_cell_error()
-# 2007-01-14 SJM Add assertions on type & range of row index.
-# 2007-01-12 SJM space_above and space_below flags were ignored (options |= 0x00 & flag ???)
-# 2007-01-12 SJM has_default_xf_index flag wasn't being set correctly.
-# 2007-01-11 SJM Fixes for row height mismatch flag
-# 2007-01-10 SJM Added new set_cell_xxxxx APIs.
-# 2007-01-10 SJM Removed methods from __slots__
-
 import BIFFRecords
 from Worksheet import Worksheet
 import Style

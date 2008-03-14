@@ -1,11 +1,5 @@
 # -*- coding: windows-1252 -*-
 
-# 2007-10-06 SJM Optional compression of duplicate fonts and XFs
-# 2007-02-21 SJM Remove debris from earlier fix
-# 2007-02-21 SJM "The first user-defined format starts at 164" (not 163)
-# 2007-02-21 SJM Make it work with Python 2.3
-# 2007-01-10 SJM Fix XFStyle() always returning the same object.
-
 import Formatting
 from BIFFRecords import *
 

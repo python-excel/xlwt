@@ -1,15 +1,5 @@
 # -*- coding: windows-1252 -*-
 
-# 2007-02-22 SJM Fixed pyExcelerator bug #1360764a: not recognising '>=' (same: '<>' and '<=')
-# 2007-02-22 SJM Changed 1-byte tokens to dict lookup instead of search in a loop
-# 2007-02-22 SJM Fixed unreported bug: not recognising '123.' as a float constant
-# 2007-02-22 SJM Fixed unreported bug: '.' can't be first char of name token
-# 2007-02-22 SJM Fixed unreported bug: not recognising lowercase names
-# 2007-02-22 SJM Fixed unreported bug: not recognising lowercase cellrefs e.g. 'z666'
-# 2007-02-22 SJM Fixed unreported bug: recognising e.g. 'R2C2' as a name
-# 2007-02-22 SJM Fixed unreported bug: recognising e.g. 'A0' as a cellref
-
-
 import sys
 from antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
 import struct

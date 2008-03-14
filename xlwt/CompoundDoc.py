@@ -3,9 +3,6 @@
 import sys
 import struct
 
-# 2007-06-02 SJM Fix bug in Reader.get_stream_data causing mangled stream to be returned when sector IDs validly not monotonically increasing.
-# 2007-02-21 SJM Support an open file or file-like object as arg to Workbook.save()
-        
 class Reader:
     def __init__(self, filename, dump = False):
         self.dump = dump

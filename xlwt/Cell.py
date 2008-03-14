@@ -1,11 +1,5 @@
 # -*- coding: windows-1252 -*-
 
-# 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
-# 2007-02-20 SJM Added support for boolean & error cells
-# 2007-01-10 SJM Fixed RK encoding bug
-# 2007-01-10 SJM Having method names in __slots__ is a WOFTAM. Removed.
-# 2007-01-10 SJM Unused & unuseable MulNumber class removed.
-
 from struct import unpack, pack
 import BIFFRecords
 

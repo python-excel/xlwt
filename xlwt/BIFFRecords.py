@@ -1,12 +1,3 @@
-# 2007-10-05 SJM Added calc_flags arg to Row.set_cell_formula
-# 2007-02-21 SJM Removed pointless calls to do-nothing superclass __init__()
-# 2007-02-21 SJM Removed pointless method get_rec_data()
-# 2007-02-20 SJM Added class BoolErrRecord
-# 2007-02-19 SJM Pass encoding through for SST, sheet_name
-# 2007-01-21 SJM Corrected mask for pattern index (range(19) but saved modulo 16)
-# 2007-01-11 SJM (1) s/struct.pack/pack/ (2) fix name of DefaultRowHeightRecord
-# 2007-01-10 SJM RK record pack format changed I to i (signed)
-
 from struct import pack
 from UnicodeUtils import upack1, upack2
 import sys

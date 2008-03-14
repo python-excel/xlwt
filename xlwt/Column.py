@@ -1,9 +1,5 @@
 # -*- coding: windows-1252 -*-
 
-# 2007-01-14 SJM Added assertions on type & range of column index; removed @accepts
-# 2007-01-10 SJM Added set_style() method
-
-
 from BIFFRecords import ColInfoRecord
 
 class Column(object):

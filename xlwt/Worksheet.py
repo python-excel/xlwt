@@ -34,13 +34,6 @@
             EOF
 '''
 
-# 2007-02-21 SJM Make it run with Python 2.3
-# 2007-02-20 SJM Apply encoding to header & footer strings
-# 2007-01-11 SJM Fixes for row height mismatch
-# 2007-01-11 SJM Fixes for sheet visibility
-# 2007-01-11 SJM Commented out @accepts
-# 2007-01-10 SJM Improvements & comments on merged cells.
-
 import BIFFRecords
 import Bitmap
 import Formatting
