@@ -499,10 +499,3 @@ class Workbook(object):
 
         doc = CompoundDoc.XlsDoc()
         doc.save(filename, self.get_biff_data())
-
-if __name__ == '__main__':
-    wb = Workbook()
-    f = file('workbook.bin', 'wb')
-    f.write(wb.get_biff_data())
-    f.close()
-    

@@ -196,11 +196,3 @@ class StyleCollection(object):
         
     def _all_styles(self):
         return StyleRecord().get()
-        
-if __name__ == '__main__':
-    sc = StyleCollection()
-    f = file('styles.bin', 'wb')
-    f.write(sc.get_biff_data())
-    f.close()
-
-            

@@ -111,12 +111,3 @@ class Lexer(TokenStream):
                 "Unexpected char %r in column %u." % (self.curr_ch(), self._pos))
         self.next_ch()
         return Tok(type=ty, text=te, col=self._pos)
-
-if __name__ == '__main__' :
-    import locale
-    # locale.setlocale(locale.LC_ALL, 'russian')
-    try:
-        for t in Lexer('>= <= <>  A0 A09 r0c0 r09c09 1+2+3+67.8678 + " @##$$$ klhkh kljhklhkl " + .58e-678*A1:B4 - 1lkjljlkjl3535порпор'):
-            print t
-    except TokenStreamException, e:
-        print "error:", e

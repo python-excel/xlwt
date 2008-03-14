@@ -514,13 +514,3 @@ class XlsDoc:
         f.write(self.dir_stream)
         if we_own_it:
             f.close()
-
-
-if __name__ == '__main__':
-    d = XlsDoc()
-    d.save('a.aaa', 'b'*17000)
-
-
-
-
-

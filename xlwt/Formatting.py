@@ -28,10 +28,6 @@ is not set), it repeats the attributes of its style XF record.
 
 '''
 
-# 2007-10-06 SJM Optional compression of duplicate fonts and XFs
-# 2007-01-21 SJM Changed default font charset from ANSI_CYRILLIC to SYS_DEFAULT
-# 2007-01-21 SJM Fixed spelling of DECORATIVE
-
 import BIFFRecords
 
 class Font(object):
@@ -263,19 +259,3 @@ class Protection(object):
             self.cell_locked,
             self.formula_hidden,        
             )
-            
-if __name__ == '__main__':
-    font0 = Font()
-    font0.name = 'Arial'
-    font1 = Font()
-    font1.name = 'Arial Cyr'
-    font2 = Font()
-    font2.name = 'Times New Roman'
-    font3 = Font()
-    font3.name = 'Courier New Cyr'
-    
-    for font, filename in [(font0, 'font0.bin'), (font1, 'font1.bin'), (font2, 'font2.bin'), (font3, 'font3.bin')]:
-        f = file(filename, 'wb')
-        f.write(font.get_biff_record().get_data())
-        f.close
-        
