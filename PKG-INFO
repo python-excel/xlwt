@@ -1,13 +1,13 @@
 Metadata-Version: 1.0
-Name: pyExcelerator
-Version: 0.6.3a1
-Summary: Library to generate Microsoft Excel (tm) spreadsheet files or to extract data from such files
+Name: xlwt
+Version: 0.7.0a4
+Summary: Library to generate Microsoft Excel (tm) spreadsheet files
 Home-page: http://www.sourceforge.net/projects/pyexcelerator
-Author: Roman V. Kiseliov
-Author-email: roman@kiseliov.ru
+Author: John Machin
+Author-email: sjmachin@lexicon.net
 License: BSD
-Download-URL: http://www.sourceforge.net/projects/pyexcelerator
-Description: Generate Excel 97+ files. Extract data from Excel 95+ spreadsheets. Full-blown UNICODE support. Pure Python code.
+Download-URL: http://groups.google.com/group/python-excel/
+Description: Generate Excel 97+ files. Full-blown UNICODE support. Pure Python code.
 Keywords: xls,excel,spreadsheet,workbook
 Platform: Platform-independent
 Classifier: Development Status :: 3 - Alpha
