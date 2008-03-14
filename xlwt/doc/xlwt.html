@@ -79,15 +79,23 @@ documentation provided is insufficient.
   </dl>
   <br />
 </dd>
-<dt><a id='xlwt.Workbook.save-method' name='xlwt.Workbook.save-method'><b>save(filename)</b></a> [<a href='#xlwt.Workbook.save-method'>#</a>]</dt>
+<dt><a id='xlwt.Workbook.save-method' name='xlwt.Workbook.save-method'><b>save(filename_or_stream)</b></a> [<a href='#xlwt.Workbook.save-method'>#</a>]</dt>
 <dd>
   <p>
   This method is used to save Workbook to a file in native Excel format.
   </p>
   <dl>
-    <dt><i>filename</i></dt>
+    <dt><i>filename_or_stream</i></dt>
     <dd>
-      The name of the file to save.
+      <p>
+      This can be a string containing a filename of the file, in which case
+      the excel file is saved to disk using the name provided.
+      </p>
+      <p>
+      It can also be a stream object with a write method, such as a
+      StringIO, in which case the data for the excel file is written
+      to the stream.
+      </p>
     </dd>
   </dl>
   <br />
