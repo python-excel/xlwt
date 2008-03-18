@@ -1,14 +1,12 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
-# Copyright (C) 2005 Kiseliov Roman
+import xlwt
 
-from xlwt import *
+# Strings passed to (for example) Worksheet.write can be unicode objects,
+# or str (8-bit) objects, which are then decoded into unicode.
+# The encoding to be used defaults to 'ascii'. This can be overridden
+# when the Workbook instance is created:
 
-w = Workbook()
-ws1 = w.add_sheet('cp1251')
-
-UnicodeUtils.DEFAULT_ENCODING = 'cp1251'
-ws1.write(0, 0, 'Îëÿ')
-
-w.save('unicode0.xls')
-
+book = xlwt.Workbook(encoding='cp1251')
+sheet = book.add_sheet('cp1251-demo')
+sheet.write(0, 0, '\xce\xeb\xff')
+book.save('unicode0.xls')
