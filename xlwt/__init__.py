@@ -1,6 +1,6 @@
 # -*- coding: windows-1252 -*-
 
-__VERSION__ = '0.7.0a4'
+__VERSION__ = '0.7.0a5'
 
 import sys
 if sys.version_info[:2] < (2, 3):

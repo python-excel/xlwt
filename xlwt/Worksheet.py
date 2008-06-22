@@ -74,10 +74,10 @@ class Worksheet(object):
         # RED HERRING ALERT: "sheet_visible" is a clone of the "selected" attribute.
         # Typically a workbook created by the Excel UI will have one sheet
         # (the sheet that was selected when the user saved it)
-        # with both bits set to 1, and all other sheets will have both 
-        # bits set to 0. The true visibility of the sheet is found in the "visibility" 
+        # with both bits set to 1, and all other sheets will have both
+        # bits set to 0. The true visibility of the sheet is found in the "visibility"
         # attribute obtained from the BOUNDSHEET record.
-        self.__sheet_visible = 0 
+        self.__sheet_visible = 0
         self.__page_preview = 0
 
         self.__first_visible_row = 0
@@ -85,7 +85,7 @@ class Worksheet(object):
         self.__grid_colour = 0x40
         self.__preview_magn = 0
         self.__normal_magn = 0
-        
+
         self.visibility = 0 # from/to BOUNDSHEET record.
 
         self.__vert_split_pos = None
@@ -113,7 +113,7 @@ class Worksheet(object):
         self.row_default_hidden = 0
         self.row_default_space_above = 0
         self.row_default_space_below = 0
-        
+
         self.__col_default_width = 0x0008
 
         self.__calc_mode = 1
@@ -991,8 +991,8 @@ class Worksheet(object):
     def write(self, r, c, label="", style=Style.default_style):
         self.row(r).write(c, label, style)
 
-    if 0: # old 
-    
+    if 0: # old
+
         def merge(self, r1, r2, c1, c2, style=Style.XFStyle()):
             self.row(r1).write_blanks(c1, c2,  style)
             for r in range(r1+1, r2+1):
@@ -1002,7 +1002,7 @@ class Worksheet(object):
         def write_merge(self, r1, r2, c1, c2, label="", style=Style.XFStyle()):
             self.merge(r1, r2, c1, c2, style)
             self.write(r1, c1,  label, style)
-            
+
     else:
 
         def merge(self, r1, r2, c1, c2, style=Style.default_style):
@@ -1015,20 +1015,24 @@ class Worksheet(object):
             # is referenced by a [MUL]BLANK record, Excel will blank
             # out the cell on the screen, but OOo & Gnu will not
             # blank it out. Need to do something better than writing
-            # multiple records. In the meantime, avoid this method and use 
+            # multiple records. In the meantime, avoid this method and use
             # write_merge() instead.
-            self.row(r1).write_blanks(c1 + 1, c2,  style)
+            if c2 > c1:
+                self.row(r1).write_blanks(c1 + 1, c2,  style)
             for r in range(r1+1, r2+1):
                 self.row(r).write_blanks(c1, c2,  style)
             self.__merged_ranges.append((r1, r2, c1, c2))
 
         def write_merge(self, r1, r2, c1, c2, label="", style=Style.default_style):
+            assert 0 <= c1 <= c2 <= 255
+            assert 0 <= r1 <= r2 <= 65535
             self.write(r1, c1, label, style)
-            self.row(r1).write_blanks(c1 + 1, c2,  style) # skip (r1, c1)
+            if c2 > c1:
+                self.row(r1).write_blanks(c1 + 1, c2,  style) # skip (r1, c1)
             for r in range(r1+1, r2+1):
                 self.row(r).write_blanks(c1, c2,  style)
             self.__merged_ranges.append((r1, r2, c1, c2))
-    
+
 
     def insert_bitmap(self, filename, row, col, x = 0, y = 0, scale_x = 1, scale_y = 1):
         bmp = Bitmap.ImDataBmpRecord(filename)
@@ -1196,9 +1200,9 @@ class Worksheet(object):
         return result
 
     def __row_blocks_rec(self):
-        # this function takes almost 99% of overall execution time 
+        # this function takes almost 99% of overall execution time
         # when file is saved
-        # return '' 
+        # return ''
         result = []
         i = 0
         used_rows = self.__rows.keys()

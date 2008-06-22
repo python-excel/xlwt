@@ -10,7 +10,7 @@ Group           Attributes
 -------------------------------------
 Number format   Number format index (index to FORMAT record)
 Font            Font index (index to FONT record)
-Alignment       Horizontal and vertical alignment, text wrap, indentation, 
+Alignment       Horizontal and vertical alignment, text wrap, indentation,
                 orientation/rotation, text direction
 Border          Border line styles and colours
 Background      Background area style and colours
@@ -35,20 +35,20 @@ class Font(object):
     ESCAPEMENT_NONE         = 0x00
     ESCAPEMENT_SUPERSCRIPT  = 0x01
     ESCAPEMENT_SUBSCRIPT    = 0x02
-    
+
     UNDERLINE_NONE          = 0x00
     UNDERLINE_SINGLE        = 0x01
     UNDERLINE_SINGLE_ACC    = 0x21
     UNDERLINE_DOUBLE        = 0x02
     UNDERLINE_DOUBLE_ACC    = 0x22
-    
+
     FAMILY_NONE         = 0x00
     FAMILY_ROMAN        = 0x01
     FAMILY_SWISS        = 0x02
     FAMILY_MODERN       = 0x03
     FAMILY_SCRIPT       = 0x04
     FAMILY_DECORATIVE   = 0x05
-    
+
     CHARSET_ANSI_LATIN          = 0x00
     CHARSET_SYS_DEFAULT         = 0x01
     CHARSET_SYMBOL              = 0x02
@@ -67,13 +67,13 @@ class Font(object):
     CHARSET_ANSI_CYRILLIC       = 0xCC
     CHARSET_ANSI_THAI           = 0xDE
     CHARSET_ANSI_LATIN_II       = 0xEE
-    CHARSET_OEM_LATIN_I         = 0xFF   
-    
+    CHARSET_OEM_LATIN_I         = 0xFF
+
     def __init__(self):
         # twip = 1/20 of a point = 1/1440 of a inch
-        # usually resolution == 96 pixels per 1 inch 
+        # usually resolution == 96 pixels per 1 inch
         # (rarely 120 pixels per 1 inch or another one)
-        
+
         self.height = 0x00C8 # 200: this is font with height 10 points
         self.italic = False
         self.struck_out = False
@@ -85,12 +85,12 @@ class Font(object):
         self.escapement = self.ESCAPEMENT_NONE
         self.underline = self.UNDERLINE_NONE
         self.family = self.FAMILY_NONE
-        self.charset = self.CHARSET_SYS_DEFAULT       
+        self.charset = self.CHARSET_SYS_DEFAULT
         self.name = 'Arial'
-                
+
     def get_biff_record(self):
         height = self.height
-        
+
         options = 0x00
         if self.bold:
             options |= 0x01
@@ -105,17 +105,17 @@ class Font(object):
             options |= 0x010
         if self.shadow:
             options |= 0x020
-            
-        colour_index = self.colour_index 
+
+        colour_index = self.colour_index
         weight = self._weight
         escapement = self.escapement
-        underline = self.underline 
-        family = self.family 
+        underline = self.underline
+        family = self.family
         charset = self.charset
         name = self.name
-        
-        return BIFFRecords.FontRecord(height, options, colour_index, weight, escapement, 
-                    underline, family, charset, 
+
+        return BIFFRecords.FontRecord(height, options, colour_index, weight, escapement,
+                    underline, family, charset,
                     name)
 
     def _search_key(self):
@@ -144,12 +144,12 @@ class Alignment(object):
     HORZ_JUSTIFIED              = 0x05 # BIFF4-BIFF8X
     HORZ_CENTER_ACROSS_SEL      = 0x06 # Centred across selection (BIFF4-BIFF8X)
     HORZ_DISTRIBUTED            = 0x07 # Distributed (BIFF8X)
-    
-    VERT_TOP                    = 0x00 
+
+    VERT_TOP                    = 0x00
     VERT_CENTER                 = 0x01
     VERT_BOTTOM                 = 0x02
     VERT_JUSTIFIED              = 0x03 # Justified (BIFF5-BIFF8X)
-    VERT_DISIRIBUTED            = 0x04 # Distributed (BIFF8X)
+    VERT_DISTRIBUTED            = 0x04 # Distributed (BIFF8X)
 
     DIRECTION_GENERAL           = 0x00 # BIFF8X
     DIRECTION_LR                = 0x01
@@ -162,12 +162,12 @@ class Alignment(object):
 
     ROTATION_0_ANGLE            = 0x00
     ROTATION_STACKED            = 0xFF
-    
+
     WRAP_AT_RIGHT               = 0x01
     NOT_WRAP_AT_RIGHT           = 0x00
-    
+
     SHRINK_TO_FIT               = 0x01
-    NOT_SHRINK_TO_FIT           = 0x00       
+    NOT_SHRINK_TO_FIT           = 0x00
 
     def __init__(self):
         self.horz = self.HORZ_GENERAL
@@ -202,7 +202,7 @@ class Borders(object):
     THIN_DASH_DOT_DOTTED        = 0x0B
     MEDIUM_DASH_DOT_DOTTED      = 0x0C
     SLANTED_MEDIUM_DASH_DOTTED  = 0x0D
-    
+
     NEED_DIAG1      = 0x01
     NEED_DIAG2      = 0x01
     NO_NEED_DIAG1   = 0x00
@@ -220,7 +220,7 @@ class Borders(object):
         self.top_colour    = 0x40
         self.bottom_colour = 0x40
         self.diag_colour   = 0x40
-        
+
         self.need_diag1 = self.NO_NEED_DIAG1
         self.need_diag2 = self.NO_NEED_DIAG2
 
@@ -234,9 +234,9 @@ class Borders(object):
 
 class Pattern(object):
     # patterns 0x00 - 0x12
-    NO_PATTERN      = 0x00 
-    SOLID_PATTERN   = 0x01 
-    
+    NO_PATTERN      = 0x00
+    SOLID_PATTERN   = 0x01
+
     def __init__(self):
         self.pattern = self.NO_PATTERN
         self.pattern_fore_colour = 0x40
@@ -248,7 +248,7 @@ class Pattern(object):
             self.pattern_fore_colour,
             self.pattern_back_colour,
             )
-        
+
 class Protection(object):
     def __init__(self):
         self.cell_locked = 1
@@ -257,5 +257,5 @@ class Protection(object):
     def _search_key(self):
         return (
             self.cell_locked,
-            self.formula_hidden,        
+            self.formula_hidden,
             )
