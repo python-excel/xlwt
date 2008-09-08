@@ -1,6 +1,6 @@
 # -*- coding: windows-1252 -*-
 
-__VERSION__ = '0.7.0a5'
+__VERSION__ = '0.7.0a6'
 
 import sys
 if sys.version_info[:2] < (2, 3):
@@ -10,7 +10,7 @@ if sys.version_info[:2] < (2, 3):
 from Workbook import Workbook
 from Worksheet import Worksheet
 from Row import Row
-from Column import Column 
+from Column import Column
 from Formatting import Font, Alignment, Borders, Pattern, Protection
-from Style import XFStyle 
+from Style import XFStyle, easyxf
 from ExcelFormula import *
