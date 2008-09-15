@@ -22,8 +22,46 @@ documented. In these cases, you'll have to refer to the source if the
 documentation provided is insufficient.
 </p>
 
-</p><h2>Module Contents <em style="color:red;">[NC]</em></h2>
+</p>
+
+<h2>Module Contents <em style="color:red;">[NC]</em></h2>
 <dl>
+  <dt><b>easyxf</b> (function)</dt>
+  <dd>
+  <p>
+  This function is used to create and configure XFStyle objects
+  for use with (for example) the Worksheet.write method.
+  </p>
+  <dl>
+    <dt><i>strg_to_parse</i></dt>
+    <dd>
+      <p>
+      	A string to be parsed to obtain attribute values for Alignment, Borders, Font,
+      	Pattern and Protection objects. Refer to the examples
+      	in the file .../examples/xlwt_easyxf_simple_demo.py and to the xf_dict
+      	dictionary in Style.py. Various synonyms including color/colour, center/centre and gray/grey
+      	are allowed. Case is irrelevant (except maybe in font names). '-' may be used instead
+      	of '_'.<br />
+		Example: "font: bold on; align: wrap on, vert centre, horiz center"
+      </p>
+    </dd>
+    <dt><i>num_format_str</i></dt>
+    <dd>
+      <p>
+		To get the "number format string" of an existing cell whose format you want to reproduce,
+		select the cell and click on Format/Cells/Number/Custom. Otherwise, refer to Excel help.<br />
+		Examples: "#,##0.00", "dd/mm/yyyy"
+      </p>
+    </dd>
+    <dt>Returns:</dt>
+    <dd>
+      An object of the XFstyle class
+    </dd>
+  </dl>
+  <br />
+
+  </dd>
+
   <dt><b>Workbook</b> (class)  [<a href='#xlwt.Workbook-class'>#</a>]</dt>
   <dd>
     <p>The class to instantiate to create a workbook</p>
@@ -123,16 +161,36 @@ name='xlwt.Worksheet.write-method'><b>write(r, c, label="", style=Style.default_
   <dl>
     <dt><i>r</i></dt>
     <dd>
-      The row in the worksheet to which the cell should be written.
+      	The zero-relative number of the row in the worksheet to which the cell should be written.
     </dd>
     <dt><i>c</i></dt>
     <dd>
-      The column in the worksheet to which the cell should be written.
+      	The zero-relative number of the column in the worksheet to which the cell should be written.
     </dd>
     <dt><i>label</i></dt>
-    <dd><em style="color:red;">[NC]</em></dd>
+    <dd>
+    	The data value to be written.
+    	An int, long, or decimal.Decimal instance is converted to float.
+    	A unicode instance is written as is.
+    	A str instance is converted to unicode using the encoding (default: 'ascii') specified
+    	when the Workbook instance was created.
+    	A datetime.datetime, datetime.date, or datetime.time instance is converted into Excel date format
+    	(a float representing the number of days since (typically) 1899-12-31T00:00:00,
+    	under the pretence that 1900 was a leap year).
+    	A bool instance will show up as TRUE or FALSE in Excel.
+    	None causes the cell to be blank -- no data, only formatting.
+    	An xlwt.Formula instance causes an Excel formula to be written.
+    	<em style="color:red;">[NC]</em>
+    </dd>
     <dt><i>style</i></dt>
-    <dd><em style="color:red;">[NC]</em></dd>
+    <dd>
+    	A style -- also known as an XF (extended format) -- is an XFStyle object, which encapsulates
+    	the formatting applied to the cell and its contents. XFStyle objects are best set up using the
+    	<i>easyxf</i> function. They may also be set up by setting attributes in
+    	Alignment, Borders, Pattern, Font and Protection objects
+    	then setting those objects and a format string as attributes of an XFStyle object.
+    	<em style="color:red;">[NC]</em>
+    </dd>
   </dl>
   <br />
 </dd>
