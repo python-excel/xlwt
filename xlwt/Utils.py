@@ -36,11 +36,11 @@ from struct import pack
 from ExcelMagic import MAX_ROW, MAX_COL
 
 
-_re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)")
+_re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)", re.IGNORECASE)
 _re_row_range = re.compile(r"\$?(\d+):\$?(\d+)")
-_re_col_range = re.compile(r"\$?([A-I]?[A-Z]):\$?([A-I]?[A-Z])")
-_re_cell_range = re.compile(r"\$?([A-I]?[A-Z]\$?\d+):\$?([A-I]?[A-Z]\$?\d+)")
-_re_cell_ref = re.compile(r"\$?([A-I]?[A-Z]\$?\d+)")
+_re_col_range = re.compile(r"\$?([A-I]?[A-Z]):\$?([A-I]?[A-Z])", re.IGNORECASE)
+_re_cell_range = re.compile(r"\$?([A-I]?[A-Z]\$?\d+):\$?([A-I]?[A-Z]\$?\d+)", re.IGNORECASE)
+_re_cell_ref = re.compile(r"\$?([A-I]?[A-Z]\$?\d+)", re.IGNORECASE)
 
 
 def col_by_name(colname):
@@ -58,27 +58,27 @@ def col_by_name(colname):
 def cell_to_rowcol(cell):
     """Convert an Excel cell reference string in A1 notation
     to numeric row/col notation.
-  
+
     Returns: row, col, row_abs, col_abs
- 
+
     """
     m = _re_cell_ex.match(cell)
     if not m:
-        raise Exception("Error in cell format")
+        raise Exception("Ill-formed single_cell reference: %s" % cell)
     col_abs, col, row_abs, row = m.groups()
     row_abs = bool(row_abs)
     col_abs = bool(col_abs)
     row = int(row) - 1
-    col = col_by_name(col)
+    col = col_by_name(col.upper())
     return row, col, row_abs, col_abs
 
 
 def cell_to_rowcol2(cell):
     """Convert an Excel cell reference string in A1 notation
     to numeric row/col notation.
-  
+
     Returns: row, col
-    
+
     """
     m = _re_cell_ex.match(cell)
     if not m:
@@ -87,14 +87,14 @@ def cell_to_rowcol2(cell):
     # Convert base26 column string to number
     # All your Base are belong to us.
     row = int(row) - 1
-    col = col_by_name(col)
+    col = col_by_name(col.upper())
     return row, col
-    
-    
+
+
 def rowcol_to_cell(row, col, row_abs=False, col_abs=False):
     """Convert numeric row/col notation to an Excel cell reference string in
     A1 notation.
- 
+
     """
     d = col // 26
     m = col % 26
@@ -115,11 +115,11 @@ def rowcol_to_cell(row, col, row_abs=False, col_abs=False):
 
 
 def cellrange_to_rowcol_pair(cellrange):
-    """Convert cell range string in A1 notation to numeric row/col 
+    """Convert cell range string in A1 notation to numeric row/col
     pair.
 
     Returns: row1, col1, row2, col2
-    
+
     """
     cellrange = cellrange.upper()
     # Convert a row range: '1:3'
@@ -134,9 +134,9 @@ def cellrange_to_rowcol_pair(cellrange):
     # A range such as A:A is equivalent to A1:A16384, so add rows as required
     res = _re_col_range.match(cellrange)
     if res:
-        col1 = col_by_name(res.group(1))
+        col1 = col_by_name(res.group(1).upper())
         row1 = 0
-        col2 = col_by_name(res.group(2))
+        col2 = col_by_name(res.group(2).upper())
         row2 = -1
         return row1, col1, row2, col2
     # Convert a cell range: 'A1:B7'

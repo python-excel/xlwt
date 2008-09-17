@@ -326,7 +326,8 @@ std_func_by_name = {
          "CHIDIST": (0x112,  2,  2,   "V",           "V V", False), # 22
           "CHIINV": (0x113,  2,  2,   "V",           "V V", False), # 23
          "CHITEST": (0x132,  2,  2,   "V",           "A A", False), # 24
-          "CHOOSE": (0x064,  2, 30,   "R",       "V R ...", False), # 25
+####      "CHOOSE": (0x064,  2, 30,   "R",       "V R ...", False), # 25
+          "CHOOSE": (0x064,  2, 30,   "V",       "V R ...", False), # 25
            "CLEAN": (0x0a2,  1,  1,   "V",             "V", False), # 26
             "CODE": (0x079,  1,  1,   "V",             "V", False), # 27
           "COLUMN": (0x009,  0,  1,   "V",             "R", False), # 28
@@ -398,6 +399,7 @@ std_func_by_name = {
        "HYPERLINK": (0x167,  1,  2,   "V",           "V V", False), # 94
      "HYPGEOMVERT": (0x121,  4,  4,   "V",       "V V V V", False), # 95
               "IF": (0x001,  2,  3,   "R",         "V R R", False), # 96
+####          "IF": (0x001,  2,  3,   "V",         "V V V", False), # 96
            "INDEX": (0x01d,  2,  4,   "R",       "R V V V", False), # 97
         "INDIRECT": (0x094,  1,  2,   "R",           "V V",  True), # 98
             "INFO": (0x0f4,  1,  1,   "V",             "V", False), # 99
