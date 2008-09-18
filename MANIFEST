@@ -2,6 +2,8 @@ HISTORY.html
 README.html
 licences.py
 setup.py
+tests/RKbug.py
+tests/RKbug1.xls
 xlwt/BIFFRecords.py
 xlwt/Bitmap.py
 xlwt/Cell.py

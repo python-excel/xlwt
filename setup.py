@@ -37,7 +37,7 @@ KEYWORDS = (
 
 SVN_URL = 'https://secure.simplistix.co.uk/svn/xlwt/trunk'
 
-DOWNLOAD_URL = 'http://....................'
+DOWNLOAD_URL = 'http://pypi.python.org/pypi/xlwt'
 
 setup(
     name = 'xlwt',
@@ -45,7 +45,7 @@ setup(
     maintainer = 'John Machin',
     maintainer_email = 'sjmachin@lexicon.net',
     url = SVN_URL,
-    # download_url = DOWNLOAD_URL,
+    download_url = DOWNLOAD_URL,
     description = DESCRIPTION,
     long_description = LONG_DESCRIPTION,
     license = 'BSD',
@@ -57,6 +57,7 @@ setup(
         'xlwt': [
             'doc/*.*',
             'examples/*.*',
+            'tests/*.*',
             ],
         },
     )
