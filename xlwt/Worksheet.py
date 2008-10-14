@@ -38,6 +38,7 @@ import BIFFRecords
 import Bitmap
 import Formatting
 import Style
+import tempfile
 
 
 class Worksheet(object):
@@ -159,6 +160,14 @@ class Worksheet(object):
         self.__protect = 0
         self.__scen_protect = 0
         self.__password = ''
+
+        self.last_used_row = 0
+        self.first_used_row = 65535
+        self.last_used_col = 0
+        self.first_used_col = 255
+        self.row_tempfile = None
+        self.__flushed_rows = {}
+        self.__row_visible_levels = 0
 
     #################################################################
     ## Properties, "getters", "setters"
@@ -991,48 +1000,33 @@ class Worksheet(object):
     def write(self, r, c, label="", style=Style.default_style):
         self.row(r).write(c, label, style)
 
-    if 0: # old
+    def merge(self, r1, r2, c1, c2, style=Style.default_style):
+        # Stand-alone merge of previously written cells.
+        # Problems: (1) style to be used should be existing style of
+        # the top-left cell, not an arg.
+        # (2) should ensure that any previous data value in
+        # non-top-left cells is nobbled.
+        # Note: if a cell is set by a data record then later
+        # is referenced by a [MUL]BLANK record, Excel will blank
+        # out the cell on the screen, but OOo & Gnu will not
+        # blank it out. Need to do something better than writing
+        # multiple records. In the meantime, avoid this method and use
+        # write_merge() instead.
+        if c2 > c1:
+            self.row(r1).write_blanks(c1 + 1, c2,  style)
+        for r in range(r1+1, r2+1):
+            self.row(r).write_blanks(c1, c2,  style)
+        self.__merged_ranges.append((r1, r2, c1, c2))
 
-        def merge(self, r1, r2, c1, c2, style=Style.XFStyle()):
-            self.row(r1).write_blanks(c1, c2,  style)
-            for r in range(r1+1, r2+1):
-                self.row(r).write_blanks(c1, c2,  style)
-            self.__merged_ranges.append((r1, r2, c1, c2))
-
-        def write_merge(self, r1, r2, c1, c2, label="", style=Style.XFStyle()):
-            self.merge(r1, r2, c1, c2, style)
-            self.write(r1, c1,  label, style)
-
-    else:
-
-        def merge(self, r1, r2, c1, c2, style=Style.default_style):
-            # Stand-alone merge of previously written cells.
-            # Problems: (1) style to be used should be existing style of
-            # the top-left cell, not an arg.
-            # (2) should ensure that any previous data value in
-            # non-top-left cells is nobbled.
-            # Note: if a cell is set by a data record then later
-            # is referenced by a [MUL]BLANK record, Excel will blank
-            # out the cell on the screen, but OOo & Gnu will not
-            # blank it out. Need to do something better than writing
-            # multiple records. In the meantime, avoid this method and use
-            # write_merge() instead.
-            if c2 > c1:
-                self.row(r1).write_blanks(c1 + 1, c2,  style)
-            for r in range(r1+1, r2+1):
-                self.row(r).write_blanks(c1, c2,  style)
-            self.__merged_ranges.append((r1, r2, c1, c2))
-
-        def write_merge(self, r1, r2, c1, c2, label="", style=Style.default_style):
-            assert 0 <= c1 <= c2 <= 255
-            assert 0 <= r1 <= r2 <= 65535
-            self.write(r1, c1, label, style)
-            if c2 > c1:
-                self.row(r1).write_blanks(c1 + 1, c2,  style) # skip (r1, c1)
-            for r in range(r1+1, r2+1):
-                self.row(r).write_blanks(c1, c2,  style)
-            self.__merged_ranges.append((r1, r2, c1, c2))
-
+    def write_merge(self, r1, r2, c1, c2, label="", style=Style.default_style):
+        assert 0 <= c1 <= c2 <= 255
+        assert 0 <= r1 <= r2 <= 65535
+        self.write(r1, c1, label, style)
+        if c2 > c1:
+            self.row(r1).write_blanks(c1 + 1, c2,  style) # skip (r1, c1)
+        for r in range(r1+1, r2+1):
+            self.row(r).write_blanks(c1, c2,  style)
+        self.__merged_ranges.append((r1, r2, c1, c2))
 
     def insert_bitmap(self, filename, row, col, x = 0, y = 0, scale_x = 1, scale_y = 1):
         bmp = Bitmap.ImDataBmpRecord(filename)
@@ -1047,7 +1041,13 @@ class Worksheet(object):
 
     def row(self, indx):
         if indx not in self.__rows:
+            if indx in self.__flushed_rows:
+                raise Exception("Attempt to reuse row index %d of sheet %r after flushing" % (indx, self.__name))
             self.__rows[indx] = self.Row(indx, self)
+            if indx > self.last_used_row:
+                self.last_used_row = indx
+            if indx < self.first_used_row:
+                self.first_used_row = indx
         return self.__rows[indx]
 
     def row_height(self, row): # in pixels
@@ -1062,12 +1062,6 @@ class Worksheet(object):
         #else:
             return 64
 
-    def get_labels_count(self):
-        result = 0
-        for r in self.__rows:
-            result += self.__rows[r].get_str_count()
-        return result
-
     ##################################################################
     ## BIFF records generation
     ##################################################################
@@ -1075,16 +1069,18 @@ class Worksheet(object):
     def __bof_rec(self):
         return BIFFRecords.Biff8BOFRecord(BIFFRecords.Biff8BOFRecord.WORKSHEET).get()
 
-    def __guts_rec(self):
-        row_visible_levels = 0
-        if len(self.__rows) != 0:
-            row_visible_levels = max([self.__rows[r].level for r in self.__rows]) + 1
+    def __update_row_visible_levels(self):
+        if self.__rows:
+            temp = max([self.__rows[r].level for r in self.__rows]) + 1
+            self.__row_visible_levels = max(temp, self.__row_visible_levels)
 
+    def __guts_rec(self):
+        self.__update_row_visible_levels()
         col_visible_levels = 0
         if len(self.__cols) != 0:
             col_visible_levels = max([self.__cols[c].level for c in self.__cols]) + 1
-
-        return BIFFRecords.GutsRecord(self.__row_gut_width, self.__col_gut_height, row_visible_levels, col_visible_levels).get()
+        return BIFFRecords.GutsRecord(
+            self.__row_gut_width, self.__col_gut_height, self.__row_visible_levels, col_visible_levels).get()
 
     def __defaultrowheight_rec(self):
         options = 0x0000
@@ -1120,26 +1116,10 @@ class Worksheet(object):
         return result
 
     def __dimensions_rec(self):
-        first_used_row = 0
-        last_used_row = 0
-        first_used_col = 0
-        last_used_col = 0
-        if len(self.__rows) > 0:
-            first_used_row = min(self.__rows)
-            last_used_row = max(self.__rows)
-            first_used_col = 0x7FFFFFF
-            # Avoid 2.3 deprecation msg when using 0xFFFFFFFF
-            # Note: max cols is only 256 in BIFF8 anyway ...
-            last_used_col = 0
-            for r in self.__rows:
-                _min = self.__rows[r].get_min_col()
-                _max = self.__rows[r].get_max_col()
-                if _min < first_used_col:
-                    first_used_col = _min
-                if _max > last_used_col:
-                    last_used_col = _max
-
-        return BIFFRecords.DimensionsRecord(first_used_row, last_used_row, first_used_col, last_used_col).get()
+        return BIFFRecords.DimensionsRecord(
+            self.first_used_row, self.last_used_row,
+            self.first_used_col, self.last_used_col
+            ).get()
 
     def __window2_rec(self):
         options = 0
@@ -1200,20 +1180,10 @@ class Worksheet(object):
         return result
 
     def __row_blocks_rec(self):
-        # this function takes almost 99% of overall execution time
-        # when file is saved
-        # return ''
         result = []
-        i = 0
-        used_rows = self.__rows.keys()
-        while i < len(used_rows):
-            j = 0
-            while i < len(used_rows) and (j < 32):
-                result.append(self.__rows[used_rows[i]].get_row_biff_data())
-                result.append(self.__rows[used_rows[i]].get_cells_biff_data())
-                j += 1
-                i += 1
-
+        for row in self.__rows.itervalues():
+            result.append(row.get_row_biff_data())
+            result.append(row.get_cells_biff_data())
         return ''.join(result)
 
     def __merged_rec(self):
@@ -1282,24 +1252,38 @@ class Worksheet(object):
         return result
 
     def get_biff_data(self):
-        result = ''
-        result += self.__bof_rec()
-        result += self.__calc_settings_rec()
-        result += self.__guts_rec()
-        result += self.__defaultrowheight_rec()
-        result += self.__wsbool_rec()
-        result += self.__colinfo_rec()
-        result += self.__dimensions_rec()
-        result += self.__print_settings_rec()
-        result += self.__protection_rec()
-        result += self.__row_blocks_rec()
-        result += self.__merged_rec()
-        result += self.__bitmaps_rec()
-        result += self.__window2_rec()
-        result += self.__panes_rec()
-        result += self.__eof_rec()
+        result = [
+            self.__bof_rec(),
+            self.__calc_settings_rec(),
+            self.__guts_rec(),
+            self.__defaultrowheight_rec(),
+            self.__wsbool_rec(),
+            self.__colinfo_rec(),
+            self.__dimensions_rec(),
+            self.__print_settings_rec(),
+            self.__protection_rec(),
+            ]
+        if self.row_tempfile:
+            self.row_tempfile.flush()
+            self.row_tempfile.seek(0)
+            result.append(self.row_tempfile.read())
+        result.extend([
+            self.__row_blocks_rec(),
+            self.__merged_rec(),
+            self.__bitmaps_rec(),
+            self.__window2_rec(),
+            self.__panes_rec(),
+            self.__eof_rec(),
+            ])
+        return ''.join(result)
 
-        return result
-
+    def flush_row_data(self):
+        if self.row_tempfile is None:
+            self.row_tempfile = tempfile.TemporaryFile()
+        self.row_tempfile.write(self.__row_blocks_rec())
+        for rowx in self.__rows:
+            self.__flushed_rows[rowx] = 1
+        self.__update_row_visible_levels()
+        self.__rows = {}
 
 

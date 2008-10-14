@@ -22,7 +22,6 @@ class Row(object):
                  "__cells",
                  "__min_col_idx",
                  "__max_col_idx",
-                 "__total_str",
                  "__xf_index",
                  "__has_default_xf_index",
                  "__has_default_format",
@@ -46,7 +45,6 @@ class Row(object):
         self.__cells = []
         self.__min_col_idx = 0
         self.__max_col_idx = 0
-        self.__total_str = 0
         self.__xf_index = 0x0F
         self.__has_default_xf_index = 0
         self.__has_default_format = 0
@@ -78,10 +76,15 @@ class Row(object):
             iarg = int(arg)
             if not ((0 <= iarg <= 255) and arg == iarg):
                 raise ValueError("column index (%r) not an int in range(256)" % arg)
+            sheet = self.__parent
             if iarg < self.__min_col_idx:
                 self.__min_col_idx = iarg
-            elif iarg > self.__max_col_idx:
+            if iarg > self.__max_col_idx:
                 self.__max_col_idx = iarg
+            if iarg < sheet.first_used_col:
+                sheet.first_used_col = iarg
+            if iarg > sheet.last_used_col:
+                sheet.last_used_col = iarg
 
     def __excel_date_dt(self, date):
         if isinstance(date, dt.date) and (not isinstance(date, dt.datetime)):
@@ -124,10 +127,6 @@ class Row(object):
         return self.__max_col_idx
 
 
-    def get_str_count(self):
-        return self.__total_str
-
-
     def get_row_biff_data(self):
         height_options = (self.height & 0x07FFF)
         height_options |= (self.has_default_height & 0x01) << 15
@@ -158,7 +157,6 @@ class Row(object):
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
         self.__cells.append(StrCell(self, colx, xf_index, self.__parent_wb.add_str(value)))
-        self.__total_str += 1
 
     def set_cell_blank(self, colx, style=Style.default_style):
         self.__adjust_height(style)
@@ -214,7 +212,6 @@ class Row(object):
                 self.__cells.append(
                     StrCell(self, col, style_index, self.__parent_wb.add_str(label))
                     )
-                self.__total_str += 1
             else:
                 self.__cells.append(BlankCell(self, col, style_index))
         elif isinstance(label, bool): # bool is subclass of int; test bool first

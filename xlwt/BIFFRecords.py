@@ -98,7 +98,7 @@ class SharedStringTable(object):
 class BiffRecord(object):
 
     _rec_data = '' # class attribute; child classes need to set this.
-    
+
     # Sheer waste.
     # def __init__(self):
     #     self._rec_data = ''
@@ -1149,10 +1149,14 @@ class DimensionsRecord(BiffRecord):
     """
     _REC_ID = 0x0200
     def __init__(self, first_used_row, last_used_row, first_used_col, last_used_col):
+        if first_used_row > last_used_row or first_used_col > last_used_col:
+            # Special case: empty worksheet
+            first_used_row = first_used_col = 0
+            last_used_row = last_used_col = -1
         self._rec_data = pack('<2L3H',
-                                            first_used_row, last_used_row + 1,
-                                            first_used_col, last_used_col + 1,
-                                            0x00)
+            first_used_row, last_used_row + 1,
+            first_used_col, last_used_col + 1,
+            0x00)
 
 
 class Window2Record(BiffRecord):
