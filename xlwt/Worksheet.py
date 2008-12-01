@@ -1057,10 +1057,11 @@ class Worksheet(object):
             return 17
 
     def col_width(self, col): # in pixels
-        #if col in self.__cols:
-        #    return self.__cols[col].width_in_pixels()
-        #else:
+        if col in self.__cols:
+            return self.__cols[col].width_in_pixels()
+        else:
             return 64
+
 
     ##################################################################
     ## BIFF records generation
@@ -1122,6 +1123,7 @@ class Worksheet(object):
             ).get()
 
     def __window2_rec(self):
+        # Appends SCL record if required
         options = 0
         options |= (self.__show_formulas        & 0x01) << 0
         options |= (self.__show_grid            & 0x01) << 1
@@ -1135,10 +1137,16 @@ class Worksheet(object):
         options |= (self.__selected             & 0x01) << 9
         options |= (self.__sheet_visible        & 0x01) << 10
         options |= (self.__page_preview         & 0x01) << 11
-
-        return BIFFRecords.Window2Record(options, self.__first_visible_row, self.__first_visible_col,
-                                        self.__grid_colour,
-                                        self.__preview_magn, self.__normal_magn).get()
+        if self.__page_preview:
+            scl_magn = self.__preview_magn
+            if not scl_magn:
+                scl_magn = 60 # Excel seems to need an SCL record in this case.
+        else:
+            scl_magn = self.__normal_magn
+        return BIFFRecords.Window2Record(
+            options, self.__first_visible_row, self.__first_visible_col,
+            self.__grid_colour,
+            self.__preview_magn, self.__normal_magn, scl_magn).get()
 
     def __panes_rec(self):
         if self.__vert_split_pos is None and self.__horz_split_pos is None:

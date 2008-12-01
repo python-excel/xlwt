@@ -13,7 +13,7 @@ def _size_col(sheet, col):
 
 
 def _size_row(sheet, row):
-    return sheet.row_height(row)     
+    return sheet.row_height(row)
 
 
 def _position_image(sheet, row_start, col_start, x1, y1, width, height):
@@ -66,7 +66,7 @@ def _position_image(sheet, row_start, col_start, x1, y1, width, height):
     y1  - Distance to top of object
     width  - Width of image frame
     height  - Height of image frame
-    
+
     """
     # Adjust start column for offsets that are greater than the col width
     while x1 >= _size_col(sheet, col_start):
@@ -95,12 +95,12 @@ def _position_image(sheet, row_start, col_start, x1, y1, width, height):
             or (_size_row(sheet, row_start) == 0) or (_size_row(sheet, row_end) == 0)):
         return
     # Convert the pixel values to the percentage value expected by Excel
-    x1 = float(x1) / _size_col(sheet, col_start) * 1024
-    y1 = float(y1) / _size_row(sheet, row_start) * 256
+    x1 = int(float(x1) / _size_col(sheet, col_start) * 1024)
+    y1 = int(float(y1) / _size_row(sheet, row_start) * 256)
     # Distance to right side of object
-    x2 = float(width) / _size_col(sheet, col_end) * 1024
+    x2 = int(float(width) / _size_col(sheet, col_end) * 1024)
     # Distance to bottom of object
-    y2 = float(height) / _size_row(sheet, row_end) * 256
+    y2 = int(float(height) / _size_row(sheet, row_end) * 256)
     return (col_start, x1, row_start, y1, col_end, x2, row_end, y2)
 
 
@@ -113,7 +113,9 @@ class ObjBmpRecord(BiffRecord):
         height = im_data_bmp.height * scale_y
 
         # Calculate the vertices of the image and write the OBJ record
-        col_start, x1, row_start, y1, col_end, x2, row_end, y2 = _position_image(sheet, row, col, x, y, width, height)
+        coordinates = _position_image(sheet, row, col, x, y, width, height)
+        # print coordinates
+        col_start, x1, row_start, y1, col_end, x2, row_end, y2 = coordinates
 
         """Store the OBJ record that precedes an IMDATA record. This could be generalise
         to support other Excel objects.
@@ -149,7 +151,7 @@ class ObjBmpRecord(BiffRecord):
         Reserved4 = 0x0000  # Reserved
         grbit2 = 0x0001     # Option flags
         Reserved5 = 0x0000  # Reserved
-        
+
         data = pack("<L", cObj)
         data += pack("<H", OT)
         data += pack("<H", id)

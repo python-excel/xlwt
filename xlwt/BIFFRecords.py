@@ -1194,16 +1194,42 @@ class Window2Record(BiffRecord):
     11 0800H 0 = Show in normal view 1 = Show in page break preview (BIFF8)
 
     The freeze flag specifies, if a following PANE record describes unfrozen or frozen panes.
+
+    *** This class appends the optional SCL record ***
+
+    Record SCL, BIFF4-BIFF8:
+
+    This record stores the magnification of the active view of the current worksheet.
+    In BIFF8 this can be either the normal view or the page break preview.
+    This is determined in the WINDOW2 record. The SCL record is part of the
+    Sheet View Settings Block.
+
+    Offset  Size    Contents
+    0       2       Numerator of the view magnification fraction (num)
+    2       2       Denumerator [denominator] of the view magnification fraction (den)
+    The magnification is stored as reduced fraction. The magnification results from num/den.
+
+    SJM note: Excel expresses (e.g.) 25% in reduced form i.e. 1/4. Reason unknown. This code
+    writes 25/100, and Excel is happy with that.
+
     """
     _REC_ID = 0x023E
 
-    def __init__(self, options, first_visible_row, first_visible_col, grid_colour, preview_magn, normal_magn):
+    def __init__(self, options, first_visible_row, first_visible_col,
+        grid_colour, preview_magn, normal_magn, scl_magn):
         self._rec_data = pack('<7HL', options,
                                     first_visible_row, first_visible_col,
                                     grid_colour,
                                     0x00,
                                     preview_magn, normal_magn,
                                     0x00L)
+        if scl_magn:
+            self._scl_rec = pack('<4H', 0x00A0, 4, scl_magn, 100)
+        else:
+            self._scl_rec = ''
+
+    def get(self):
+        return self.get_rec_header() + self._rec_data + self._scl_rec
 
 
 class PanesRecord(BiffRecord):

@@ -398,8 +398,8 @@ std_func_by_name = {
             "HOUR": (0x047,  1,  1,   "V",             "V", False), # 93
        "HYPERLINK": (0x167,  1,  2,   "V",           "V V", False), # 94
      "HYPGEOMVERT": (0x121,  4,  4,   "V",       "V V V V", False), # 95
-              "IF": (0x001,  2,  3,   "R",         "V R R", False), # 96
-####          "IF": (0x001,  2,  3,   "V",         "V V V", False), # 96
+####          "IF": (0x001,  2,  3,   "R",         "V R R", False), # 96
+              "IF": (0x001,  2,  3,   "V",         "V V V", False), # 96
            "INDEX": (0x01d,  2,  4,   "R",       "R V V V", False), # 97
         "INDIRECT": (0x094,  1,  2,   "R",           "V V",  True), # 98
             "INFO": (0x0f4,  1,  1,   "V",             "V", False), # 99
