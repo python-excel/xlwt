@@ -1,7 +1,8 @@
 # This demonstrates the effect of changing the column width
 # when inserting a picture/image.
 
-w = Workbook()
+import xlwt
+w = xlwt.Workbook()
 ws = w.add_sheet('Image')
 
 ws.write(0, 2, "chg wid: none")
