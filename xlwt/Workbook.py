@@ -18,24 +18,24 @@ Record Order in BIFF8
             PROT4REV
             PROT4REVPASS
       BACKUP
-      HIDEOBJ 
-      WINDOW1 
-      DATEMODE 
+      HIDEOBJ
+      WINDOW1
+      DATEMODE
       PRECISION
       REFRESHALL
-      BOOKBOOL 
+      BOOKBOOL
       FONT +
       FORMAT *
       XF +
       STYLE +
     ? PALETTE
       USESELFS
-    
+
       BOUNDSHEET +
-    
-      COUNTRY 
-    ? Link Table 
-      SST 
+
+      COUNTRY
+    ? Link Table
+      SST
       ExtSST
       EOF
 '''
@@ -50,23 +50,23 @@ class Workbook(object):
     #################################################################
     def __init__(self, encoding='ascii', style_compression=0):
         self.encoding = encoding
-        self.__owner = 'None'       
+        self.__owner = 'None'
         self.__country_code = None # 0x07 is Russia :-)
         self.__wnd_protect = 0
         self.__obj_protect = 0
-        self.__protect = 0        
+        self.__protect = 0
         self.__backup_on_save = 0
         # for WINDOW1 record
         self.__hpos_twips = 0x01E0
         self.__vpos_twips = 0x005A
         self.__width_twips = 0x3FCF
         self.__height_twips = 0x2A4E
-        
+
         self.__active_sheet = 0
         self.__first_tab_index = 0
         self.__selected_tabs = 0x01
         self.__tab_width_twips = 0x0258
-        
+
         self.__wnd_hidden = 0
         self.__wnd_mini = 0
         self.__hscroll_visible = 1
@@ -74,18 +74,18 @@ class Workbook(object):
         self.__tabs_visible = 1
 
         self.__styles = Style.StyleCollection(style_compression)
-         
+
         self.__dates_1904 = 0
         self.__use_cell_values = 1
-        
+
         self.__sst = BIFFRecords.SharedStringTable(self.encoding)
-        
+
         self.__worksheets = []
 
     #################################################################
     ## Properties, "getters", "setters"
     #################################################################
-    
+
     def get_style_stats(self):
         return self.__styles.stats[:]
 
@@ -136,7 +136,7 @@ class Workbook(object):
         return bool(self.__protect)
 
     protect = property(get_protect, set_protect)
-    
+
     #################################################################
 
     def set_backup_on_save(self, value):
@@ -294,18 +294,18 @@ class Workbook(object):
 
     def add_str(self, s):
         return self.__sst.add_str(s)
-        
+
     def str_index(self, s):
         return self.__sst.str_index(s)
-        
-    def add_sheet(self, sheetname):
+
+    def add_sheet(self, sheetname, cell_overwrite_ok=False):
         import Worksheet
-        self.__worksheets.append(Worksheet.Worksheet(sheetname, self))
+        self.__worksheets.append(Worksheet.Worksheet(sheetname, self, cell_overwrite_ok))
         return self.__worksheets[-1]
 
     def get_sheet(self, sheetnum):
         return self.__worksheets[sheetnum]
-        
+
     ##################################################################
     ## BIFF records generation
     ##################################################################
@@ -315,7 +315,7 @@ class Workbook(object):
 
     def __eof_rec(self):
         return BIFFRecords.EOFRecord().get()
-        
+
     def __intf_hdr_rec(self):
         return BIFFRecords.InteraceHdrRecord().get()
 
@@ -348,10 +348,10 @@ class Workbook(object):
 
     def __backup_rec(self):
         return BIFFRecords.BackupRecord(self.__backup_on_save).get()
-        
+
     def __hide_obj_rec(self):
         return BIFFRecords.HideObjRecord().get()
-        
+
     def __window1_rec(self):
         flags = 0
         flags |= (self.__wnd_hidden) << 0
@@ -359,41 +359,41 @@ class Workbook(object):
         flags |= (self.__hscroll_visible) << 3
         flags |= (self.__vscroll_visible) << 4
         flags |= (self.__tabs_visible) << 5
-        
-        return BIFFRecords.Window1Record(self.__hpos_twips, self.__vpos_twips, 
-                                self.__width_twips, self.__height_twips, 
+
+        return BIFFRecords.Window1Record(self.__hpos_twips, self.__vpos_twips,
+                                self.__width_twips, self.__height_twips,
                                 flags,
-                                self.__active_sheet, self.__first_tab_index, 
+                                self.__active_sheet, self.__first_tab_index,
                                 self.__selected_tabs, self.__tab_width_twips).get()
-        
+
     def __codepage_rec(self):
         return BIFFRecords.CodepageBiff8Record().get()
-        
+
     def __country_rec(self):
         if not self.__country_code:
             return ''
         return BIFFRecords.CountryRecord(self.__country_code, self.__country_code).get()
-        
+
     def __dsf_rec(self):
         return BIFFRecords.DSFRecord().get()
-        
+
     def __tabid_rec(self):
         return BIFFRecords.TabIDRecord(len(self.__worksheets)).get()
-        
+
     def __fngroupcount_rec(self):
         return BIFFRecords.FnGroupCountRecord().get()
-        
+
     def __datemode_rec(self):
-        return BIFFRecords.DateModeRecord(self.__dates_1904).get()        
+        return BIFFRecords.DateModeRecord(self.__dates_1904).get()
 
     def __precision_rec(self):
-        return BIFFRecords.PrecisionRecord(self.__use_cell_values).get()         
+        return BIFFRecords.PrecisionRecord(self.__use_cell_values).get()
 
     def __refresh_all_rec(self):
-        return BIFFRecords.RefreshAllRecord().get()        
+        return BIFFRecords.RefreshAllRecord().get()
 
     def __bookbool_rec(self):
-        return BIFFRecords.BookBoolRecord().get()         
+        return BIFFRecords.BookBoolRecord().get()
 
     def __all_fonts_num_formats_xf_styles_rec(self):
         return self.__styles.get_biff_data()
@@ -401,12 +401,12 @@ class Workbook(object):
     def __palette_rec(self):
         result = ''
         return result
-        
+
     def __useselfs_rec(self):
         return BIFFRecords.UseSelfsRecord().get()
-        
+
     def __boundsheets_rec(self, data_len_before, data_len_after, sheet_biff_lens):
-        #  .................................  
+        #  .................................
         # BOUNDSEHEET0
         # BOUNDSEHEET1
         # BOUNDSEHEET2
@@ -419,24 +419,24 @@ class Workbook(object):
             boundsheets_len += len(BIFFRecords.BoundSheetRecord(
                 0x00L, sheet.visibility, sheet.name, self.encoding
                 ).get())
-        
+
         start = data_len_before + boundsheets_len + data_len_after
-        
+
         result = ''
         for sheet_biff_len,  sheet in zip(sheet_biff_lens, self.__worksheets):
             result += BIFFRecords.BoundSheetRecord(
                 start, sheet.visibility, sheet.name, self.encoding
                 ).get()
-            start += sheet_biff_len            
+            start += sheet_biff_len
         return result
 
     def __all_links_rec(self):
         result = ''
         return result
-        
+
     def __sst_rec(self):
         return self.__sst.get_biff_record()
-        
+
     def __ext_sst_rec(self, abs_stream_pos):
         return ''
         #return BIFFRecords.ExtSSTRecord(abs_stream_pos, self.sst_record.str_placement,
@@ -450,8 +450,8 @@ class Workbook(object):
         before += self.__intf_end_rec()
         before += self.__write_access_rec()
         before += self.__codepage_rec()
-        before += self.__dsf_rec() 
-        before += self.__tabid_rec() 
+        before += self.__dsf_rec()
+        before += self.__tabid_rec()
         before += self.__fngroupcount_rec()
         before += self.__wnd_protect_rec()
         before += self.__protect_rec()
@@ -459,8 +459,8 @@ class Workbook(object):
         before += self.__password_rec()
         before += self.__prot4rev_rec()
         before += self.__prot4rev_pass_rec()
-        before += self.__backup_rec()        
-        before += self.__hide_obj_rec()        
+        before += self.__backup_rec()
+        before += self.__hide_obj_rec()
         before += self.__window1_rec()
         before += self.__datemode_rec()
         before += self.__precision_rec()
@@ -469,13 +469,13 @@ class Workbook(object):
         before += self.__all_fonts_num_formats_xf_styles_rec()
         before += self.__palette_rec()
         before += self.__useselfs_rec()
-        
+
         country            = self.__country_rec()
         all_links          = self.__all_links_rec()
-        
-        shared_str_table   = self.__sst_rec()        
+
+        shared_str_table   = self.__sst_rec()
         after = country + all_links + shared_str_table
-        
+
         ext_sst = self.__ext_sst_rec(0) # need fake cause we need calc stream pos
         eof = self.__eof_rec()
 
@@ -486,12 +486,12 @@ class Workbook(object):
             data = sheet.get_biff_data()
             sheets += data
             sheet_biff_lens.append(len(data))
-            
-        bundlesheets = self.__boundsheets_rec(len(before), len(after)+len(ext_sst)+len(eof), sheet_biff_lens)       
-       
+
+        bundlesheets = self.__boundsheets_rec(len(before), len(after)+len(ext_sst)+len(eof), sheet_biff_lens)
+
         sst_stream_pos = len(before) + len(bundlesheets) + len(country)  + len(all_links)
-        ext_sst = self.__ext_sst_rec(sst_stream_pos)           
-        
+        ext_sst = self.__ext_sst_rec(sst_stream_pos)
+
         return before + bundlesheets + after + ext_sst + eof + sheets
 
     def save(self, filename):

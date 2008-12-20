@@ -4,48 +4,48 @@ from struct import unpack, pack
 import BIFFRecords
 
 class StrCell(object):
-    __slots__ = ["__parent", "__idx", "__xf_idx", "__sst_idx"]
+    __slots__ = ["__rowx", "__idx", "__xf_idx", "__sst_idx"]
 
-    def __init__(self, parent, idx, xf_idx, sst_idx):
-        self.__parent = parent
+    def __init__(self, rowx, idx, xf_idx, sst_idx):
+        self.__rowx = rowx
         self.__idx = idx
         self.__xf_idx = xf_idx
         self.__sst_idx = sst_idx
 
     def get_biff_data(self):
-        return BIFFRecords.LabelSSTRecord(self.__parent.get_index(),
-            self.__idx, self.__xf_idx, self.__sst_idx).get()
+        # return BIFFRecords.LabelSSTRecord(self.__rowx, self.__idx, self.__xf_idx, self.__sst_idx).get()
+        return pack('<5HL', 0x00FD, 10, self.__rowx, self.__idx, self.__xf_idx, self.__sst_idx)
 
 class BlankCell(object):
-    __slots__ = ["__parent", "__idx", "__xf_idx"]
+    __slots__ = ["__rowx", "__idx", "__xf_idx"]
 
-    def __init__(self, parent, idx, xf_idx):
-        self.__parent = parent
+    def __init__(self, rowx, idx, xf_idx):
+        self.__rowx = rowx
         self.__idx = idx
         self.__xf_idx = xf_idx
 
     def get_biff_data(self):
-        return BIFFRecords.BlankRecord(self.__parent.get_index(),
-            self.__idx, self.__xf_idx).get()
+        # return BIFFRecords.BlankRecord(self.__rowx, self.__idx, self.__xf_idx).get()
+        return pack('<5H', 0x0201, 6, self.__rowx, self.__idx, self.__xf_idx)
 
 class MulBlankCell(object):
-    __slots__ = ["__parent", "__col1", "__col2", "__xf_idx"]
+    __slots__ = ["__rowx", "__col1", "__col2", "__xf_idx"]
 
-    def __init__(self, parent, col1, col2, xf_idx):
-        self.__parent = parent
+    def __init__(self, rowx, col1, col2, xf_idx):
+        self.__rowx = rowx
         self.__col1 = col1
         self.__col2 = col2
         self.__xf_idx = xf_idx
 
     def get_biff_data(self):
-        return BIFFRecords.MulBlankRecord(self.__parent.get_index(),
+        return BIFFRecords.MulBlankRecord(self.__rowx,
             self.__col1, self.__col2, self.__xf_idx).get()
 
 class NumberCell(object):
-    __slots__ = ["__parent", "__idx", "__xf_idx", "__number"]
+    __slots__ = ["__rowx", "__idx", "__xf_idx", "__number"]
 
-    def __init__(self, parent, idx, xf_idx, number):
-        self.__parent = parent
+    def __init__(self, rowx, idx, xf_idx, number):
+        self.__rowx = rowx
         self.__idx = idx
         self.__xf_idx = xf_idx
         self.__number = float(number)
@@ -65,11 +65,11 @@ class NumberCell(object):
             if inum == num: # survives round-trip
                 # print "30-bit integer RK", inum, hex(inum)
                 rk_encoded = 2 | (inum << 2)
-                return BIFFRecords.RKRecord(self.__parent.get_index(),
-                    self.__idx, self.__xf_idx, rk_encoded).get()        
+                # return BIFFRecords.RKRecord(self.__rowx, self.__idx, self.__xf_idx, rk_encoded).get()
+                return pack('<5Hi', 0x27E, 10, self.__rowx, self.__idx, self.__xf_idx, rk_encoded)
 
         temp = num * 100
-        
+
         if -0x20000000 <= temp < 0x20000000:
             # That was step 1: the coded value will fit in
             # a 30-bit signed integer.
@@ -80,8 +80,8 @@ class NumberCell(object):
             if itemp / 100.0 == num:
                 # print "30-bit integer RK*100", itemp, hex(itemp)
                 rk_encoded = 3 | (itemp << 2)
-                return BIFFRecords.RKRecord(self.__parent.get_index(),
-                    self.__idx, self.__xf_idx, rk_encoded).get()
+                # return BIFFRecords.RKRecord(self.__rowx, self.__idx, self.__xf_idx, rk_encoded).get()
+                return pack('<5Hi', 0x27E, 10, self.__rowx, self.__idx, self.__xf_idx, rk_encoded)
 
         if 0: # Cost of extra pack+unpack not justified by tiny yield.
             packed = pack('<d', num)
@@ -89,7 +89,7 @@ class NumberCell(object):
             if not w01 and not(w23 & 3):
                 # 34 lsb are 0
                 # print "float RK", w23, hex(w23)
-                return BIFFRecords.RKRecord(self.__parent.get_index(),
+                return BIFFRecords.RKRecord(self.__rowx,
                     self.__idx, self.__xf_idx, w23).get()
 
             packed100 = pack('<d', temp)
@@ -97,25 +97,25 @@ class NumberCell(object):
             if not w01 and not(w23 & 3):
                 # 34 lsb are 0
                 # print "float RK*100", w23, hex(w23)
-                return BIFFRecords.RKRecord(self.__parent.get_index(),
+                return BIFFRecords.RKRecord(self.__rowx,
                     self.__idx, self.__xf_idx, w23 | 1).get()
 
-        #print "Number" 
+        #print "Number"
         #print
-        return BIFFRecords.NumberRecord(self.__parent.get_index(),
-            self.__idx, self.__xf_idx, num).get()
+        # return BIFFRecords.NumberRecord(self.__rowx, self.__idx, self.__xf_idx, num).get()
+        return pack('<5Hd', 0x0203, 14, self.__rowx, self.__idx, self.__xf_idx, num)
 
 class BooleanCell(object):
-    __slots__ = ["__parent", "__idx", "__xf_idx", "__number"]
+    __slots__ = ["__rowx", "__idx", "__xf_idx", "__number"]
 
-    def __init__(self, parent, idx, xf_idx, number):
-        self.__parent = parent
+    def __init__(self, rowx, idx, xf_idx, number):
+        self.__rowx = rowx
         self.__idx = idx
         self.__xf_idx = xf_idx
         self.__number = number
 
     def get_biff_data(self):
-        return BIFFRecords.BoolErrRecord(self.__parent.get_index(),
+        return BIFFRecords.BoolErrRecord(self.__rowx,
             self.__idx, self.__xf_idx, self.__number, 0).get()
 
 error_code_map = {
@@ -136,10 +136,10 @@ error_code_map = {
 }
 
 class ErrorCell(object):
-    __slots__ = ["__parent", "__idx", "__xf_idx", "__number"]
+    __slots__ = ["__rowx", "__idx", "__xf_idx", "__number"]
 
-    def __init__(self, parent, idx, xf_idx, error_string_or_code):
-        self.__parent = parent
+    def __init__(self, rowx, idx, xf_idx, error_string_or_code):
+        self.__rowx = rowx
         self.__idx = idx
         self.__xf_idx = xf_idx
         try:
@@ -148,19 +148,19 @@ class ErrorCell(object):
             raise Exception('Illegal error value (%r)' % error_string_or_code)
 
     def get_biff_data(self):
-        return BIFFRecords.BoolErrRecord(self.__parent.get_index(),
+        return BIFFRecords.BoolErrRecord(self.__rowx,
             self.__idx, self.__xf_idx, self.__number, 1).get()
 
 class FormulaCell(object):
-    __slots__ = ["__parent", "__idx", "__xf_idx", "__frmla", "__calc_flags"]
+    __slots__ = ["__rowx", "__idx", "__xf_idx", "__frmla", "__calc_flags"]
 
-    def __init__(self, parent, idx, xf_idx, frmla, calc_flags=0):
-        self.__parent = parent
+    def __init__(self, rowx, idx, xf_idx, frmla, calc_flags=0):
+        self.__rowx = rowx
         self.__idx = idx
         self.__xf_idx = xf_idx
         self.__frmla = frmla
         self.__calc_flags = calc_flags
 
     def get_biff_data(self):
-        return BIFFRecords.FormulaRecord(self.__parent.get_index(),
+        return BIFFRecords.FormulaRecord(self.__rowx,
             self.__idx, self.__xf_idx, self.__frmla.rpn(), self.__calc_flags).get()

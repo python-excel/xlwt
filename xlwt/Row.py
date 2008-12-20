@@ -42,7 +42,7 @@ class Row(object):
         self.__idx = rowx
         self.__parent = parent_sheet
         self.__parent_wb = parent_sheet.get_parent()
-        self.__cells = []
+        self.__cells = {}
         self.__min_col_idx = 0
         self.__max_col_idx = 0
         self.__xf_index = 0x0F
@@ -144,9 +144,30 @@ class Row(object):
         return BIFFRecords.RowRecord(self.__idx, self.__min_col_idx,
             self.__max_col_idx, height_options, options).get()
 
+    def insert_cell(self, col_index, cell_obj):
+        if col_index in self.__cells and not self.__parent._cell_overwrite_ok:
+            msg = "Attempt to overwrite cell: sheetname=%r rowx=%d colx=%d" \
+                % (self.__parent.name, self.__idx, col_index)
+            raise Exception(msg)
+        self.__cells[col_index] = cell_obj
+
+    def insert_mulcells(self, colx1, colx2, cell_obj):
+        if self.__parent._cell_overwrite_ok:
+            self.__cells[colx1] = cell_obj
+            return
+        for col_index in xrange(colx1, colx2+1):
+            if col_index in self.__cells:
+                msg = "Attempt to overwrite cell: sheetname=%r rowx=%d colx=%d" \
+                    % (self.__parent.name, self.__idx, col_index)
+                raise Exception(msg)
+            self.__cells[col_index] = cell_obj
+            cell_obj = None # for 2nd & subsequent passes
 
     def get_cells_biff_data(self):
-        return ''.join([ cell.get_biff_data() for cell in self.__cells ])
+        # return ''.join([ cell.get_biff_data() for cell in self.__cells ])
+        cell_items = self.__cells.items()
+        cell_items.sort() # in column order
+        return ''.join([cell.get_biff_data() for colx, cell in cell_items if cell is not None])
 
 
     def get_index(self):
@@ -156,84 +177,79 @@ class Row(object):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(StrCell(self, colx, xf_index, self.__parent_wb.add_str(value)))
+        self.insert_cell(colx, StrCell(self.__idx, colx, xf_index, self.__parent_wb.add_str(value)))
 
     def set_cell_blank(self, colx, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(BlankCell(self, colx, xf_index))
+        self.insert_cell(colx, BlankCell(self.__idx, colx, xf_index))
 
     def set_cell_mulblanks(self, first_colx, last_colx, style=Style.default_style):
         assert 0 <= first_colx <= last_colx <= 255
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(first_colx, last_colx)
         xf_index = self.__parent_wb.add_style(style)
-        ncols = last_colx - first_colx + 1
-        self.__cells.append(MulBlankCell(self, first_colx, last_colx, xf_index))
+        # ncols = last_colx - first_colx + 1
+        self.insert_mulcells(first_colx, last_colx, MulBlankCell(self.__idx, first_colx, last_colx, xf_index))
 
     def set_cell_number(self, colx, number, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(NumberCell(self, colx, xf_index, number))
+        self.insert_cell(colx, NumberCell(self.__idx, colx, xf_index, number))
 
     def set_cell_date(self, colx, datetime_obj, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(
-            NumberCell(self, colx, xf_index, self.__excel_date_dt(datetime_obj)))
+        self.insert_cell(colx,
+            NumberCell(self.__idx, colx, xf_index, self.__excel_date_dt(datetime_obj)))
 
     def set_cell_formula(self, colx, formula, style=Style.default_style, calc_flags=0):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(FormulaCell(self, colx, xf_index, formula, calc_flags=0))
+        self.insert_cell(colx, FormulaCell(self.__idx, colx, xf_index, formula, calc_flags=0))
 
     def set_cell_boolean(self, colx, value, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(BooleanCell(self, colx, xf_index, bool(value)))
+        self.insert_cell(colx, BooleanCell(self.__idx, colx, xf_index, bool(value)))
 
     def set_cell_error(self, colx, error_string_or_code, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__cells.append(ErrorCell(self, colx, xf_index, error_string_or_code))
+        self.insert_cell(colx, ErrorCell(self.__idx, colx, xf_index, error_string_or_code))
 
-    def write(self, col, label, style):
+    def write(self, col, label, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
         style_index = self.__parent_wb.add_style(style)
         if isinstance(label, basestring):
             if len(label) > 0:
-                self.__cells.append(
-                    StrCell(self, col, style_index, self.__parent_wb.add_str(label))
+                self.insert_cell(col,
+                    StrCell(self.__idx, col, style_index, self.__parent_wb.add_str(label))
                     )
             else:
-                self.__cells.append(BlankCell(self, col, style_index))
+                self.insert_cell(col, BlankCell(self.__idx, col, style_index))
         elif isinstance(label, bool): # bool is subclass of int; test bool first
-            self.__cells.append(BooleanCell(self, col, style_index, label))
+            self.insert_cell(col, BooleanCell(self.__idx, col, style_index, label))
         elif isinstance(label, (float, int, long, Decimal)):
-            self.__cells.append(NumberCell(self, col, style_index, label))
+            self.insert_cell(col, NumberCell(self.__idx, col, style_index, label))
         elif isinstance(label, (dt.datetime, dt.date, dt.time)):
             date_number = self.__excel_date_dt(label)
-            self.__cells.append(NumberCell(self, col, style_index, date_number))
+            self.insert_cell(col, NumberCell(self.__idx, col, style_index, date_number))
         elif label is None:
-            self.__cells.append(BlankCell(self, col, style_index))
+            self.insert_cell(col, BlankCell(self.__idx, col, style_index))
         elif isinstance(label, ExcelFormula.Formula):
-            self.__cells.append(FormulaCell(self, col, style_index, label))
+            self.insert_cell(col, FormulaCell(self.__idx, col, style_index, label))
         else:
             raise Exception("Unexpected data type %r" % type(label))
 
-    def write_blanks(self, c1, c2, style):
-        assert c1 <= c2
-        self.__adjust_height(style)
-        self.__adjust_bound_col_idx(c1, c2)
-        style_index = self.__parent_wb.add_style(style)
-        self.__cells.append(MulBlankCell(self, c1, c2, style_index))
+    write_blanks = set_cell_mulblanks
 
 
 

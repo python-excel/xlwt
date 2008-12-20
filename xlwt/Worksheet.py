@@ -47,7 +47,7 @@ class Worksheet(object):
     #################################################################
     ## Constructor
     #################################################################
-    def __init__(self, sheetname, parent_book):
+    def __init__(self, sheetname, parent_book, cell_overwrite_ok=False):
         import Row
         self.Row = Row.Row
 
@@ -56,6 +56,7 @@ class Worksheet(object):
 
         self.__name = sheetname
         self.__parent = parent_book
+        self._cell_overwrite_ok = cell_overwrite_ok
 
         self.__rows = {}
         self.__cols = {}
