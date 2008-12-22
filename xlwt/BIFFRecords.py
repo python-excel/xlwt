@@ -10,29 +10,47 @@ class SharedStringTable(object):
     def __init__(self, encoding):
         self.encoding = encoding
         self._sst_record = ''
-        self._continues = []
+        self._continues = [None, None]
         self._current_piece = pack('<II', 0, 0)
-        self._pos = len(self._current_piece)
-
         self._str_indexes = {}
+        self._tally = []
         self._add_calls = 0
 
     def add_str(self, s):
+        if self.encoding != 'ascii' and not isinstance(s, unicode):
+            s = unicode(s, encoding)
         self._add_calls += 1
         if s not in self._str_indexes:
-            self._str_indexes[s] = len(self._str_indexes)
-            self._add_to_sst(s)
-        return self._str_indexes[s]
+            idx = len(self._str_indexes)
+            self._str_indexes[s] = idx
+            self._tally.append(1)
+            # self._add_to_sst(s)
+        else:
+            idx = self._str_indexes[s]
+            self._tally[idx] += 1
+        return idx
+
+    def del_str(self, idx):
+        # we are replacing the contents of a string cell
+        assert self._tally[idx] > 0
+        self._tally[idx] -= 1
+        self._add_calls -= 1
 
     def str_index(self, s):
         return self._str_indexes[s]
 
     def get_biff_record(self):
+        data = [(idx, s) for s, idx in self._str_indexes.iteritems()]
+        data.sort() # in index order
+        for idx, s in data:
+            if self._tally[idx] == 0:
+                s = u''
+            self._add_to_sst(s)
+        del data
         self._new_piece()
-        result = pack('<2HII', self._SST_ID, len(self._sst_record), self._add_calls, len(self._str_indexes))
-        result += self._sst_record[8:]
-        result += ''.join(self._continues)
-        return result
+        self._continues[0] = pack('<2HII', self._SST_ID, len(self._sst_record), self._add_calls, len(self._str_indexes))
+        self._continues[1] = self._sst_record[8:]
+        return ''.join(self._continues)
 
     def _add_to_sst(self, s):
         u_str = upack2(s, self.encoding)
@@ -57,7 +75,6 @@ class SharedStringTable(object):
             curr_piece_len = len(self._current_piece)
             self._continues.append(pack('<2H%ds'%curr_piece_len, self._CONTINUE_ID, curr_piece_len, self._current_piece))
         self._current_piece = ''
-        self._pos = len(self._current_piece)
 
     def _save_atom(self, s):
         atom_len = len(s)

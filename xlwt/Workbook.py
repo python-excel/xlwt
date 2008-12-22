@@ -295,6 +295,9 @@ class Workbook(object):
     def add_str(self, s):
         return self.__sst.add_str(s)
 
+    def del_str(self, sst_idx):
+        self.__sst.del_str(sst_idx)
+
     def str_index(self, s):
         return self.__sst.str_index(s)
 

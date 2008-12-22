@@ -3,7 +3,8 @@
 import BIFFRecords
 from Worksheet import Worksheet
 import Style
-from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell
+from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
+    _get_cells_biff_data_mul
 import ExcelFormula
 import datetime as dt
 try:
@@ -145,30 +146,28 @@ class Row(object):
             self.__max_col_idx, height_options, options).get()
 
     def insert_cell(self, col_index, cell_obj):
-        if col_index in self.__cells and not self.__parent._cell_overwrite_ok:
-            msg = "Attempt to overwrite cell: sheetname=%r rowx=%d colx=%d" \
-                % (self.__parent.name, self.__idx, col_index)
-            raise Exception(msg)
-        self.__cells[col_index] = cell_obj
-
-    def insert_mulcells(self, colx1, colx2, cell_obj):
-        if self.__parent._cell_overwrite_ok:
-            self.__cells[colx1] = cell_obj
-            return
-        for col_index in xrange(colx1, colx2+1):
-            if col_index in self.__cells:
+        if col_index in self.__cells:
+            if not self.__parent._cell_overwrite_ok:
                 msg = "Attempt to overwrite cell: sheetname=%r rowx=%d colx=%d" \
                     % (self.__parent.name, self.__idx, col_index)
                 raise Exception(msg)
-            self.__cells[col_index] = cell_obj
-            cell_obj = None # for 2nd & subsequent passes
+            prev_cell_obj = self.__cells[col_index]
+            sst_idx = getattr(prev_cell_obj, 'sst_idx', None)
+            if sst_idx is not None:
+                self.__parent_wb.del_str(sst_idx)
+        self.__cells[col_index] = cell_obj
+
+    def insert_mulcells(self, colx1, colx2, cell_obj):
+        self.insert_cell(colx1, cell_obj)
+        for col_index in xrange(colx1+1, colx2+1):
+            self.insert_cell(col_index, None)
 
     def get_cells_biff_data(self):
-        # return ''.join([ cell.get_biff_data() for cell in self.__cells ])
-        cell_items = self.__cells.items()
+        cell_items = [item for item in self.__cells.iteritems() if item[1] is not None]
         cell_items.sort() # in column order
-        return ''.join([cell.get_biff_data() for colx, cell in cell_items if cell is not None])
-
+        return _get_cells_biff_data_mul(self.__idx, cell_items)
+        # previously:
+        # return ''.join([cell.get_biff_data() for colx, cell in cell_items])
 
     def get_index(self):
         return self.__idx
