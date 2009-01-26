@@ -9,29 +9,31 @@ class SharedStringTable(object):
 
     def __init__(self, encoding):
         self.encoding = encoding
-        self._sst_record = ''
-        self._continues = [None, None]
-        self._current_piece = pack('<II', 0, 0)
         self._str_indexes = {}
         self._tally = []
         self._add_calls = 0
+        # Following 3 attrs are used for temporary storage in the
+        # get_biff_record() method and methods called by it. The pseudo-
+        # initialisation here is for documentation purposes only.
+        self._sst_record = None
+        self._continues = None
+        self._current_piece = None
 
     def add_str(self, s):
         if self.encoding != 'ascii' and not isinstance(s, unicode):
-            s = unicode(s, encoding)
+            s = unicode(s, self.encoding)
         self._add_calls += 1
         if s not in self._str_indexes:
             idx = len(self._str_indexes)
             self._str_indexes[s] = idx
             self._tally.append(1)
-            # self._add_to_sst(s)
         else:
             idx = self._str_indexes[s]
             self._tally[idx] += 1
         return idx
 
     def del_str(self, idx):
-        # we are replacing the contents of a string cell
+        # This is called when we are replacing the contents of a string cell.
         assert self._tally[idx] > 0
         self._tally[idx] -= 1
         self._add_calls -= 1
@@ -40,6 +42,9 @@ class SharedStringTable(object):
         return self._str_indexes[s]
 
     def get_biff_record(self):
+        self._sst_record = ''
+        self._continues = [None, None]
+        self._current_piece = pack('<II', 0, 0)
         data = [(idx, s) for s, idx in self._str_indexes.iteritems()]
         data.sort() # in index order
         for idx, s in data:
@@ -50,7 +55,12 @@ class SharedStringTable(object):
         self._new_piece()
         self._continues[0] = pack('<2HII', self._SST_ID, len(self._sst_record), self._add_calls, len(self._str_indexes))
         self._continues[1] = self._sst_record[8:]
-        return ''.join(self._continues)
+        self._sst_record = None
+        self._current_piece = None
+        result = ''.join(self._continues)
+        self._continues = None
+        return result
+
 
     def _add_to_sst(self, s):
         u_str = upack2(s, self.encoding)
