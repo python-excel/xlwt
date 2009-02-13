@@ -3,10 +3,19 @@ header {
     import Utils
     from UnicodeUtils import upack1
     from ExcelMagic import *
+
+    _RVAdelta = {"R": 0, "V": 0x20, "A": 0x40}
+    
+    class FormulaParseException(Exception):
+        """
+        An exception indicating that a Formula could not be successfully parsed.
+        """
 }
 
 header "ExcelFormulaParser.__init__" {
     self.rpn = ""
+    self.sheet_references = []
+    self.rpn_offsets = []
 }
 
 options {
@@ -27,8 +36,11 @@ tokens {
     STR_CONST;
     NUM_CONST;
     INT_CONST;
-    
+
+    FUNC_IF;
+    FUNC_CHOOSE;
     NAME;
+    QUOTENAME;
 
     EQ;
     NE;
@@ -56,6 +68,7 @@ tokens {
     SEMICOLON;
     REF2D;
     REF2D_R1C1;
+    BANG;
 }
 
 formula
@@ -143,11 +156,15 @@ primary[arg_type]
         }
     | str_tok:STR_CONST
         {
-            self.rpn += struct.pack("B", ptgStr) + upack1(str_tok.text[1:-1])
+            self.rpn += struct.pack("B", ptgStr) + upack1(str_tok.text[1:-1].replace("\"\"", "\""))
         }
     | int_tok:INT_CONST
         {
-            self.rpn += struct.pack("<BH", ptgInt, int(int_tok.text))
+            int_value = int(int_tok.text)
+            if int_value <= 65535:
+                self.rpn += struct.pack("<BH", ptgInt, int_value)
+            else:
+                self.rpn += struct.pack("<Bd", ptgNum, float(int_value))
         }
     | num_tok:NUM_CONST
         {
@@ -156,23 +173,102 @@ primary[arg_type]
     | ref2d_tok:REF2D
         {
             r, c = Utils.cell_to_packed_rowcol(ref2d_tok.text)
-            if arg_type == "R":
-                self.rpn += struct.pack("<B2H", ptgRefR, r, c)
-            else:
-                self.rpn += struct.pack("<B2H", ptgRefV, r, c)
+            ptg = ptgRefR + _RVAdelta[arg_type]
+            self.rpn += struct.pack("<B2H", ptg, r, c)
         }
     | ref2d1_tok:REF2D COLON ref2d2_tok:REF2D
         {
             r1, c1 = Utils.cell_to_packed_rowcol(ref2d1_tok.text)
             r2, c2 = Utils.cell_to_packed_rowcol(ref2d2_tok.text)
-            if arg_type == "R":
-                self.rpn += struct.pack("<B4H", ptgAreaR, r1, r2, c1, c2)
-            else:
-                self.rpn += struct.pack("<B4H", ptgAreaV, r1, r2, c1, c2)
+            ptg = ptgAreaR + _RVAdelta[arg_type]
+            self.rpn += struct.pack("<B4H", ptg, r1, r2, c1, c2)
+        }
+    | sheet1 = sheet
+        { 
+            sheet2 = sheet1
+        }
+        ( COLON sheet2 = sheet )? BANG ref3d_ref2d: REF2D
+        {
+            ptg = ptgRef3dR + _RVAdelta[arg_type]
+            rpn_ref2d = ""
+            r1, c1 = Utils.cell_to_packed_rowcol(ref3d_ref2d.text)
+            rpn_ref2d = struct.pack("<3H", 0x0000, r1, c1)
+        }
+        ( COLON ref3d_ref2d2: REF2D
+            {
+                ptg = ptgArea3dR + _RVAdelta[arg_type]
+                r2, c2 = Utils.cell_to_packed_rowcol(ref3d_ref2d2.text)
+                rpn_ref2d = struct.pack("<5H", 0x0000, r1, r2, c1, c2)
+            }
+        )?
+        {
+            self.rpn += struct.pack("<B", ptg)
+            self.sheet_references.append([sheet1, sheet2])
+            self.rpn_offsets.append(len(self.rpn))
+            self.rpn += rpn_ref2d
+        }
+    | FUNC_IF
+        LP expr["V"] (SEMICOLON | COMMA)
+        {
+            self.rpn += struct.pack("<BBH", ptgAttr, 0x02, 0) // tAttrIf
+            pos0 = len(self.rpn) - 2
+        }
+        expr[arg_type] (SEMICOLON | COMMA)
+        {
+            self.rpn += struct.pack("<BBH", ptgAttr, 0x08, 0) // tAttrSkip
+            pos1 = len(self.rpn) - 2
+            self.rpn = self.rpn[:pos0] + struct.pack("<H", pos1-pos0) + self.rpn[pos0+2:]
+        }
+        expr[arg_type] RP
+        {
+            self.rpn += struct.pack("<BBH", ptgAttr, 0x08, 3) // tAttrSkip
+            self.rpn += struct.pack("<BBH", ptgFuncVarR, 3, 1) // 3 = nargs, 1 = IF func
+            pos2 = len(self.rpn)
+            self.rpn = self.rpn[:pos1] + struct.pack("<H", pos2-(pos1+2)-1) + self.rpn[pos1+2:]
+        }
+    | FUNC_CHOOSE
+        {
+            arg_type = "R"
+            rpn_chunks = []
+        }
+        LP expr["V"] // first argument (the selector)
+        {
+            rpn_start = len(self.rpn)
+        }
+        (
+            (SEMICOLON | COMMA)
+                { mark = len(self.rpn) }
+                (
+                  expr[arg_type]
+                | { self.rpn += struct.pack("B", ptgMissArg) }
+                )
+                { rpn_chunks.append(self.rpn[mark:]) }
+        )*
+        RP
+        {
+            self.rpn = self.rpn[:rpn_start]
+            nc = len(rpn_chunks)
+            chunklens = [len(chunk) for chunk in rpn_chunks]
+            skiplens = [0] * nc
+            skiplens[-1] = 3
+            for ic in xrange(nc-1, 0, -1):
+                skiplens[ic-1] = skiplens[ic] + chunklens[ic] + 4
+            jump_pos = [2 * nc + 2]
+            for ic in xrange(nc):
+                jump_pos.append(jump_pos[-1] + chunklens[ic] + 4)
+            choose_rpn = []
+            choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x04, nc)) // 0x04 is tAttrChoose
+            choose_rpn.append(struct.pack("<%dH" % (nc+1), *jump_pos))
+            for ic in xrange(nc):
+                choose_rpn.append(rpn_chunks[ic])
+                choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x08, skiplens[ic])) // 0x08 is tAttrSkip
+            choose_rpn.append(struct.pack("<BBH", ptgFuncVarV, nc+1, 100)) // 100 is CHOOSE fn
+            self.rpn += "".join(choose_rpn)
         }
     | name_tok:NAME
         {
-            self.rpn += ""
+            raise Exception("[formula] found unexpected NAME token (%r)" % name_tok.txt)
+            // #### TODO: handle references to defined names here
         }
     | func_tok:NAME
         {
@@ -184,31 +280,19 @@ primary[arg_type]
                 arg_type_list,
                 volatile_func) = std_func_by_name[func_tok.text.upper()]
             else:
-                raise Exception, "unknown function: %s" % func_tok.text
+                raise Exception("[formula] unknown function (%s)" % func_tok.text)
         }
         LP arg_count = expr_list[arg_type_list, min_argc, max_argc] RP
         {
             if arg_count > max_argc or arg_count < min_argc:
                 raise Exception, "%d parameters for function: %s" % (arg_count, func_tok.text)
             if min_argc == max_argc:
-                if func_type == "V":
-                    func_ptg = ptgFuncV
-                elif func_type == "R":
-                    func_ptg = ptgFuncR
-                elif func_type == "A":
-                    func_ptg = ptgFuncA
-                else:
-                    raise Exception, "wrong function type"
+                func_ptg = ptgFuncR + _RVAdelta[func_type]
                 self.rpn += struct.pack("<BH", func_ptg, opcode)
+            elif arg_count == 1 and func_tok.text.upper() == "SUM":
+                self.rpn += struct.pack("<BBH", ptgAttr, 0x10, 0) // tAttrSum
             else:
-                if func_type == "V":
-                    func_ptg = ptgFuncVarV
-                elif func_type == "R":
-                    func_ptg = ptgFuncVarR
-                elif func_type == "A":
-                    func_ptg = ptgFuncVarA
-                else:
-                    raise Exception, "wrong function type"
+                func_ptg = ptgFuncVarR + _RVAdelta[func_type]
                 self.rpn += struct.pack("<2BH", func_ptg, arg_count, opcode)
         }
     | LP expr[arg_type] RP
@@ -218,11 +302,11 @@ primary[arg_type]
     ;
 
 expr_list[arg_type_list, min_argc, max_argc] returns [arg_cnt]
-{
-    arg_cnt = 0
-    arg_type_list = arg_type_list.split()
-    arg_type = arg_type_list[arg_cnt]
-}
+    {
+        arg_cnt = 0
+        arg_type_list = arg_type_list.split()
+        arg_type = arg_type_list[arg_cnt]
+    }
     : expr[arg_type] { arg_cnt += 1 }
     (
         {
@@ -233,7 +317,7 @@ expr_list[arg_type_list, min_argc, max_argc] returns [arg_cnt]
             if arg_type == "...":
                 arg_type = arg_type_list[-2]
         }
-        SEMICOLON
+        (SEMICOLON | COMMA)
             (
                   expr[arg_type]
                 | { self.rpn += struct.pack("B", ptgMissArg) }
@@ -243,3 +327,11 @@ expr_list[arg_type_list, min_argc, max_argc] returns [arg_cnt]
     |
     ;
 
+sheet returns[ref]
+    : sheet_ref_name: NAME
+    	{ ref = sheet_ref_name.text }
+    | sheet_ref_int: INT_CONST
+    	{ ref = sheet_ref_int.text }
+    | sheet_ref_quote: QUOTENAME
+    	{ ref = sheet_ref_quote.text[1:-1].replace("''", "'") }
+    ;

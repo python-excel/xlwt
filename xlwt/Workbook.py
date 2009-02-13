@@ -81,6 +81,8 @@ class Workbook(object):
         self.__sst = BIFFRecords.SharedStringTable(self.encoding)
 
         self.__worksheets = []
+        self.__worksheet_idx_from_name = {}
+        self.__refs = {}
 
     #################################################################
     ## Properties, "getters", "setters"
@@ -302,12 +304,66 @@ class Workbook(object):
         return self.__sst.str_index(s)
 
     def add_sheet(self, sheetname, cell_overwrite_ok=False):
-        import Worksheet
+        import Worksheet, Utils
+        if not isinstance(sheetname, unicode):
+            sheetname = sheetname.decode(self.encoding)
+        if not Utils.valid_sheet_name(sheetname):
+            raise Exception("invalid worksheet name %r" % sheetname)
+        lower_name = sheetname.lower()
+        if lower_name in self.__worksheet_idx_from_name:
+            raise Exception("duplicate worksheet name %r" % sheetname)
+        self.__worksheet_idx_from_name[lower_name] = len(self.__worksheets)
         self.__worksheets.append(Worksheet.Worksheet(sheetname, self, cell_overwrite_ok))
         return self.__worksheets[-1]
 
     def get_sheet(self, sheetnum):
         return self.__worksheets[sheetnum]
+
+    def raise_bad_sheetname(self, sheetname):
+        raise Exception("Formula: unknown sheet name %s" % sheetname)
+
+    def convert_sheetindex(self, strg_ref, n_sheets):
+        idx = int(strg_ref)
+        if 0 <= idx < n_sheets:
+            return idx
+        msg = "Formula: sheet index (%s) >= number of sheets (%d)" % (strg_ref, n_sheets)
+        raise Exception(msg)
+
+    def add_sheet_reference(self, formula):
+        supbookx = 0 # FIXME: we assume there is only one SupBook (internal references)
+        indexes = []
+        n_sheets = len(self.__worksheets)
+        for ref0, ref1 in formula.get_references():
+            if not ref0.isdigit():
+                try:
+                    ref0n = self.__worksheet_idx_from_name[ref0.lower()]
+                except KeyError:
+                    self.raise_bad_sheetname(ref0)
+            else:
+                ref0n = self.convert_sheetindex(ref0, n_sheets)
+            if ref1 == ref0:
+                ref1n = ref0n
+            elif not ref1.isdigit():
+                try:
+                    ref1n = self.__worksheet_idx_from_name[ref1.lower()]
+                except KeyError:
+                    self.raise_bad_sheetname(ref1)
+            else:
+                ref1n = self.convert_sheetindex(ref1, n_sheets)
+            if ref1n < ref0n:
+                msg = "Formula: sheets out of order; %r:%r -> (%d, %d)" \
+                    % (ref0, ref1, ref0n, ref1n)
+                raise Exception(msg)
+            reference = (supbookx, ref0n, ref1n)
+            if reference in self.__refs:
+                indexes.append(self.__refs[reference])
+            else:
+                nrefs = len(self.__refs)
+                if nrefs > 65535:
+                    raise Exception('More than 65536 inter-sheet references')
+                self.__refs[reference] = nrefs
+                indexes.append(nrefs)
+        formula.update_references(indexes)
 
     ##################################################################
     ## BIFF records generation
@@ -434,8 +490,17 @@ class Workbook(object):
         return result
 
     def __all_links_rec(self):
-        result = ''
-        return result
+        supbook_records = ''
+        externsheet_record = ''
+        if len(self.__refs) > 0:
+            supbook_records += BIFFRecords.InternalReferenceSupBookRecord(len(self.__worksheets)).get()
+            # get references in index order
+            temp = [(idx, ref) for ref, idx in self.__refs.items()]
+            temp.sort()
+            temp = [ref for idx, ref in temp]
+            externsheet_record = BIFFRecords.ExternSheetRecord(temp).get()
+
+        return supbook_records + externsheet_record
 
     def __sst_rec(self):
         return self.__sst.get_biff_record()
@@ -502,3 +567,5 @@ class Workbook(object):
 
         doc = CompoundDoc.XlsDoc()
         doc.save(filename, self.get_biff_data())
+
+

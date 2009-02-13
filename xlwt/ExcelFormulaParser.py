@@ -1,4 +1,4 @@
-### $ANTLR 2.7.7 (20060930): "excel-formula.g" -> "ExcelFormulaParser.py"$
+### $ANTLR 2.7.7 (20060930): "xlwt/excel-formula.g" -> "ExcelFormulaParser.py"$
 ### import antlr and other modules ..
 import sys
 import antlr
@@ -8,19 +8,24 @@ if version < '2.2.1':
     False = 0
 if version < '2.3':
     True = not False
-### header action >>> 
-__rev_id__ = """$Id$"""
-
+### header action >>>
 import struct
 import Utils
 from UnicodeUtils import upack1
 from ExcelMagic import *
-### header action <<< 
+
+_RVAdelta = {"R": 0, "V": 0x20, "A": 0x40}
+
+class FormulaParseException(Exception):
+   """
+   An exception indicating that a Formula could not be successfully parsed.
+   """
+### header action <<<
 ### preamble action>>>
 
 ### preamble action <<<
 
-### import antlr.Token 
+### import antlr.Token
 from antlr import Token
 ### >>>The Known Token Types <<<
 SKIP                = antlr.SKIP
@@ -34,55 +39,56 @@ FALSE_CONST = 5
 STR_CONST = 6
 NUM_CONST = 7
 INT_CONST = 8
-NAME = 9
-EQ = 10
-NE = 11
-GT = 12
-LT = 13
-GE = 14
-LE = 15
-ADD = 16
-SUB = 17
-MUL = 18
-DIV = 19
-POWER = 20
-PERCENT = 21
-LP = 22
-RP = 23
-LB = 24
-RB = 25
-COLON = 26
-COMMA = 27
-SEMICOLON = 28
-REF2D = 29
-REF2D_R1C1 = 30
-CONCAT = 31
+FUNC_IF = 9
+FUNC_CHOOSE = 10
+NAME = 11
+QUOTENAME = 12
+EQ = 13
+NE = 14
+GT = 15
+LT = 16
+GE = 17
+LE = 18
+ADD = 19
+SUB = 20
+MUL = 21
+DIV = 22
+POWER = 23
+PERCENT = 24
+LP = 25
+RP = 26
+LB = 27
+RB = 28
+COLON = 29
+COMMA = 30
+SEMICOLON = 31
+REF2D = 32
+REF2D_R1C1 = 33
+BANG = 34
+CONCAT = 35
 
-class FormulaParseException(Exception):
-    """
-    An exception indicating that a Formula could not be successfully parsed.
-    """
-    
 class Parser(antlr.LLkParser):
     ### user action >>>
     ### user action <<<
-    
+
     def __init__(self, *args, **kwargs):
         antlr.LLkParser.__init__(self, *args, **kwargs)
         self.tokenNames = _tokenNames
-        ### __init__ header action >>> 
+        ### __init__ header action >>>
         self.rpn = ""
-        ### __init__ header action <<< 
-        
-    def formula(self):    
-        
+        self.sheet_references = []
+        self.rpn_offsets = []
+        ### __init__ header action <<<
+
+    def formula(self):
+
         pass
         self.expr("V")
-    
+
     def expr(self,
         arg_type
-    ):    
-        
+    ):
+
         pass
         self.prec0_expr(arg_type)
         while True:
@@ -117,17 +123,17 @@ class Parser(antlr.LLkParser):
                     op = struct.pack('B', ptgLE)
                 else:
                         raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-                    
+
                 self.prec0_expr(arg_type)
                 self.rpn += op
             else:
                 break
-            
-    
+
+
     def prec0_expr(self,
         arg_type
-    ):    
-        
+    ):
+
         pass
         self.prec1_expr(arg_type)
         while True:
@@ -140,12 +146,12 @@ class Parser(antlr.LLkParser):
                 self.rpn += op
             else:
                 break
-            
-    
+
+
     def prec1_expr(self,
         arg_type
-    ):    
-        
+    ):
+
         pass
         self.prec2_expr(arg_type)
         while True:
@@ -164,17 +170,17 @@ class Parser(antlr.LLkParser):
                     op = struct.pack('B', ptgSub)
                 else:
                         raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-                    
+
                 self.prec2_expr(arg_type)
                 self.rpn += op
             else:
                 break
-            
-    
+
+
     def prec2_expr(self,
         arg_type
-    ):    
-        
+    ):
+
         pass
         self.prec3_expr(arg_type)
         while True:
@@ -193,17 +199,17 @@ class Parser(antlr.LLkParser):
                     op = struct.pack('B', ptgDiv)
                 else:
                         raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-                    
+
                 self.prec3_expr(arg_type)
                 self.rpn += op
             else:
                 break
-            
-    
+
+
     def prec3_expr(self,
         arg_type
-    ):    
-        
+    ):
+
         pass
         self.prec4_expr(arg_type)
         while True:
@@ -216,12 +222,12 @@ class Parser(antlr.LLkParser):
                 self.rpn += op
             else:
                 break
-            
-    
+
+
     def prec4_expr(self,
         arg_type
-    ):    
-        
+    ):
+
         pass
         self.prec5_expr(arg_type)
         la1 = self.LA(1)
@@ -231,20 +237,20 @@ class Parser(antlr.LLkParser):
             pass
             self.match(PERCENT)
             self.rpn += struct.pack('B', ptgPercent)
-        elif la1 and la1 in [EOF,EQ,NE,GT,LT,GE,LE,ADD,SUB,MUL,DIV,POWER,RP,SEMICOLON,CONCAT]:
+        elif la1 and la1 in [EOF,EQ,NE,GT,LT,GE,LE,ADD,SUB,MUL,DIV,POWER,RP,COMMA,SEMICOLON,CONCAT]:
             pass
         else:
                 raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-            
-    
+
+
     def prec5_expr(self,
         arg_type
-    ):    
-        
+    ):
+
         la1 = self.LA(1)
         if False:
             pass
-        elif la1 and la1 in [TRUE_CONST,FALSE_CONST,STR_CONST,NUM_CONST,INT_CONST,NAME,LP,REF2D]:
+        elif la1 and la1 in [TRUE_CONST,FALSE_CONST,STR_CONST,NUM_CONST,INT_CONST,FUNC_IF,FUNC_CHOOSE,NAME,QUOTENAME,LP,REF2D]:
             pass
             self.primary(arg_type)
         elif la1 and la1 in [SUB]:
@@ -254,18 +260,20 @@ class Parser(antlr.LLkParser):
             self.rpn += struct.pack('B', ptgUminus)
         else:
                 raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-            
-    
+
+
     def primary(self,
         arg_type
-    ):    
-        
+    ):
+
         str_tok = None
         int_tok = None
         num_tok = None
         ref2d_tok = None
         ref2d1_tok = None
         ref2d2_tok = None
+        ref3d_ref2d = None
+        ref3d_ref2d2 = None
         name_tok = None
         func_tok = None
         la1 = self.LA(1)
@@ -283,17 +291,112 @@ class Parser(antlr.LLkParser):
             pass
             str_tok = self.LT(1)
             self.match(STR_CONST)
-            self.rpn += struct.pack("B", ptgStr) + upack1(str_tok.text[1:-1])
-        elif la1 and la1 in [INT_CONST]:
-            pass
-            int_tok = self.LT(1)
-            self.match(INT_CONST)
-            self.rpn += struct.pack("<BH", ptgInt, int(int_tok.text))
+            self.rpn += struct.pack("B", ptgStr) + upack1(str_tok.text[1:-1].replace("\"\"", "\""))
         elif la1 and la1 in [NUM_CONST]:
             pass
             num_tok = self.LT(1)
             self.match(NUM_CONST)
             self.rpn += struct.pack("<Bd", ptgNum, float(num_tok.text))
+        elif la1 and la1 in [FUNC_IF]:
+            pass
+            self.match(FUNC_IF)
+            self.match(LP)
+            self.expr("V")
+            la1 = self.LA(1)
+            if False:
+                pass
+            elif la1 and la1 in [SEMICOLON]:
+                pass
+                self.match(SEMICOLON)
+            elif la1 and la1 in [COMMA]:
+                pass
+                self.match(COMMA)
+            else:
+                    raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+            self.rpn += struct.pack("<BBH", ptgAttr, 0x02, 0) # tAttrIf
+            pos0 = len(self.rpn) - 2
+            self.expr(arg_type)
+            la1 = self.LA(1)
+            if False:
+                pass
+            elif la1 and la1 in [SEMICOLON]:
+                pass
+                self.match(SEMICOLON)
+            elif la1 and la1 in [COMMA]:
+                pass
+                self.match(COMMA)
+            else:
+                    raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+            self.rpn += struct.pack("<BBH", ptgAttr, 0x08, 0) # tAttrSkip
+            pos1 = len(self.rpn) - 2
+            self.rpn = self.rpn[:pos0] + struct.pack("<H", pos1-pos0) + self.rpn[pos0+2:]
+            self.expr(arg_type)
+            self.match(RP)
+            self.rpn += struct.pack("<BBH", ptgAttr, 0x08, 3) # tAttrSkip
+            self.rpn += struct.pack("<BBH", ptgFuncVarR, 3, 1) # 3 = nargs, 1 = IF func
+            pos2 = len(self.rpn)
+            self.rpn = self.rpn[:pos1] + struct.pack("<H", pos2-(pos1+2)-1) + self.rpn[pos1+2:]
+        elif la1 and la1 in [FUNC_CHOOSE]:
+            pass
+            self.match(FUNC_CHOOSE)
+            arg_type = "R"
+            rpn_chunks = []
+            self.match(LP)
+            self.expr("V")
+            rpn_start = len(self.rpn)
+            while True:
+                if (self.LA(1)==COMMA or self.LA(1)==SEMICOLON):
+                    pass
+                    la1 = self.LA(1)
+                    if False:
+                        pass
+                    elif la1 and la1 in [SEMICOLON]:
+                        pass
+                        self.match(SEMICOLON)
+                    elif la1 and la1 in [COMMA]:
+                        pass
+                        self.match(COMMA)
+                    else:
+                            raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+                    mark = len(self.rpn)
+                    la1 = self.LA(1)
+                    if False:
+                        pass
+                    elif la1 and la1 in [TRUE_CONST,FALSE_CONST,STR_CONST,NUM_CONST,INT_CONST,FUNC_IF,FUNC_CHOOSE,NAME,QUOTENAME,SUB,LP,REF2D]:
+                        pass
+                        self.expr(arg_type)
+                    elif la1 and la1 in [RP,COMMA,SEMICOLON]:
+                        pass
+                        self.rpn += struct.pack("B", ptgMissArg)
+                    else:
+                            raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+                    rpn_chunks.append(self.rpn[mark:])
+                else:
+                    break
+
+            self.match(RP)
+            self.rpn = self.rpn[:rpn_start]
+            nc = len(rpn_chunks)
+            chunklens = [len(chunk) for chunk in rpn_chunks]
+            skiplens = [0] * nc
+            skiplens[-1] = 3
+            for ic in xrange(nc-1, 0, -1):
+               skiplens[ic-1] = skiplens[ic] + chunklens[ic] + 4
+            jump_pos = [2 * nc + 2]
+            for ic in xrange(nc):
+               jump_pos.append(jump_pos[-1] + chunklens[ic] + 4)
+            choose_rpn = []
+            choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x04, nc)) # 0x04 is tAttrChoose
+            choose_rpn.append(struct.pack("<%dH" % (nc+1), *jump_pos))
+            for ic in xrange(nc):
+               choose_rpn.append(rpn_chunks[ic])
+               choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x08, skiplens[ic])) # 0x08 is tAttrSkip
+            choose_rpn.append(struct.pack("<BBH", ptgFuncVarV, nc+1, 100)) # 100 is CHOOSE fn
+            self.rpn += "".join(choose_rpn)
         elif la1 and la1 in [LP]:
             pass
             self.match(LP)
@@ -301,15 +404,22 @@ class Parser(antlr.LLkParser):
             self.match(RP)
             self.rpn += struct.pack("B", ptgParen)
         else:
-            if (self.LA(1)==REF2D) and (_tokenSet_0.member(self.LA(2))):
+            if (self.LA(1)==INT_CONST) and (_tokenSet_0.member(self.LA(2))):
+                pass
+                int_tok = self.LT(1)
+                self.match(INT_CONST)
+                int_value = int(int_tok.text)
+                if int_value <= 65535:
+                   self.rpn += struct.pack("<BH", ptgInt, int_value)
+                else:
+                   self.rpn += struct.pack("<Bd", ptgNum, float(int_value))
+            elif (self.LA(1)==REF2D) and (_tokenSet_0.member(self.LA(2))):
                 pass
                 ref2d_tok = self.LT(1)
                 self.match(REF2D)
                 r, c = Utils.cell_to_packed_rowcol(ref2d_tok.text)
-                if arg_type == "R":
-                   self.rpn += struct.pack("<B2H", ptgRefR, r, c)
-                else:
-                   self.rpn += struct.pack("<B2H", ptgRefV, r, c)
+                ptg = ptgRefR + _RVAdelta[arg_type]
+                self.rpn += struct.pack("<B2H", ptg, r, c)
             elif (self.LA(1)==REF2D) and (self.LA(2)==COLON):
                 pass
                 ref2d1_tok = self.LT(1)
@@ -319,15 +429,57 @@ class Parser(antlr.LLkParser):
                 self.match(REF2D)
                 r1, c1 = Utils.cell_to_packed_rowcol(ref2d1_tok.text)
                 r2, c2 = Utils.cell_to_packed_rowcol(ref2d2_tok.text)
-                if arg_type == "R":
-                   self.rpn += struct.pack("<B4H", ptgAreaR, r1, r2, c1, c2)
+                ptg = ptgAreaR + _RVAdelta[arg_type]
+                self.rpn += struct.pack("<B4H", ptg, r1, r2, c1, c2)
+            elif (self.LA(1)==INT_CONST or self.LA(1)==NAME or self.LA(1)==QUOTENAME) and (self.LA(2)==COLON or self.LA(2)==BANG):
+                pass
+                sheet1=self.sheet()
+                sheet2 = sheet1
+                la1 = self.LA(1)
+                if False:
+                    pass
+                elif la1 and la1 in [COLON]:
+                    pass
+                    self.match(COLON)
+                    sheet2=self.sheet()
+                elif la1 and la1 in [BANG]:
+                    pass
                 else:
-                   self.rpn += struct.pack("<B4H", ptgAreaV, r1, r2, c1, c2)
+                        raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+                self.match(BANG)
+                ref3d_ref2d = self.LT(1)
+                self.match(REF2D)
+                ptg = ptgRef3dR + _RVAdelta[arg_type]
+                rpn_ref2d = ""
+                r1, c1 = Utils.cell_to_packed_rowcol(ref3d_ref2d.text)
+                rpn_ref2d = struct.pack("<3H", 0x0000, r1, c1)
+                la1 = self.LA(1)
+                if False:
+                    pass
+                elif la1 and la1 in [COLON]:
+                    pass
+                    self.match(COLON)
+                    ref3d_ref2d2 = self.LT(1)
+                    self.match(REF2D)
+                    ptg = ptgArea3dR + _RVAdelta[arg_type]
+                    r2, c2 = Utils.cell_to_packed_rowcol(ref3d_ref2d2.text)
+                    rpn_ref2d = struct.pack("<5H", 0x0000, r1, r2, c1, c2)
+                elif la1 and la1 in [EOF,EQ,NE,GT,LT,GE,LE,ADD,SUB,MUL,DIV,POWER,PERCENT,RP,COMMA,SEMICOLON,CONCAT]:
+                    pass
+                else:
+                        raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+                self.rpn += struct.pack("<B", ptg)
+                self.sheet_references.append([sheet1, sheet2])
+                self.rpn_offsets.append(len(self.rpn))
+                self.rpn += rpn_ref2d
             elif (self.LA(1)==NAME) and (_tokenSet_0.member(self.LA(2))):
                 pass
                 name_tok = self.LT(1)
                 self.match(NAME)
-                self.rpn += ""
+                raise Exception("[formula] found unexpected NAME token (%r)" % name_tok.txt)
+                # #### TODO: handle references to defined names here
             elif (self.LA(1)==NAME) and (self.LA(2)==LP):
                 pass
                 func_tok = self.LT(1)
@@ -340,55 +492,70 @@ class Parser(antlr.LLkParser):
                    arg_type_list,
                    volatile_func) = std_func_by_name[func_tok.text.upper()]
                 else:
-                   raise FormulaParseException, "unknown function: %s" % func_tok.text
+                   raise Exception("[formula] unknown function (%s)" % func_tok.text)
                 self.match(LP)
                 arg_count=self.expr_list(arg_type_list, min_argc, max_argc)
                 self.match(RP)
                 if arg_count > max_argc or arg_count < min_argc:
-                   raise FormulaParseException, "%d parameters for function %s, should have been between %i and %i" % (
-                       arg_count, func_tok.text, min_argc, max_argc
-                       )
+                   raise Exception, "%d parameters for function: %s" % (arg_count, func_tok.text)
                 if min_argc == max_argc:
-                   if func_type == "V":
-                       func_ptg = ptgFuncV
-                   elif func_type == "R":
-                       func_ptg = ptgFuncR
-                   elif func_type == "A":
-                       func_ptg = ptgFuncA
-                   else:
-                       raise FormulaParseException, "wrong function type"
+                   func_ptg = ptgFuncR + _RVAdelta[func_type]
                    self.rpn += struct.pack("<BH", func_ptg, opcode)
+                elif arg_count == 1 and func_tok.text.upper() == "SUM":
+                   self.rpn += struct.pack("<BBH", ptgAttr, 0x10, 0) # tAttrSum
                 else:
-                   if func_type == "V":
-                       func_ptg = ptgFuncVarV
-                   elif func_type == "R":
-                       func_ptg = ptgFuncVarR
-                   elif func_type == "A":
-                       func_ptg = ptgFuncVarA
-                   else:
-                       raise FormulaParseException, "wrong function type"
+                   func_ptg = ptgFuncVarR + _RVAdelta[func_type]
                    self.rpn += struct.pack("<2BH", func_ptg, arg_count, opcode)
             else:
                 raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-            
-    
+
+
+    def sheet(self):
+        ref = None
+
+        sheet_ref_name = None
+        sheet_ref_int = None
+        sheet_ref_quote = None
+        la1 = self.LA(1)
+        if False:
+            pass
+        elif la1 and la1 in [NAME]:
+            pass
+            sheet_ref_name = self.LT(1)
+            self.match(NAME)
+            ref = sheet_ref_name.text
+        elif la1 and la1 in [INT_CONST]:
+            pass
+            sheet_ref_int = self.LT(1)
+            self.match(INT_CONST)
+            ref = sheet_ref_int.text
+        elif la1 and la1 in [QUOTENAME]:
+            pass
+            sheet_ref_quote = self.LT(1)
+            self.match(QUOTENAME)
+            ref = sheet_ref_quote.text[1:-1].replace("''", "'")
+        else:
+                raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+        return ref
+
     def expr_list(self,
         arg_type_list, min_argc, max_argc
-    ):    
+    ):
         arg_cnt = None
-        
+
         arg_cnt = 0
         arg_type_list = arg_type_list.split()
         arg_type = arg_type_list[arg_cnt]
         la1 = self.LA(1)
         if False:
             pass
-        elif la1 and la1 in [TRUE_CONST,FALSE_CONST,STR_CONST,NUM_CONST,INT_CONST,NAME,SUB,LP,REF2D]:
+        elif la1 and la1 in [TRUE_CONST,FALSE_CONST,STR_CONST,NUM_CONST,INT_CONST,FUNC_IF,FUNC_CHOOSE,NAME,QUOTENAME,SUB,LP,REF2D]:
             pass
             self.expr(arg_type)
             arg_cnt += 1
             while True:
-                if (self.LA(1)==SEMICOLON):
+                if (self.LA(1)==COMMA or self.LA(1)==SEMICOLON):
                     pass
                     if arg_cnt < len(arg_type_list):
                        arg_type = arg_type_list[arg_cnt]
@@ -396,70 +563,86 @@ class Parser(antlr.LLkParser):
                        arg_type = arg_type_list[-1]
                     if arg_type == "...":
                        arg_type = arg_type_list[-2]
-                    self.match(SEMICOLON)
                     la1 = self.LA(1)
                     if False:
                         pass
-                    elif la1 and la1 in [TRUE_CONST,FALSE_CONST,STR_CONST,NUM_CONST,INT_CONST,NAME,SUB,LP,REF2D]:
+                    elif la1 and la1 in [SEMICOLON]:
+                        pass
+                        self.match(SEMICOLON)
+                    elif la1 and la1 in [COMMA]:
+                        pass
+                        self.match(COMMA)
+                    else:
+                            raise antlr.NoViableAltException(self.LT(1), self.getFilename())
+
+                    la1 = self.LA(1)
+                    if False:
+                        pass
+                    elif la1 and la1 in [TRUE_CONST,FALSE_CONST,STR_CONST,NUM_CONST,INT_CONST,FUNC_IF,FUNC_CHOOSE,NAME,QUOTENAME,SUB,LP,REF2D]:
                         pass
                         self.expr(arg_type)
-                    elif la1 and la1 in [RP,SEMICOLON]:
+                    elif la1 and la1 in [RP,COMMA,SEMICOLON]:
                         pass
                         self.rpn += struct.pack("B", ptgMissArg)
                     else:
                             raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-                        
+
                     arg_cnt += 1
                 else:
                     break
-                
+
         elif la1 and la1 in [RP]:
             pass
         else:
                 raise antlr.NoViableAltException(self.LT(1), self.getFilename())
-            
+
         return arg_cnt
-    
+
 
 _tokenNames = [
-    "<0>", 
-    "EOF", 
-    "<2>", 
-    "NULL_TREE_LOOKAHEAD", 
-    "TRUE_CONST", 
-    "FALSE_CONST", 
-    "STR_CONST", 
-    "NUM_CONST", 
-    "INT_CONST", 
-    "NAME", 
-    "EQ", 
-    "NE", 
-    "GT", 
-    "LT", 
-    "GE", 
-    "LE", 
-    "ADD", 
-    "SUB", 
-    "MUL", 
-    "DIV", 
-    "POWER", 
-    "PERCENT", 
-    "LP", 
-    "RP", 
-    "LB", 
-    "RB", 
-    "COLON", 
-    "COMMA", 
-    "SEMICOLON", 
-    "REF2D", 
-    "REF2D_R1C1", 
+    "<0>",
+    "EOF",
+    "<2>",
+    "NULL_TREE_LOOKAHEAD",
+    "TRUE_CONST",
+    "FALSE_CONST",
+    "STR_CONST",
+    "NUM_CONST",
+    "INT_CONST",
+    "FUNC_IF",
+    "FUNC_CHOOSE",
+    "NAME",
+    "QUOTENAME",
+    "EQ",
+    "NE",
+    "GT",
+    "LT",
+    "GE",
+    "LE",
+    "ADD",
+    "SUB",
+    "MUL",
+    "DIV",
+    "POWER",
+    "PERCENT",
+    "LP",
+    "RP",
+    "LB",
+    "RB",
+    "COLON",
+    "COMMA",
+    "SEMICOLON",
+    "REF2D",
+    "REF2D_R1C1",
+    "BANG",
     "CONCAT"
 ]
-    
+
 
 ### generate bit set
-def mk_tokenSet_0(): 
+def mk_tokenSet_0():
     ### var1
-    data = [ 2428500994L, 0L]
+    data = [ 37681618946L, 0L]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
+

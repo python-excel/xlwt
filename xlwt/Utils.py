@@ -24,11 +24,10 @@
 
 # Portions are (C) Roman V. Kiseliov, 2005
 
-"""pyXLWriter.utilites
 
-Utilities for work with reference to cells
+# Utilities for work with reference to cells and with sheetnames
 
-"""
+
 __rev_id__ = """$Id$"""
 
 import re
@@ -163,3 +162,19 @@ def cell_to_packed_rowcol(cell):
     col |= int(not row_abs) << 15
     col |= int(not col_abs) << 14
     return row, col
+
+# === sheetname functions ===
+
+def valid_sheet_name(sheet_name):
+    if sheet_name == u"" or sheet_name[0] == u"'" or len(sheet_name) > 31:
+        return False
+    for c in sheet_name:
+        if c in u"[]:\\?/*\x00":
+            return False
+    return True
+
+def quote_sheet_name(unquoted_sheet_name):
+    if not valid_sheet_name(unquoted_sheet_name):
+        raise Exception(
+            'attempt to quote an invalid worksheet name %r' % unquoted_sheet_name)
+    return u"'" + unquoted_sheet_name.replace(u"'", u"''") + u"'"

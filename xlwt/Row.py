@@ -1,7 +1,6 @@
 # -*- coding: windows-1252 -*-
 
 import BIFFRecords
-from Worksheet import Worksheet
 import Style
 from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
     _get_cells_biff_data_mul
@@ -209,6 +208,7 @@ class Row(object):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
+        self.__parent_wb.add_sheet_reference(label)
         self.insert_cell(colx, FormulaCell(self.__idx, colx, xf_index, formula, calc_flags=0))
 
     def set_cell_boolean(self, colx, value, style=Style.default_style):
@@ -244,6 +244,7 @@ class Row(object):
         elif label is None:
             self.insert_cell(col, BlankCell(self.__idx, col, style_index))
         elif isinstance(label, ExcelFormula.Formula):
+            self.__parent_wb.add_sheet_reference(label)
             self.insert_cell(col, FormulaCell(self.__idx, col, style_index, label))
         else:
             raise Exception("Unexpected data type %r" % type(label))
