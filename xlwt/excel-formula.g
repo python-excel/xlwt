@@ -15,7 +15,7 @@ header {
 header "ExcelFormulaParser.__init__" {
     self.rpn = ""
     self.sheet_references = []
-    self.rpn_offsets = []
+    self.xcall_references = []
 }
 
 options {
@@ -203,8 +203,7 @@ primary[arg_type]
         )?
         {
             self.rpn += struct.pack("<B", ptg)
-            self.sheet_references.append([sheet1, sheet2])
-            self.rpn_offsets.append(len(self.rpn))
+            self.sheet_references.append((sheet1, sheet2, len(self.rpn)))
             self.rpn += rpn_ref2d
         }
     | FUNC_IF
@@ -234,6 +233,7 @@ primary[arg_type]
         LP expr["V"] // first argument (the selector)
         {
             rpn_start = len(self.rpn)
+            ref_markers = [len(self.sheet_references)]
         }
         (
             (SEMICOLON | COMMA)
@@ -242,7 +242,10 @@ primary[arg_type]
                   expr[arg_type]
                 | { self.rpn += struct.pack("B", ptgMissArg) }
                 )
-                { rpn_chunks.append(self.rpn[mark:]) }
+                {
+                    rpn_chunks.append(self.rpn[mark:])
+                    ref_markers.append(len(self.sheet_references))
+                }
         )*
         RP
         {
@@ -256,6 +259,12 @@ primary[arg_type]
             jump_pos = [2 * nc + 2]
             for ic in xrange(nc):
                 jump_pos.append(jump_pos[-1] + chunklens[ic] + 4)
+            chunk_shift = 2 * nc + 6 // size of tAttrChoose
+            for ic in xrange(nc):
+                for refx in xrange(ref_markers[ic], ref_markers[ic+1]):
+                    ref = self.sheet_references[refx]
+                    self.sheet_references[refx] = (ref[0], ref[1], ref[2] + chunk_shift)
+                chunk_shift += 4 // size of tAttrSkip
             choose_rpn = []
             choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x04, nc)) // 0x04 is tAttrChoose
             choose_rpn.append(struct.pack("<%dH" % (nc+1), *jump_pos))
@@ -272,21 +281,35 @@ primary[arg_type]
         }
     | func_tok:NAME
         {
-            if func_tok.text.upper() in std_func_by_name:
+            func_toku = func_tok.text.upper()
+            if func_toku in all_funcs_by_name:
                 (opcode,
                 min_argc,
                 max_argc,
                 func_type,
-                arg_type_list,
-                volatile_func) = std_func_by_name[func_tok.text.upper()]
+                arg_type_str) = all_funcs_by_name[func_toku]
+                arg_type_list = list(arg_type_str)
             else:
                 raise Exception("[formula] unknown function (%s)" % func_tok.text)
+            xcall = opcode < 0
+            if xcall:
+                // The name of the add-in function is passed as the 1st arg
+                // of the hidden XCALL function
+                self.xcall_references.append((func_toku, len(self.rpn) + 1))
+                self.rpn += struct.pack("<BHHH",
+                    ptgNameXR,
+                    0xadde, // ##PATCHME## index to REF entry in EXTERNSHEET record
+                    0xefbe, // ##PATCHME## one-based index to EXTERNNAME record
+                    0x0000) // unused
         }
         LP arg_count = expr_list[arg_type_list, min_argc, max_argc] RP
         {
             if arg_count > max_argc or arg_count < min_argc:
                 raise Exception, "%d parameters for function: %s" % (arg_count, func_tok.text)
-            if min_argc == max_argc:
+            if xcall:
+                func_ptg = ptgFuncVarR + _RVAdelta[func_type]
+                self.rpn += struct.pack("<2BH", func_ptg, arg_count + 1, 255) // 255 is magic XCALL function
+            elif min_argc == max_argc:
                 func_ptg = ptgFuncR + _RVAdelta[func_type]
                 self.rpn += struct.pack("<BH", func_ptg, opcode)
             elif arg_count == 1 and func_tok.text.upper() == "SUM":
@@ -304,7 +327,6 @@ primary[arg_type]
 expr_list[arg_type_list, min_argc, max_argc] returns [arg_cnt]
     {
         arg_cnt = 0
-        arg_type_list = arg_type_list.split()
         arg_type = arg_type_list[arg_cnt]
     }
     : expr[arg_type] { arg_cnt += 1 }
@@ -314,7 +336,7 @@ expr_list[arg_type_list, min_argc, max_argc] returns [arg_cnt]
                 arg_type = arg_type_list[arg_cnt]
             else:
                 arg_type = arg_type_list[-1]
-            if arg_type == "...":
+            if arg_type == "+":
                 arg_type = arg_type_list[-2]
         }
         (SEMICOLON | COMMA)

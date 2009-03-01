@@ -2268,14 +2268,14 @@ class NameRecord(BiffRecord):
         else:
             uname = upack1(name)[1:]
         uname_len = len(uname)
-        
+
         #~ self._rec_data = pack('<HBBHHHBBBB%ds%ds' % (uname_len, len(rpn)), options, keyboard_shortcut, uname_len, len(rpn), 0x0000, sheet_index, len(menu_text), len(desc_text), len(help_text), len(status_text), uname, rpn) + menu_text + desc_text + help_text + status_text
         self._rec_data = pack('<HBBHHHBBBBB%ds%ds' % (uname_len, len(rpn)), options, keyboard_shortcut, uname_len, len(rpn), 0x0000, sheet_index, 0x00, len(menu_text), len(desc_text), len(help_text), len(status_text), uname, rpn) + menu_text + desc_text + help_text + status_text
-        
+
 # Excel (both 2003 and 2007) don't like refs
 # split over a record boundary, which is what the
 # standard BiffRecord.get method does.
-        
+
 # 8224 max data bytes in a BIFF record
 # 6 bytes per ref
 # 1370 = floor((8224 - 2) / 6.0) max refs in a record
@@ -2285,9 +2285,9 @@ _maxRefPerRecord = 1370
 class ExternSheetRecord(BiffRecord):
     """
     In BIFF8 the record stores a list with indexes to SUPBOOK
-    records (list of REF structures, 6.100). See 5.10.3 for 
+    records (list of REF structures, 6.100). See 5.10.3 for
     details about external references in BIFF8.
-    
+
     Record EXTERNSHEET, BIFF8:
     Offset          Size      Contents
        0             2        Number of following REF structures (nm)
@@ -2300,7 +2300,7 @@ class ExternSheetRecord(BiffRecord):
     _REC_ID = 0x0017
 
     def __init__(self, refs):
-        
+
         # do we always need this ref? or only if there are no refs?
         # (I believe that if there are no refs then we should not generate the link table - Ruben)
         #refs.insert(0, (0,0,0))
@@ -2328,7 +2328,7 @@ class SupBookRecord(BiffRecord):
     it is used to store DDE and OLE object links, or to indicate
     an internal 3D reference or an add-in function. See 5.10.3
     for details about external references in BIFF8.
-    
+
     """
     _REC_ID = 0x01AE
 
@@ -2336,7 +2336,7 @@ class InternalReferenceSupBookRecord(SupBookRecord):
     """
     In each file occurs a SUPBOOK that is used for internal 3D
     references. It stores the number of sheets of the own document.
-    
+
     Record SUPBOOK for 3D references, BIFF8:
     Offset         Size   Contents
       0             2     Number of sheets in this document
@@ -2346,3 +2346,48 @@ class InternalReferenceSupBookRecord(SupBookRecord):
 
     def __init__(self, num_sheets):
         self._rec_data = pack('<HBB', num_sheets, 0x01, 0x04)
+
+class XcallSupBookRecord(SupBookRecord):
+    """
+    Add-in function names are stored in EXTERNNAME records following this record.
+
+    Offset  Size    Contents
+    0       2       0001H
+    2       2       01H 3AH (relict of BIFF5, the byte string ':', see EXTERNSHEET record, 5.41)
+
+    """
+
+    def __init__(self):
+        self._rec_data = pack('<HBB', 1, 0x01, 0x3A)
+
+
+class ExternnameRecord(BiffRecord):
+    """
+    Record EXTERNNAME for external names and Analysis add-in functions, BIFF5-BIFF8:
+    Offset  Size    Contents
+    0       2       Option flags (see below)
+    2       2       0 for global names, or:
+                    BIFF5: One-based index to EXTERNSHEET record containing the sheet name,
+                    BIFF8: One-based index to sheet list in preceding EXTERNALBOOK record.
+    4       2       Not used
+    6       var.    BIFF5: Name (byte string, 8-bit string length, ?2.5.2).
+                    BIFF8: Name (Unicode string, 8-bit string length, ?2.5.3).
+                    See DEFINEDNAME record (?5.33) for a list of built-in names, if the built-in flag is set
+                    in the option flags above.
+    var.    var.    Formula data (RPN token array, ?3)
+
+    Option flags for external names (BIFF5-BIFF8)
+    Bit     Mask    Contents
+    0       0001H   0 = Standard name; 1 = Built-in name
+    1       0002H   0 = Manual link; 1 = Automatic link (DDE links and OLE links only)
+    2       0004H   1 = Picture link (DDE links and OLE links only)
+    3       0008H   1 = This is the “StdDocumentName” identifier (DDE links only)
+    4       0010H   1 = OLE link
+    14-5    7FE0H   Clipboard format of last successful update (DDE links and OLE links only)
+    15      8000H   1 = Iconified picture link (BIFF8 OLE links only)
+    """
+    _REC_ID = 0x0023
+
+    def __init__(self, options=0, index=0, name=None, fmla=None):
+        self._rec_data = pack('<HHH', options, index, 0) + upack1(name) + fmla
+

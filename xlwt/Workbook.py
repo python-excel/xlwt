@@ -82,7 +82,15 @@ class Workbook(object):
 
         self.__worksheets = []
         self.__worksheet_idx_from_name = {}
-        self.__refs = {}
+        self.__sheet_refs = {}
+        self._supbook_xref = {}
+        self._xcall_xref = {}
+        self._ownbook_supbookx = None
+        self._ownbook_supbook_ref = None
+        self._xcall_supbookx = None
+        self._xcall_supbook_ref = None
+
+
 
     #################################################################
     ## Properties, "getters", "setters"
@@ -329,11 +337,34 @@ class Workbook(object):
         msg = "Formula: sheet index (%s) >= number of sheets (%d)" % (strg_ref, n_sheets)
         raise Exception(msg)
 
+    def _get_supbook_index(self, tag):
+        if tag in self._supbook_xref:
+            return self._supbook_xref[tag]
+        self._supbook_xref[tag] = idx = len(self._supbook_xref)
+        return idx
+
+    def setup_ownbook(self):
+        self._ownbook_supbookx = self._get_supbook_index(('ownbook', 0))
+        self._ownbook_supbook_ref = None
+        reference = (self._ownbook_supbookx, 0xFFFE, 0xFFFE)
+        if reference in self.__sheet_refs:
+            raise Exception("can't happen")
+        self.__sheet_refs[reference] = self._ownbook_supbook_ref = len(self.__sheet_refs)
+
+    def setup_xcall(self):
+        self._xcall_supbookx = self._get_supbook_index(('xcall', 0))
+        self._xcall_supbook_ref = None
+        reference = (self._xcall_supbookx, 0xFFFE, 0xFFFE)
+        if reference in self.__sheet_refs:
+            raise Exception("can't happen")
+        self.__sheet_refs[reference] = self._xcall_supbook_ref = len(self.__sheet_refs)
+
     def add_sheet_reference(self, formula):
-        supbookx = 0 # FIXME: we assume there is only one SupBook (internal references)
-        indexes = []
+        patches = []
         n_sheets = len(self.__worksheets)
-        for ref0, ref1 in formula.get_references():
+        sheet_refs, xcall_refs = formula.get_references()
+
+        for ref0, ref1, offset in sheet_refs:
             if not ref0.isdigit():
                 try:
                     ref0n = self.__worksheet_idx_from_name[ref0.lower()]
@@ -354,16 +385,34 @@ class Workbook(object):
                 msg = "Formula: sheets out of order; %r:%r -> (%d, %d)" \
                     % (ref0, ref1, ref0n, ref1n)
                 raise Exception(msg)
-            reference = (supbookx, ref0n, ref1n)
-            if reference in self.__refs:
-                indexes.append(self.__refs[reference])
+            if self._ownbook_supbookx is None:
+                self.setup_ownbook()
+            reference = (self._ownbook_supbookx, ref0n, ref1n)
+            if reference in self.__sheet_refs:
+                patches.append((offset, self.__sheet_refs[reference]))
             else:
-                nrefs = len(self.__refs)
+                nrefs = len(self.__sheet_refs)
                 if nrefs > 65535:
                     raise Exception('More than 65536 inter-sheet references')
-                self.__refs[reference] = nrefs
-                indexes.append(nrefs)
-        formula.update_references(indexes)
+                self.__sheet_refs[reference] = nrefs
+                patches.append((offset, nrefs))
+
+        for funcname, offset in xcall_refs:
+            if self._ownbook_supbookx is None:
+                self.setup_ownbook()
+            if self._xcall_supbookx is None:
+                self.setup_xcall()
+            # print funcname, self._supbook_xref
+            patches.append((offset, self._xcall_supbook_ref))
+            if not isinstance(funcname, unicode):
+                funcname = funcname.decode(self.encoding)
+            if funcname in self._xcall_xref:
+                idx = self._xcall_xref[funcname]
+            else:
+                self._xcall_xref[funcname] = idx = len(self._xcall_xref)
+            patches.append((offset + 2, idx + 1))
+
+        formula.patch_references(patches)
 
     ##################################################################
     ## BIFF records generation
@@ -490,17 +539,33 @@ class Workbook(object):
         return result
 
     def __all_links_rec(self):
-        supbook_records = ''
-        externsheet_record = ''
-        if len(self.__refs) > 0:
-            supbook_records += BIFFRecords.InternalReferenceSupBookRecord(len(self.__worksheets)).get()
+        pieces = []
+        temp = [(idx, tag) for tag, idx in self._supbook_xref.items()]
+        temp.sort()
+        for idx, tag in temp:
+            stype, snum = tag
+            if stype == 'ownbook':
+                rec = BIFFRecords.InternalReferenceSupBookRecord(len(self.__worksheets)).get()
+                pieces.append(rec)
+            elif stype == 'xcall':
+                rec = BIFFRecords.XcallSupBookRecord().get()
+                pieces.append(rec)
+                temp = [(idx, name) for name, idx in self._xcall_xref.items()]
+                temp.sort()
+                for idx, name in temp:
+                    rec = BIFFRecords.ExternnameRecord(
+                        options=0, index=0, name=name, fmla='\x02\x00\x1c\x17').get()
+                    pieces.append(rec)
+            else:
+                raise Exception('unknown supbook stype %r' % stype)
+        if len(self.__sheet_refs) > 0:
             # get references in index order
-            temp = [(idx, ref) for ref, idx in self.__refs.items()]
+            temp = [(idx, ref) for ref, idx in self.__sheet_refs.items()]
             temp.sort()
             temp = [ref for idx, ref in temp]
             externsheet_record = BIFFRecords.ExternSheetRecord(temp).get()
-
-        return supbook_records + externsheet_record
+            pieces.append(externsheet_record)
+        return ''.join(pieces)
 
     def __sst_rec(self):
         return self.__sst.get_biff_record()
