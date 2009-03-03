@@ -1,7 +1,7 @@
 Metadata-Version: 1.0
 Name: xlwt
-Version: 0.7.0
-Summary: Library to create spreadsheet files compatible with MS Excel 97/2000/XP/2003 XLS files, on any platform, with Python 2.3 or later
+Version: 0.7.1
+Summary: Library to create spreadsheet files compatible with MS Excel 97/2000/XP/2003 XLS files, on any platform, with Python 2.3 to 2.6
 Home-page: https://secure.simplistix.co.uk/svn/xlwt/trunk
 Author: John Machin
 Author-email: sjmachin@lexicon.net
@@ -11,8 +11,8 @@ Description: xlwt is a library for generating spreadsheet files that are compati
         with Excel 97/2000/XP/2003, OpenOffice.org Calc, and Gnumeric. xlwt has
         full support for Unicode. Excel spreadsheets can be generated on any
         platform without needing Excel or a COM server. The only requirement is
-        Python 2.3 or higher. xlwt is a fork of pyExcelerator.
-        
+        Python 2.3 to 2.6. xlwt is a fork of pyExcelerator.
+
 Keywords: xls excel spreadsheet workbook worksheet pyExcelerator
 Platform: Platform Independent
 Classifier: Operating System :: OS Independent
