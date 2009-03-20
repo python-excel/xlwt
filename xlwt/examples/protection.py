@@ -89,16 +89,6 @@ ws2.row(7).level = 2
 ws2.row(8).level = 1
 ws2.row(9).level = 1
 
-ws2.write_merge(1, 1, 1, 5, 'test 1', style)
-ws2.write_merge(2, 2, 1, 4, 'test 1', style)
-ws2.write_merge(3, 3, 1, 3, 'test 2', style)
-ws2.write_merge(4, 4, 1, 4, 'test 1', style)
-ws2.write_merge(5, 5, 1, 4, 'test 3', style)
-ws2.write_merge(6, 6, 1, 5, 'test 1', style)
-ws2.write_merge(7, 7, 1, 5, 'test 4', style)
-ws2.write_merge(8, 8, 1, 4, 'test 1', style)
-ws2.write_merge(9, 9, 1, 3, 'test 5', style)
-
 ws2.col(1).level = 1
 ws2.col(2).level = 1
 ws2.col(3).level = 2
