@@ -24,7 +24,6 @@ class Row(object):
                  "__max_col_idx",
                  "__xf_index",
                  "__has_default_xf_index",
-                 "__has_default_format",
                  "__height_in_pixels",
                  # public variables
                  "height",
@@ -47,7 +46,6 @@ class Row(object):
         self.__max_col_idx = 0
         self.__xf_index = 0x0F
         self.__has_default_xf_index = 0
-        self.__has_default_format = 0
         self.__height_in_pixels = 0x11
 
         self.height = 0x00FF
@@ -208,7 +206,7 @@ class Row(object):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(colx)
         xf_index = self.__parent_wb.add_style(style)
-        self.__parent_wb.add_sheet_reference(label)
+        self.__parent_wb.add_sheet_reference(formula)
         self.insert_cell(colx, FormulaCell(self.__idx, colx, xf_index, formula, calc_flags=0))
 
     def set_cell_boolean(self, colx, value, style=Style.default_style):

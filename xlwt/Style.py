@@ -461,7 +461,9 @@ xf_dict = {
     'font': {
         'bold': bool_map,
         'charset': charset_map,
+        'color':  'colour_index',
         'color_index':  'colour_index',
+        'colour':  'colour_index',
         'colour_index': [colour_map, colour_index_func_15],
         'escapement': {'none': 0, 'superscript': 1, 'subscript': 2},
         'family': {'none': 0, 'roman': 1, 'swiss': 2, 'modern': 3, 'script': 4, 'decorative': 5, },

@@ -85,8 +85,8 @@ class Worksheet(object):
         self.__first_visible_row = 0
         self.__first_visible_col = 0
         self.__grid_colour = 0x40
-        self.__preview_magn = 0
-        self.__normal_magn = 0
+        self.__preview_magn = 60 # percent
+        self.__normal_magn = 100 # percent
 
         self.visibility = 0 # from/to BOUNDSHEET record.
 
@@ -1124,7 +1124,7 @@ class Worksheet(object):
             ).get()
 
     def __window2_rec(self):
-        # Appends SCL record if required
+        # Appends SCL record.
         options = 0
         options |= (self.__show_formulas        & 0x01) << 0
         options |= (self.__show_grid            & 0x01) << 1
@@ -1140,8 +1140,6 @@ class Worksheet(object):
         options |= (self.__page_preview         & 0x01) << 11
         if self.__page_preview:
             scl_magn = self.__preview_magn
-            if not scl_magn:
-                scl_magn = 60 # Excel seems to need an SCL record in this case.
         else:
             scl_magn = self.__normal_magn
         return BIFFRecords.Window2Record(
