@@ -347,6 +347,7 @@ del _colour_map_text, _line, _name, _num
 
 pattern_map = {
     # Text values for pattern.pattern
+    # xlwt/doc/pattern_examples.xls showcases all of these patterns.
     'no_fill':              0,
     'none':                 0,
     'solid':                1,
