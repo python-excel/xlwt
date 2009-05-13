@@ -4,7 +4,10 @@ header {
     from UnicodeUtils import upack1
     from ExcelMagic import *
 
-    _RVAdelta = {"R": 0, "V": 0x20, "A": 0x40}
+    _RVAdelta =     {"R": 0, "V": 0x20, "A": 0x40}
+    _RVAdeltaRef =  {"R": 0, "V": 0x20, "A": 0x40, "D": 0x20}
+    _RVAdeltaArea = {"R": 0, "V": 0x20, "A": 0x40, "D": 0}
+
     
     class FormulaParseException(Exception):
         """
@@ -76,7 +79,8 @@ formula
     ;
 
 expr[arg_type]
-    : prec0_expr[arg_type]
+    : // {print "\n**expr %s" % arg_type}
+    prec0_expr[arg_type]
         (
             (
                   EQ { op = struct.pack('B', ptgEQ) }
@@ -101,13 +105,19 @@ prec0_expr[arg_type]
     ;
 
 prec1_expr[arg_type]
-    : prec2_expr[arg_type]
+    : // {print "**prec1_expr1 %s" % arg_type}
+    prec2_expr[arg_type]
+    // {print "**prec1_expr2 %s" % arg_type}
         (
             (
                   ADD { op = struct.pack('B', ptgAdd) }
                 | SUB { op = struct.pack('B', ptgSub) }
             )
-            prec2_expr[arg_type] { self.rpn += op }
+            // {print "**prec1_expr3 %s" % arg_type}
+            prec2_expr[arg_type]
+            { self.rpn += op;
+            // print "**prec1_expr4 %s" % arg_type
+            }
         )*
     ;
 
@@ -160,6 +170,7 @@ primary[arg_type]
         }
     | int_tok:INT_CONST
         {
+            // print "**int_const", int_tok.text
             int_value = int(int_tok.text)
             if int_value <= 65535:
                 self.rpn += struct.pack("<BH", ptgInt, int_value)
@@ -172,15 +183,16 @@ primary[arg_type]
         }
     | ref2d_tok:REF2D
         {
+            // print "**ref2d %s %s" % (ref2d_tok.text, arg_type)
             r, c = Utils.cell_to_packed_rowcol(ref2d_tok.text)
-            ptg = ptgRefR + _RVAdelta[arg_type]
+            ptg = ptgRefR + _RVAdeltaRef[arg_type]
             self.rpn += struct.pack("<B2H", ptg, r, c)
         }
     | ref2d1_tok:REF2D COLON ref2d2_tok:REF2D
         {
             r1, c1 = Utils.cell_to_packed_rowcol(ref2d1_tok.text)
             r2, c2 = Utils.cell_to_packed_rowcol(ref2d2_tok.text)
-            ptg = ptgAreaR + _RVAdelta[arg_type]
+            ptg = ptgAreaR + _RVAdeltaArea[arg_type]
             self.rpn += struct.pack("<B4H", ptg, r1, r2, c1, c2)
         }
     | sheet1 = sheet
@@ -189,14 +201,14 @@ primary[arg_type]
         }
         ( COLON sheet2 = sheet )? BANG ref3d_ref2d: REF2D
         {
-            ptg = ptgRef3dR + _RVAdelta[arg_type]
+            ptg = ptgRef3dR + _RVAdeltaRef[arg_type]
             rpn_ref2d = ""
             r1, c1 = Utils.cell_to_packed_rowcol(ref3d_ref2d.text)
             rpn_ref2d = struct.pack("<3H", 0x0000, r1, c1)
         }
         ( COLON ref3d_ref2d2: REF2D
             {
-                ptg = ptgArea3dR + _RVAdelta[arg_type]
+                ptg = ptgArea3dR + _RVAdeltaArea[arg_type]
                 r2, c2 = Utils.cell_to_packed_rowcol(ref3d_ref2d2.text)
                 rpn_ref2d = struct.pack("<5H", 0x0000, r1, r2, c1, c2)
             }
@@ -291,6 +303,7 @@ primary[arg_type]
                 arg_type_list = list(arg_type_str)
             else:
                 raise Exception("[formula] unknown function (%s)" % func_tok.text)
+            // print "**func_tok1 %s %s" % (func_toku, func_type)
             xcall = opcode < 0
             if xcall:
                 // The name of the add-in function is passed as the 1st arg
@@ -328,6 +341,7 @@ expr_list[arg_type_list, min_argc, max_argc] returns [arg_cnt]
     {
         arg_cnt = 0
         arg_type = arg_type_list[arg_cnt]
+        // print "**expr_list1[%d] req=%s" % (arg_cnt, arg_type)
     }
     : expr[arg_type] { arg_cnt += 1 }
     (
@@ -338,6 +352,7 @@ expr_list[arg_type_list, min_argc, max_argc] returns [arg_cnt]
                 arg_type = arg_type_list[-1]
             if arg_type == "+":
                 arg_type = arg_type_list[-2]
+            // print "**expr_list2[%d] req=%s" % (arg_cnt, arg_type)
         }
         (SEMICOLON | COMMA)
             (

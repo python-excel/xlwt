@@ -14,7 +14,10 @@ import Utils
 from UnicodeUtils import upack1
 from ExcelMagic import *
 
-_RVAdelta = {"R": 0, "V": 0x20, "A": 0x40}
+_RVAdelta =     {"R": 0, "V": 0x20, "A": 0x40}
+_RVAdeltaRef =  {"R": 0, "V": 0x20, "A": 0x40, "D": 0x20}
+_RVAdeltaArea = {"R": 0, "V": 0x20, "A": 0x40, "D": 0}
+
 
 class FormulaParseException(Exception):
    """
@@ -172,7 +175,8 @@ class Parser(antlr.LLkParser):
                         raise antlr.NoViableAltException(self.LT(1), self.getFilename())
 
                 self.prec2_expr(arg_type)
-                self.rpn += op
+                self.rpn += op;
+                          # print "**prec1_expr4 %s" % arg_type
             else:
                 break
 
@@ -416,6 +420,7 @@ class Parser(antlr.LLkParser):
                 pass
                 int_tok = self.LT(1)
                 self.match(INT_CONST)
+                # print "**int_const", int_tok.text
                 int_value = int(int_tok.text)
                 if int_value <= 65535:
                    self.rpn += struct.pack("<BH", ptgInt, int_value)
@@ -425,8 +430,9 @@ class Parser(antlr.LLkParser):
                 pass
                 ref2d_tok = self.LT(1)
                 self.match(REF2D)
+                # print "**ref2d %s %s" % (ref2d_tok.text, arg_type)
                 r, c = Utils.cell_to_packed_rowcol(ref2d_tok.text)
-                ptg = ptgRefR + _RVAdelta[arg_type]
+                ptg = ptgRefR + _RVAdeltaRef[arg_type]
                 self.rpn += struct.pack("<B2H", ptg, r, c)
             elif (self.LA(1)==REF2D) and (self.LA(2)==COLON):
                 pass
@@ -437,7 +443,7 @@ class Parser(antlr.LLkParser):
                 self.match(REF2D)
                 r1, c1 = Utils.cell_to_packed_rowcol(ref2d1_tok.text)
                 r2, c2 = Utils.cell_to_packed_rowcol(ref2d2_tok.text)
-                ptg = ptgAreaR + _RVAdelta[arg_type]
+                ptg = ptgAreaR + _RVAdeltaArea[arg_type]
                 self.rpn += struct.pack("<B4H", ptg, r1, r2, c1, c2)
             elif (self.LA(1)==INT_CONST or self.LA(1)==NAME or self.LA(1)==QUOTENAME) and (self.LA(2)==COLON or self.LA(2)==BANG):
                 pass
@@ -458,7 +464,7 @@ class Parser(antlr.LLkParser):
                 self.match(BANG)
                 ref3d_ref2d = self.LT(1)
                 self.match(REF2D)
-                ptg = ptgRef3dR + _RVAdelta[arg_type]
+                ptg = ptgRef3dR + _RVAdeltaRef[arg_type]
                 rpn_ref2d = ""
                 r1, c1 = Utils.cell_to_packed_rowcol(ref3d_ref2d.text)
                 rpn_ref2d = struct.pack("<3H", 0x0000, r1, c1)
@@ -470,7 +476,7 @@ class Parser(antlr.LLkParser):
                     self.match(COLON)
                     ref3d_ref2d2 = self.LT(1)
                     self.match(REF2D)
-                    ptg = ptgArea3dR + _RVAdelta[arg_type]
+                    ptg = ptgArea3dR + _RVAdeltaArea[arg_type]
                     r2, c2 = Utils.cell_to_packed_rowcol(ref3d_ref2d2.text)
                     rpn_ref2d = struct.pack("<5H", 0x0000, r1, r2, c1, c2)
                 elif la1 and la1 in [EOF,EQ,NE,GT,LT,GE,LE,ADD,SUB,MUL,DIV,POWER,PERCENT,RP,COMMA,SEMICOLON,CONCAT]:
@@ -501,6 +507,7 @@ class Parser(antlr.LLkParser):
                    arg_type_list = list(arg_type_str)
                 else:
                    raise Exception("[formula] unknown function (%s)" % func_tok.text)
+                # print "**func_tok1 %s %s" % (func_toku, func_type)
                 xcall = opcode < 0
                 if xcall:
                    # The name of the add-in function is passed as the 1st arg
@@ -567,6 +574,7 @@ class Parser(antlr.LLkParser):
 
         arg_cnt = 0
         arg_type = arg_type_list[arg_cnt]
+        # print "**expr_list1[%d] req=%s" % (arg_cnt, arg_type)
         la1 = self.LA(1)
         if False:
             pass
@@ -583,6 +591,7 @@ class Parser(antlr.LLkParser):
                        arg_type = arg_type_list[-1]
                     if arg_type == "+":
                        arg_type = arg_type_list[-2]
+                    # print "**expr_list2[%d] req=%s" % (arg_cnt, arg_type)
                     la1 = self.LA(1)
                     if False:
                         pass
