@@ -67,7 +67,8 @@ class Worksheet(object):
         self.__show_grid = 1
         self.__show_headers = 1
         self.__panes_frozen = 0
-        self.__show_empty_as_zero = 1
+        ### self.__show_empty_as_zero = 1 ### deprecated with extreme prejudice 2009-05-19
+        self.show_zero_values = 1
         self.__auto_colour_grid = 1
         self.__cols_right_to_left = 0
         self.__show_outline = 1
@@ -259,13 +260,13 @@ class Worksheet(object):
 
     #################################################################
 
-    def set_show_empty_as_zero(self, value):
-        self.__show_empty_as_zero = int(value)
+    ### def set_show_empty_as_zero(self, value):
+    ###     self.__show_empty_as_zero = int(value)
 
-    def get_show_empty_as_zero(self):
-        return bool(self.__show_empty_as_zero)
+    ### def get_show_empty_as_zero(self):
+    ###     return bool(self.__show_empty_as_zero)
 
-    show_empty_as_zero = property(get_show_empty_as_zero, set_show_empty_as_zero)
+    ### show_empty_as_zero = property(get_show_empty_as_zero, set_show_empty_as_zero)
 
     #################################################################
 
@@ -1130,7 +1131,7 @@ class Worksheet(object):
         options |= (self.__show_grid            & 0x01) << 1
         options |= (self.__show_headers         & 0x01) << 2
         options |= (self.__panes_frozen         & 0x01) << 3
-        options |= (self.__show_empty_as_zero   & 0x01) << 4
+        options |= (self.show_zero_values       & 0x01) << 4
         options |= (self.__auto_colour_grid     & 0x01) << 5
         options |= (self.__cols_right_to_left   & 0x01) << 6
         options |= (self.__show_outline         & 0x01) << 7
