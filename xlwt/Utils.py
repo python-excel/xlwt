@@ -95,6 +95,8 @@ def rowcol_to_cell(row, col, row_abs=False, col_abs=False):
     A1 notation.
 
     """
+    assert 0 <= row < MAX_ROW # MAX_ROW counts from 1
+    assert 0 <= col < MAX_COL # MAX_COL counts from 1
     d = col // 26
     m = col % 26
     chr1 = ""    # Most significant character in AA1
@@ -112,6 +114,20 @@ def rowcol_to_cell(row, col, row_abs=False, col_abs=False):
     # Zero index to 1-index
     return col_abs + chr1 + chr2 + row_abs + str(row + 1)
 
+def rowcol_pair_to_cellrange(row1, col1, row2, col2,
+    row1_abs=False, col1_abs=False, row2_abs=False, col2_abs=False):
+    """Convert two (row,column) pairs
+    into a cell range string in A1:B2 notation.
+
+    Returns: cell range string
+    """
+    assert row1 <= row2
+    assert col1 <= col2
+    return (
+        rowcol_to_cell(row1, col1, row1_abs, col1_abs)
+        + ":"
+        + rowcol_to_cell(row2, col2, row2_abs, col2_abs)
+        )
 
 def cellrange_to_rowcol_pair(cellrange):
     """Convert cell range string in A1 notation to numeric row/col
