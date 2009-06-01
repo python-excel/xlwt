@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: xlwt
-Version: 0.7.1
+Version: 0.7.2
 Summary: Library to create spreadsheet files compatible with MS Excel 97/2000/XP/2003 XLS files, on any platform, with Python 2.3 to 2.6
 Home-page: https://secure.simplistix.co.uk/svn/xlwt/trunk
 Author: John Machin

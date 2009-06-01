@@ -39,7 +39,7 @@ DOWNLOAD_URL = 'http://pypi.python.org/pypi/xlwt'
 
 setup(
     name = 'xlwt',
-    version = '0.7.2alpha',
+    version = '0.7.2',
     maintainer = 'John Machin',
     maintainer_email = 'sjmachin@lexicon.net',
     url = SVN_URL,

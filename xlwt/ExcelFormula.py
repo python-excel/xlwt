@@ -1,4 +1,4 @@
-# -*- coding: windows-1251 -*-
+# -*- coding: windows-1252 -*-
 
 import ExcelFormulaParser, ExcelFormulaLexer
 import struct
