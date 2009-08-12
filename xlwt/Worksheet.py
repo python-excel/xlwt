@@ -67,18 +67,22 @@ class Worksheet(object):
         self.__show_grid = 1
         self.__show_headers = 1
         self.__panes_frozen = 0
-        ### self.__show_empty_as_zero = 1 ### deprecated with extreme prejudice 2009-05-19
         self.show_zero_values = 1
         self.__auto_colour_grid = 1
         self.__cols_right_to_left = 0
         self.__show_outline = 1
         self.__remove_splits = 0
+        # Multiple sheets can be selected, but only one can be active
+        # (hold down Ctrl and click multiple tabs in the file in OOo)
         self.__selected = 0
-        # RED HERRING ALERT: "sheet_visible" is a clone of the "selected" attribute.
-        # Typically a workbook created by the Excel UI will have one sheet
-        # (the sheet that was selected when the user saved it)
-        # with both bits set to 1, and all other sheets will have both
-        # bits set to 0. The true visibility of the sheet is found in the "visibility"
+        # "sheet_visible" should really be called "sheet_active"
+        # and is 1 when this sheet is the sheet displayed when the file
+        # is open. More than likely only one sheet should ever be set as
+        # visible.
+        # The same sheet should be specified in Workbook.active_sheet
+        # (that way, both the WINDOW1 record in the book and the WINDOW2
+        # records in each sheet will be in agreement)
+        # The visibility of the sheet is found in the "visibility"
         # attribute obtained from the BOUNDSHEET record.
         self.__sheet_visible = 0
         self.__page_preview = 0
