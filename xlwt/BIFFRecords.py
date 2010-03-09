@@ -1250,7 +1250,7 @@ class Window2Record(BiffRecord):
                                     0x00,
                                     preview_magn, normal_magn,
                                     0x00L)
-        if scl_magn:
+        if scl_magn is not None:
             self._scl_rec = pack('<4H', 0x00A0, 4, scl_magn, 100)
         else:
             self._scl_rec = ''

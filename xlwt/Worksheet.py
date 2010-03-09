@@ -90,8 +90,10 @@ class Worksheet(object):
         self.__first_visible_row = 0
         self.__first_visible_col = 0
         self.__grid_colour = 0x40
-        self.__preview_magn = 60 # percent
-        self.__normal_magn = 100 # percent
+        self.__preview_magn = 0 # use default (60%)
+        self.__normal_magn = 0 # use default (100%)
+        self.__scl_magn = None
+        self.explicit_magn_setting = False
 
         self.visibility = 0 # from/to BOUNDSHEET record.
 
@@ -391,6 +393,17 @@ class Worksheet(object):
         return self.__normal_magn
 
     normal_magn = property(get_normal_magn, set_normal_magn)
+
+    #################################################################
+
+    def set_scl_magn(self, value):
+        self.__scl_magn = value
+
+    def get_scl_magn(self):
+        return self.__scl_magn
+
+    scl_magn = property(get_scl_magn, set_scl_magn)
+
 
     #################################################################
 
@@ -1143,10 +1156,24 @@ class Worksheet(object):
         options |= (self.__selected             & 0x01) << 9
         options |= (self.__sheet_visible        & 0x01) << 10
         options |= (self.__page_preview         & 0x01) << 11
-        if self.__page_preview:
-            scl_magn = self.__preview_magn
+        if self.explicit_magn_setting:
+            # Experimentation: caller can set the scl magn.
+            # None -> no SCL record written
+            # Otherwise 10 <= scl_magn <= 400 or scl_magn == 0
+            # Note: value 0 means use 100 for normal view, 60 for page break preview
+            # BREAKING NEWS: Excel interprets scl_magn = 0 very literally, your
+            # sheet appears like a tiny dot on the screen
+            scl_magn = self.__scl_magn
         else:
-            scl_magn = self.__normal_magn
+            if self.__page_preview:
+                scl_magn = self.__preview_magn
+                magn_default = 60
+            else:
+                scl_magn = self.__normal_magn
+                magn_default = 100
+            if scl_magn == magn_default or scl_magn == 0:
+                # Emulate what we think MS does
+                scl_magn = None # don't write an SCL record
         return BIFFRecords.Window2Record(
             options, self.__first_visible_row, self.__first_visible_col,
             self.__grid_colour,
@@ -1172,8 +1199,10 @@ class Worksheet(object):
             if self.__horz_split_first_visible is None:
                 self.__horz_split_first_visible = 0
             # inspired by pyXLWriter
-            self.__horz_split_pos = 20*self.__horz_split_pos + 255
-            self.__vert_split_pos = 113.879*self.__vert_split_pos + 390
+            if self.__horz_split_pos > 0:
+                self.__horz_split_pos = 20 * self.__horz_split_pos + 255
+            if self.__vert_split_pos > 0:
+                self.__vert_split_pos = 113.879 * self.__vert_split_pos + 390
 
         if self.__vert_split_pos > 0 and self.__horz_split_pos > 0:
             self.__split_active_pane = 0
@@ -1184,11 +1213,14 @@ class Worksheet(object):
         else:
             self.__split_active_pane = 3
 
-        result = BIFFRecords.PanesRecord(self.__vert_split_pos,
-                                         self.__horz_split_pos,
-                                         self.__horz_split_first_visible,
-                                         self.__vert_split_first_visible,
-                                         self.__split_active_pane).get()
+        result = BIFFRecords.PanesRecord(*map(int, (
+            self.__vert_split_pos,
+            self.__horz_split_pos,
+            self.__horz_split_first_visible,
+            self.__vert_split_first_visible,
+            self.__split_active_pane
+            ))).get()
+
         return result
 
     def __row_blocks_rec(self):
