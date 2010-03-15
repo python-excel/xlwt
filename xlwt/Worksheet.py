@@ -103,6 +103,27 @@ class Worksheet(object):
         self.__horz_split_first_visible = None
         self.__split_active_pane = None
 
+        # This is a caller-settable flag:
+
+        self.split_position_units_are_twips = False
+
+        # Default is False for backward compatibility with pyExcelerator
+        # and previous versions of xlwt.
+        #   if panes_frozen:
+        #       vert/horz_split_pos are taken as number of rows/cols
+        #   else: # split
+        #       if split_position_units_are_twips:
+        #           vert/horz_split_pos are taken as number of twips
+        #       else:
+        #           vert/horz_split_pos are taken as
+        #           number of rows(cols) * default row(col) height (width) (i.e. 12.75 (8.43) somethings)
+        #           and converted to twips by approximate formulas
+        # Callers who are copying an existing file should use
+        #     xlwt_worksheet.split_position_units_are_twips = True
+        # because that's what's actually in the file.
+
+		# There are 20 twips to a point. There are 72 points to an inch.
+
         self.__row_gut_width = 0
         self.__col_gut_height = 0
 
@@ -1198,11 +1219,12 @@ class Worksheet(object):
                 self.__vert_split_first_visible = 0
             if self.__horz_split_first_visible is None:
                 self.__horz_split_first_visible = 0
-            # inspired by pyXLWriter
-            if self.__horz_split_pos > 0:
-                self.__horz_split_pos = 20 * self.__horz_split_pos + 255
-            if self.__vert_split_pos > 0:
-                self.__vert_split_pos = 113.879 * self.__vert_split_pos + 390
+            if not self.split_position_units_are_twips:
+                # inspired by pyXLWriter
+                if self.__horz_split_pos > 0:
+                    self.__horz_split_pos = 20 * self.__horz_split_pos + 255
+                if self.__vert_split_pos > 0:
+                    self.__vert_split_pos = 113.879 * self.__vert_split_pos + 390
 
         if self.__vert_split_pos > 0 and self.__horz_split_pos > 0:
             self.__split_active_pane = 0
