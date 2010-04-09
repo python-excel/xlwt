@@ -1318,11 +1318,28 @@ class PanesRecord(BiffRecord):
     ------------|-------------      ------------|-------------
     """
     _REC_ID = 0x0041
+    
+    valid_active_pane = {
+        # entries are of the form:
+        # (int(px > 0),int(px>0)) -> allowed values
+        (0,0):(3,),
+        (0,1):(2,3),
+        (1,0):(1,3),
+        (1,1):(0,1,2,3),
+        }
+    
     def __init__(self, px, py, first_row_bottom, first_col_right, active_pane):
+        allowed = self.valid_active_pane.get(
+            (int(px > 0),int(py > 0))
+            )
+        if active_pane not in allowed:
+            raise ValueError('Cannot set active_pane to %i, must be one of %s' % (
+                    active_pane, ', '.join(allowed)
+                    ))
         self._rec_data = pack('<5H',
-                                            px, py,
-                                            first_row_bottom, first_col_right,
-                                            active_pane)
+                              px, py,
+                              first_row_bottom, first_col_right,
+                              active_pane)
 
 
 class RowRecord(BiffRecord):

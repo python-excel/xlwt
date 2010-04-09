@@ -44,6 +44,9 @@ import tempfile
 class Worksheet(object):
     from Workbook import Workbook
 
+    # a safe default value, 3 is always valid!
+    active_pane = 3
+    
     #################################################################
     ## Constructor
     #################################################################
@@ -101,7 +104,6 @@ class Worksheet(object):
         self.__horz_split_pos = None
         self.__vert_split_first_visible = None
         self.__horz_split_first_visible = None
-        self.__split_active_pane = None
 
         # This is a caller-settable flag:
 
@@ -465,16 +467,6 @@ class Worksheet(object):
         return self.__horz_split_first_visible
 
     horz_split_first_visible = property(get_horz_split_first_visible, set_horz_split_first_visible)
-
-    #################################################################
-
-    #def set_split_active_pane(self, value):
-    #    self.__split_active_pane = abs(value) & 0x03
-    #
-    #def get_split_active_pane(self):
-    #    return self.__split_active_pane
-    #
-    #split_active_pane = property(get_split_active_pane, set_split_active_pane)
 
     #################################################################
 
@@ -1226,21 +1218,12 @@ class Worksheet(object):
                 if self.__vert_split_pos > 0:
                     self.__vert_split_pos = 113.879 * self.__vert_split_pos + 390
 
-        if self.__vert_split_pos > 0 and self.__horz_split_pos > 0:
-            self.__split_active_pane = 0
-        elif self.__vert_split_pos > 0 and self.__horz_split_pos == 0:
-            self.__split_active_pane = 1
-        elif self.__vert_split_pos == 0 and self.__horz_split_pos > 0:
-            self.__split_active_pane = 2
-        else:
-            self.__split_active_pane = 3
-
         result = BIFFRecords.PanesRecord(*map(int, (
             self.__vert_split_pos,
             self.__horz_split_pos,
             self.__horz_split_first_visible,
             self.__vert_split_first_visible,
-            self.__split_active_pane
+            self.active_pane
             ))).get()
 
         return result
