@@ -1470,7 +1470,7 @@ class MulBlankRecord(BiffRecord):
 
     def __init__(self, row, first_col, last_col, xf_index):
         blanks_count = last_col-first_col+1
-        self._rec_data = pack('%dH' % blanks_count, *([xf_index]*blanks_count))
+        self._rec_data = pack('<%dH' % blanks_count, *([xf_index] * blanks_count))
         self._rec_data = pack('<2H', row, first_col) +  self._rec_data + pack('<H',  last_col)
 
 
