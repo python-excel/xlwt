@@ -858,5 +858,5 @@ error_msg_by_code = {
     0x17: u"#REF!",   # illegal or deleted cell reference
     0x1D: u"#NAME?",  # wrong function or range name
     0x24: u"#NUM!",   # value range overflow
-    0x2A: u"#N/A!"    # argument or function not available
+    0x2A: u"#N/A"    # argument or function not available
 }
