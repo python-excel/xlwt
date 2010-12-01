@@ -301,6 +301,9 @@ class Workbook(object):
 
     def add_style(self, style):
         return self.__styles.add(style)
+    
+    def add_font(self, font):
+        return self.__styles.add_font(font)
 
     def add_str(self, s):
         return self.__sst.add_str(s)
@@ -310,6 +313,12 @@ class Workbook(object):
 
     def str_index(self, s):
         return self.__sst.str_index(s)
+        
+    def add_rt(self, rt):
+        return self.__sst.add_rt(rt)
+    
+    def rt_index(self, rt):
+        return self.__sst.rt_index(rt)
 
     def add_sheet(self, sheetname, cell_overwrite_ok=False):
         import Worksheet, Utils

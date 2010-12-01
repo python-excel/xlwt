@@ -51,8 +51,8 @@ def upack2(s, encoding='ascii'):
     # Limit is based on number of content characters
     # (not on number of bytes in packed result)
     len_us = len(us)
-    if len_us > 65535:
-        raise Exception('String longer than 65535 characters')
+    if len_us > 32767:
+        raise Exception('String longer than 32767 characters')
     try:
         encs = us.encode('latin1')
         # Success here means all chars are in U+0000 to U+00FF
@@ -62,6 +62,32 @@ def upack2(s, encoding='ascii'):
         encs = us.encode('utf_16_le')
         flag = 1
     return pack('<HB', len_us, flag) + encs
+
+def upack2rt(rt, encoding='ascii'):
+    us = u''
+    fr = ''
+    # convert rt strings to unicode if not already unicode
+    # also generate the formatting run for the styles added
+    for s, xf in rt:
+        if xf is not None:
+            fr += pack('<HH', len(us), xf)
+        if isinstance(s, unicode):
+            us += s
+        else:
+            us += unicode(s, encoding)
+    num_fr = len(fr) / 4
+    len_us = len(us)
+    if len_us > 32767:
+        raise Exception('String longer than 32767 characters')
+    try:
+        encs = us.encode('latin1')
+        # Success here means all chars are in U+0000 to U+00FF
+        # inclusive, meaning that we can use "compressed format".
+        flag = 0 | 8
+    except UnicodeEncodeError:
+        encs = us.encode('utf_16_le')
+        flag = 1 | 8
+    return pack('<HBH', len_us, flag, num_fr) + encs, fr
 
 def upack1(s, encoding='ascii'):
     # Same as upack2(), but with a one-byte length field.

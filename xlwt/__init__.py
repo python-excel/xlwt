@@ -12,5 +12,5 @@ from Worksheet import Worksheet
 from Row import Row
 from Column import Column
 from Formatting import Font, Alignment, Borders, Pattern, Protection
-from Style import XFStyle, easyxf
+from Style import XFStyle, easyxf, easyfont
 from ExcelFormula import *

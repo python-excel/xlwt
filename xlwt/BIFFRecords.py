@@ -1,6 +1,6 @@
 # -*- coding: cp1252 -*-
 from struct import pack
-from UnicodeUtils import upack1, upack2
+from UnicodeUtils import upack1, upack2, upack2rt
 import sys
 
 class SharedStringTable(object):
@@ -10,6 +10,7 @@ class SharedStringTable(object):
     def __init__(self, encoding):
         self.encoding = encoding
         self._str_indexes = {}
+        self._rt_indexes = {}
         self._tally = []
         self._add_calls = 0
         # Following 3 attrs are used for temporary storage in the
@@ -24,16 +25,34 @@ class SharedStringTable(object):
             s = unicode(s, self.encoding)
         self._add_calls += 1
         if s not in self._str_indexes:
-            idx = len(self._str_indexes)
+            idx = len(self._str_indexes) + len(self._rt_indexes)
             self._str_indexes[s] = idx
             self._tally.append(1)
         else:
             idx = self._str_indexes[s]
             self._tally[idx] += 1
         return idx
+	
+    def add_rt(self, rt):
+        rtList = []
+        for s, xf in rt:
+            if self.encoding != 'ascii' and not isinstance(s, unicode):
+                s = unicode(s, self.encoding)
+            rtList.append((s, xf))
+        rt = tuple(rtList)
+        self._add_calls += 1
+        if rt not in self._rt_indexes:
+            idx = len(self._str_indexes) + len(self._rt_indexes)
+            self._rt_indexes[rt] = idx
+            self._tally.append(1)
+        else:
+            idx = self._rt_indexes[rt]
+            self._tally[idx] += 1
+        return idx
 
     def del_str(self, idx):
         # This is called when we are replacing the contents of a string cell.
+        # handles both regular and rt strings
         assert self._tally[idx] > 0
         self._tally[idx] -= 1
         self._add_calls -= 1
@@ -41,19 +60,26 @@ class SharedStringTable(object):
     def str_index(self, s):
         return self._str_indexes[s]
 
+    def rt_index(self, rt):
+        return self._rt_indexes[rt]
+
     def get_biff_record(self):
         self._sst_record = ''
         self._continues = [None, None]
         self._current_piece = pack('<II', 0, 0)
         data = [(idx, s) for s, idx in self._str_indexes.iteritems()]
+        data.extend([(idx, s) for s, idx in self._rt_indexes.iteritems()])
         data.sort() # in index order
         for idx, s in data:
             if self._tally[idx] == 0:
                 s = u''
-            self._add_to_sst(s)
+            if isinstance(s, str) or isinstance(s, unicode):
+                self._add_to_sst(s)
+            else:
+                self._add_rt_to_sst(s)
         del data
         self._new_piece()
-        self._continues[0] = pack('<2HII', self._SST_ID, len(self._sst_record), self._add_calls, len(self._str_indexes))
+        self._continues[0] = pack('<2HII', self._SST_ID, len(self._sst_record), self._add_calls, len(self._str_indexes) + len(self._rt_indexes))
         self._continues[1] = self._sst_record[8:]
         self._sst_record = None
         self._current_piece = None
@@ -77,6 +103,24 @@ class SharedStringTable(object):
 
         self._save_atom(u_str[0:atom_len])
         self._save_splitted(u_str[atom_len:], is_unicode_str)
+	
+    def _add_rt_to_sst(self, rt):
+        rt_str, rt_fr = upack2rt(rt, self.encoding)
+        is_unicode_str = rt_str[2] == '\x09'
+        if is_unicode_str:
+            atom_len = 7 # 2 byte -- len,
+                         # 1 byte -- options,
+                         # 2 byte -- number of rt runs
+                         # 2 byte -- 1st sym
+        else:
+            atom_len = 6 # 2 byte -- len,
+                         # 1 byte -- options,
+                         # 2 byte -- number of rt runs
+                         # 1 byte -- 1st sym
+        self._save_atom(rt_str[0:atom_len])
+        self._save_splitted(rt_str[atom_len:], is_unicode_str)
+        for i in range(0, len(rt_fr), 4):
+            self._save_atom(rt_fr[i:i+4])
 
     def _new_piece(self):
         if self._sst_record == '':

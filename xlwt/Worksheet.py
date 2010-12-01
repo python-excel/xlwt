@@ -1031,6 +1031,9 @@ class Worksheet(object):
 
     def write(self, r, c, label="", style=Style.default_style):
         self.row(r).write(c, label, style)
+		
+    def write_rich_text(self, r, c, label=("",), style=Style.default_style):
+		self.row(r).write_rich_text(c, label, style)
 
     def merge(self, r1, r2, c1, c2, style=Style.default_style):
         # Stand-alone merge of previously written cells.

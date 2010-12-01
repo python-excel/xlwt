@@ -6,6 +6,8 @@ from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, Bool
     _get_cells_biff_data_mul
 import ExcelFormula
 import datetime as dt
+from Formatting import Font
+
 try:
     from decimal import Decimal
 except ImportError:
@@ -244,6 +246,36 @@ class Row(object):
         elif isinstance(label, ExcelFormula.Formula):
             self.__parent_wb.add_sheet_reference(label)
             self.insert_cell(col, FormulaCell(self.__idx, col, style_index, label))
+        else:
+            raise Exception("Unexpected data type %r" % type(label))
+
+    def write_rich_text(self, col, label, style=Style.default_style):
+        self.__adjust_height(style)
+        self.__adjust_bound_col_idx(col)
+        style_index = self.__parent_wb.add_style(style)
+        default_font = None
+        if isinstance(label, list) or isinstance(label, tuple):
+            rt = []
+            for data in label:
+                if isinstance(data, basestring):
+                    s = data
+                    font = default_font
+                elif isinstance(data, list) or isinstance(data, tuple):
+                    if isinstance(data[0], basestring) and isinstance(data[1], Font):
+                        s = data[0]
+                        font = self.__parent_wb.add_font(data[1])
+                    else:
+                        raise Exception ("Unexpected data type %r, %r" % (type(data[0]), type(data[1])))
+                else:
+                    raise Exception ("Unexpected data type %r" % type(label))
+                if len(s) > 0:
+                    rt.append((s, font))
+                    if default_font is None:
+                        default_font = self.__parent_wb.add_font(style.font)
+            if len(rt) > 0:
+                self.insert_cell(col, StrCell(self.__idx, col, style_index, self.__parent_wb.add_rt(rt)))
+            else:
+                self.insert_cell(col, BlankCell(self.__idx, col, style_index))
         else:
             raise Exception("Unexpected data type %r" % type(label))
 

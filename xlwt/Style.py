@@ -149,6 +149,33 @@ class StyleCollection(object):
             raise ValueError("More than 4094 XFs (styles)")
 
         return xf, xf_index
+        
+    def add_font(self, font):
+        return self._add_font(font)
+        
+    def _add_font(self, font):
+        if font in self._font_id2x:
+            font_idx = self._font_id2x[font]
+            self.stats[0] += 1
+        elif self.style_compression:
+            search_key = font._search_key()
+            font_idx = self._font_val2x.get(search_key)
+            if font_idx is not None:
+                self._font_id2x[font] = font_idx
+                self.stats[1] += 1
+            else:
+                font_idx = len(self._font_x2id) + 1 # Why plus 1? Font 4 is missing
+                self._font_id2x[font] = font_idx
+                self._font_val2x[search_key] = font_idx
+                self._font_x2id[font_idx] = font
+                self.stats[2] += 1
+        else:
+            font_idx = len(self._font_id2x) + 1
+            self._font_id2x[font] = font_idx
+            self.stats[2] += 1
+            
+        return font_idx
+
 
     def get_biff_data(self):
         result = ''
@@ -590,3 +617,10 @@ def easyxf(strg_to_parse="", num_format_str=None,
         _parse_strg_to_obj(strg_to_parse, xfobj, xf_dict,
             field_sep=field_sep, line_sep=line_sep, intro_sep=intro_sep, esc_char=esc_char, debug=debug)
     return xfobj
+
+def easyfont(strg_to_parse="", field_sep=",", esc_char="\\", debug=False):
+    xfobj = XFStyle()
+    if strg_to_parse:
+        _parse_strg_to_obj("font: " + strg_to_parse, xfobj, xf_dict,
+            field_sep=field_sep, line_sep=";", intro_sep=":", esc_char=esc_char, debug=debug)
+    return xfobj.font
