@@ -254,30 +254,29 @@ class Row(object):
         self.__adjust_bound_col_idx(col)
         style_index = self.__parent_wb.add_style(style)
         default_font = None
-        if isinstance(label, list) or isinstance(label, tuple):
-            rt = []
-            for data in label:
-                if isinstance(data, basestring):
-                    s = data
-                    font = default_font
-                elif isinstance(data, list) or isinstance(data, tuple):
-                    if isinstance(data[0], basestring) and isinstance(data[1], Font):
-                        s = data[0]
-                        font = self.__parent_wb.add_font(data[1])
-                    else:
-                        raise Exception ("Unexpected data type %r, %r" % (type(data[0]), type(data[1])))
-                else:
-                    raise Exception ("Unexpected data type %r" % type(label))
-                if len(s) > 0:
-                    rt.append((s, font))
-                    if default_font is None:
-                        default_font = self.__parent_wb.add_font(style.font)
-            if len(rt) > 0:
-                self.insert_cell(col, StrCell(self.__idx, col, style_index, self.__parent_wb.add_rt(rt)))
-            else:
-                self.insert_cell(col, BlankCell(self.__idx, col, style_index))
-        else:
+        if not isinstance(label, (list, tuple)):
             raise Exception("Unexpected data type %r" % type(label))
+        rt = []
+        for data in label:
+            if isinstance(data, basestring):
+                s = data
+                font = default_font
+            elif isinstance(data, (list, tuple)):
+                if not isinstance(data[0], basestring) or not isinstance(data[1], Font):
+                    raise Exception ("Unexpected data type %r, %r" % (type(data[0]), type(data[1])))
+                s = data[0]
+                font = self.__parent_wb.add_font(data[1])
+            else:
+                raise Exception ("Unexpected data type %r" % type(label))
+            if s:
+                rt.append((s, font))
+                if default_font is None:
+                    default_font = self.__parent_wb.add_font(style.font)
+        if rt:
+            self.insert_cell(col, StrCell(self.__idx, col, style_index, self.__parent_wb.add_rt(rt)))
+        else:
+            self.insert_cell(col, BlankCell(self.__idx, col, style_index))
+            
 
     write_blanks = set_cell_mulblanks
 
