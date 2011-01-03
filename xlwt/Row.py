@@ -246,18 +246,24 @@ class Row(object):
         elif isinstance(label, ExcelFormula.Formula):
             self.__parent_wb.add_sheet_reference(label)
             self.insert_cell(col, FormulaCell(self.__idx, col, style_index, label))
+        elif isinstance(label, (list, tuple)):
+            self.__rich_text_helper(col, label, style, style_index)
         else:
             raise Exception("Unexpected data type %r" % type(label))
 
-    def write_rich_text(self, col, label, style=Style.default_style):
+    def set_cell_rich_text(self, col, rich_text_list, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
-        style_index = self.__parent_wb.add_style(style)
-        default_font = None
-        if not isinstance(label, (list, tuple)):
-            raise Exception("Unexpected data type %r" % type(label))
+        if not isinstance(rich_text_list, (list, tuple)):
+            raise Exception("Unexpected data type %r" % type(rich_text_list))
+        self.__rich_text_helper(col, rich_text_list, style)
+
+    def __rich_text_helper(self, col, rich_text_list, style, style_index=None):
+        if style_index is None:
+            style_index = self.__parent_wb.add_style(style)
+        default_font = None    
         rt = []
-        for data in label:
+        for data in rich_text_list:
             if isinstance(data, basestring):
                 s = data
                 font = default_font
@@ -267,7 +273,7 @@ class Row(object):
                 s = data[0]
                 font = self.__parent_wb.add_font(data[1])
             else:
-                raise Exception ("Unexpected data type %r" % type(label))
+                raise Exception ("Unexpected data type %r" % type(data))
             if s:
                 rt.append((s, font))
                 if default_font is None:
@@ -276,9 +282,10 @@ class Row(object):
             self.insert_cell(col, StrCell(self.__idx, col, style_index, self.__parent_wb.add_rt(rt)))
         else:
             self.insert_cell(col, BlankCell(self.__idx, col, style_index))
-            
 
     write_blanks = set_cell_mulblanks
+    write_rich_text = set_cell_rich_text
+
 
 
 
