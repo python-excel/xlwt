@@ -1318,6 +1318,11 @@ class Worksheet(object):
             self.row_tempfile.flush()
             self.row_tempfile.seek(0)
             result.append(self.row_tempfile.read())
+            self.row_tempfile.seek(0, 2) # to EOF
+            # Above seek() is necessary to avoid a spurious IOError
+            # with Errno 0 if the caller continues on writing rows
+            # and flushing row data after the save().
+            # See http://bugs.python.org/issue3207
         result.extend([
             self.__row_blocks_rec(),
             self.__merged_rec(),
