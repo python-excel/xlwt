@@ -1682,8 +1682,8 @@ class ColInfoRecord(BiffRecord):
     """
     _REC_ID = 0x007D
 
-    def __init__(self, first_col, last_col, width, xf_index, options):
-        self._rec_data = pack('<6H', first_col, last_col, width, xf_index, options, 0)
+    def __init__(self, first_col, last_col, width, xf_index, options, unused):
+        self._rec_data = pack('<6H', first_col, last_col, width, xf_index, options, unused)
 
 class CalcModeRecord(BiffRecord):
     """

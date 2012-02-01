@@ -15,6 +15,9 @@ class Column(object):
         self.hidden = 0
         self.level = 0
         self.collapse = 0
+        self.user_set = 0
+        self.best_fit = 0
+        self.unused = 0
 
     def set_style(self, style):
         self._xf_index = self._parent_wb.add_style(style)
@@ -25,10 +28,12 @@ class Column(object):
 
     def get_biff_record(self):
         options =  (self.hidden & 0x01) << 0
+        options |= (self.user_set & 0x01) << 1
+        options |= (self.best_fit & 0x01) << 2
         options |= (self.level & 0x07) << 8
         options |= (self.collapse & 0x01) << 12
 
-        return ColInfoRecord(self._index, self._index, self.width, self._xf_index, options).get()
+        return ColInfoRecord(self._index, self._index, self.width, self._xf_index, options, self.unused).get()
 
 
 
