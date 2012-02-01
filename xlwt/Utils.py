@@ -31,7 +31,6 @@
 __rev_id__ = """$Id$"""
 
 import re
-from struct import pack
 from ExcelMagic import MAX_ROW, MAX_COL
 
 
@@ -43,14 +42,14 @@ _re_cell_ref = re.compile(r"\$?([A-I]?[A-Z]\$?\d+)", re.IGNORECASE)
 
 
 def col_by_name(colname):
-    """
+    """'A' -> 0, 'Z' -> 25, 'AA' -> 26, etc
     """
     col = 0
-    pow = 1
+    power = 1
     for i in xrange(len(colname)-1, -1, -1):
         ch = colname[i]
-        col += (ord(ch) - ord('A') + 1) * pow
-        pow *= 26
+        col += (ord(ch) - ord('A') + 1) * power
+        power *= 26
     return col - 1
 
 
@@ -165,7 +164,7 @@ def cellrange_to_rowcol_pair(cellrange):
     if res:
         row1, col1 = cell_to_rowcol2(res.group(1))
         return row1, col1, row1, col1
-    raise Exception("Unknown cell reference %s" % (cell))
+    raise Exception("Unknown cell reference %s" % (cellrange))
 
 
 def cell_to_packed_rowcol(cell):
