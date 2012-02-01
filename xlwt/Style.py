@@ -1,7 +1,7 @@
 # -*- coding: windows-1252 -*-
 
 import Formatting
-from BIFFRecords import *
+from BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
 
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
 
@@ -24,10 +24,10 @@ class StyleCollection(object):
             '0.00',
             '#,##0',
             '#,##0.00',
-            '"$"#,##0_);("$"#,##',
-            '"$"#,##0_);[Red]("$"#,##',
-            '"$"#,##0.00_);("$"#,##',
-            '"$"#,##0.00_);[Red]("$"#,##',
+            '"$"#,##0_);("$"#,##0)',
+            '"$"#,##0_);[Red]("$"#,##0)',
+            '"$"#,##0.00_);("$"#,##0.00)',
+            '"$"#,##0.00_);[Red]("$"#,##0.00)',
             '0%',
             '0.00%',
             '0.00E+00',
