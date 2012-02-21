@@ -2,6 +2,7 @@
 
 import sys, glob
 from distutils.core import setup
+from xlwt import __VERSION__
 
 DESCRIPTION = (
     'Library to create spreadsheet files compatible with '
@@ -39,7 +40,7 @@ DOWNLOAD_URL = 'http://pypi.python.org/pypi/xlwt'
 
 setup(
     name = 'xlwt',
-    version = '0.7.3dev',
+    version = __VERSION__,
     maintainer = 'John Machin',
     maintainer_email = 'sjmachin@lexicon.net',
     url = SVN_URL,
