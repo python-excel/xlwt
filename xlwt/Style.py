@@ -371,6 +371,96 @@ for _line in _colour_map_text.splitlines():
         colour_map[_name.replace('gray', 'grey')] = _num
 del _colour_map_text, _line, _name, _num
 
+def add_palette_colour (colour_str, colour_index, debug=False):
+    if not (8 <= colour_index <= len(excel_default_palette_b8)+7):
+        raise Exception("add_palette_colour: colour_index (%d) not in range(8, %d)" % 
+                (colour_index, len(excel_default_palette_b8)+7))
+    if debug:
+        if colour_map.has_key(colour_str):
+            print "Add palette colour %s with index %x (previous index was %d)" % \
+                    (colour_str, colour_index, colour_map[colour_str]) 
+        else:
+            print "Add new palette colour %s with index %x" % (colour_str, colour_index)
+    colour_map[colour_str] = colour_index
+
+# user-defined palette defines 56 RGB colors from entry 8 - 64
+#excel_default_palette_b8 = [ # (red, green, blue)
+#    (  0,  0,  0), (255,255,255), (255,  0,  0), (  0,255,  0),
+#    (  0,  0,255), (255,255,  0), (255,  0,255), (  0,255,255),
+#    (128,  0,  0), (  0,128,  0), (  0,  0,128), (128,128,  0),
+#    (128,  0,128), (  0,128,128), (192,192,192), (128,128,128),
+#    (153,153,255), (153, 51,102), (255,255,204), (204,255,255),
+#    (102,  0,102), (255,128,128), (  0,102,204), (204,204,255),
+#    (  0,  0,128), (255,  0,255), (255,255,  0), (  0,255,255),
+#    (128,  0,128), (128,  0,  0), (  0,128,128), (  0,  0,255),
+#    (  0,204,255), (204,255,255), (204,255,204), (255,255,153),
+#    (153,204,255), (255,153,204), (204,153,255), (255,204,153),
+#    ( 51,102,255), ( 51,204,204), (153,204,  0), (255,204,  0),
+#    (255,153,  0), (255,102,  0), (102,102,153), (150,150,150),
+#    (  0, 51,102), ( 51,153,102), (  0, 51,  0), ( 51, 51,  0),
+#    (153, 51,  0), (153, 51,102), ( 51, 51,153), ( 51, 51, 51),
+#    ]
+
+# Default colour table for BIFF8 copied from 
+# OpenOffice.org's Documentation of the Microsoft Excel File Format, Excel Version 2003
+# Note palette has LSB padded with 2 bytes 0x00
+excel_default_palette_b8 = ( 
+0x00000000, 
+0xFFFFFF00, 
+0xFF000000, 
+0x00FF0000, 
+0x0000FF00, 
+0xFFFF0000, 
+0xFF00FF00, 
+0x00FFFF00,
+0x80000000, 
+0x00800000, 
+0x00008000, 
+0x80800000, 
+0x80008000, 
+0x00808000, 
+0xC0C0C000, 
+0x80808000, 
+0x9999FF00, 
+0x99336600, 
+0xFFFFCC00, 
+0xCCFFFF00, 
+0x66006600, 
+0xFF808000, 
+0x0066CC00, 
+0xCCCCFF00, 
+0x00008000, 
+0xFF00FF00, 
+0xFFFF0000, 
+0x00FFFF00, 
+0x80008000, 
+0x80000000, 
+0x00808000, 
+0x0000FF00, 
+0x00CCFF00, 
+0xCCFFFF00, 
+0xCCFFCC00, 
+0xFFFF9900, 
+0x99CCFF00, 
+0xFF99CC00, 
+0xCC99FF00, 
+0xFFCC9900, 
+0x3366FF00, 
+0x33CCCC00, 
+0x99CC0000, 
+0xFFCC0000, 
+0xFF990000, 
+0xFF660000, 
+0x66669900, 
+0x96969600, 
+0x00336600, 
+0x33996600, 
+0x00330000, 
+0x33330000, 
+0x99330000, 
+0x99336600, 
+0x33339900, 
+0x33333300)
 
 pattern_map = {
     # Text values for pattern.pattern
