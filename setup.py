@@ -7,7 +7,7 @@ from xlwt import __VERSION__
 DESCRIPTION = (
     'Library to create spreadsheet files compatible with '
     'MS Excel 97/2000/XP/2003 XLS files, '
-    'on any platform, with Python 2.3 to 2.6'
+    'on any platform, with Python 2.3 to 2.7'
     )
 
 LONG_DESCRIPTION = """\
@@ -15,7 +15,7 @@ xlwt is a library for generating spreadsheet files that are compatible
 with Excel 97/2000/XP/2003, OpenOffice.org Calc, and Gnumeric. xlwt has
 full support for Unicode. Excel spreadsheets can be generated on any
 platform without needing Excel or a COM server. The only requirement is
-Python 2.3 to 2.6. xlwt is a fork of pyExcelerator.
+Python 2.3 to 2.7. xlwt is a fork of pyExcelerator.
 """
 
 CLASSIFIERS = [
