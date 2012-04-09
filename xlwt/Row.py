@@ -86,20 +86,27 @@ class Row(object):
             if iarg > sheet.last_used_col:
                 sheet.last_used_col = iarg
 
-    def __excel_date_dt(self, date):
-        if isinstance(date, dt.date) and (not isinstance(date, dt.datetime)):
-            epoch = dt.date(1899, 12, 31)
-        elif isinstance(date, dt.time):
+    def __excel_date_dt(self, date): 
+        adj = False
+        if isinstance(date, dt.date):
+            if self.__parent_wb.dates_1904:
+                epoch_tuple = (1904, 1, 1)
+            else:
+                epoch_tuple = (1899, 12, 31)
+                adj = True
+            if isinstance(date, dt.datetime):
+                epoch = dt.datetime(*epoch_tuple)
+            else:
+                epoch = dt.date(*epoch_tuple)
+        else: # it's a datetime.time instance
             date = dt.datetime.combine(dt.datetime(1900, 1, 1), date)
-            epoch = dt.datetime(1900, 1, 1, 0, 0, 0)
-        else:
-            epoch = dt.datetime(1899, 12, 31, 0, 0, 0)
+            epoch = dt.datetime(1900, 1, 1)
         delta = date - epoch
-        xldate = delta.days + float(delta.seconds) / (24*60*60)
+        xldate = delta.days + delta.seconds / 86400.0                      
         # Add a day for Excel's missing leap day in 1900
-        if xldate > 59:
+        if adj and xldate > 59:
             xldate += 1
-        return xldate
+        return xldate    
 
     def get_height_in_pixels(self):
         return self.__height_in_pixels
