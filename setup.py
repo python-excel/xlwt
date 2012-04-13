@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys, glob
 from distutils.core import setup
 from xlwt import __VERSION__
 
