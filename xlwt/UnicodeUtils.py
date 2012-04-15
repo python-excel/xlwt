@@ -58,10 +58,17 @@ def upack2(s, encoding='ascii'):
         # Success here means all chars are in U+0000 to U+00FF
         # inclusive, meaning that we can use "compressed format".
         flag = 0
+        n_items = len_us
     except UnicodeEncodeError:
         encs = us.encode('utf_16_le')
         flag = 1
-    return pack('<HB', len_us, flag) + encs
+        n_items = len(encs) // 2
+        # n_items is the number of "double byte characters".
+        # Can't use len(us).
+        # len(u"\U0001D400") -> 1 on a wide-unicode build 
+        # and 2 on a narrow-unicode build.
+        # We need n_items == 2 in this case.
+    return pack('<HB', n_items, flag) + encs
 
 def upack2rt(rt, encoding='ascii'):
     us = u''
@@ -75,7 +82,7 @@ def upack2rt(rt, encoding='ascii'):
             us += s
         else:
             us += unicode(s, encoding)
-    num_fr = len(fr) / 4
+    num_fr = len(fr) // 4 # // to ensure result is int
     len_us = len(us)
     if len_us > 32767:
         raise Exception('String longer than 32767 characters')
@@ -84,10 +91,12 @@ def upack2rt(rt, encoding='ascii'):
         # Success here means all chars are in U+0000 to U+00FF
         # inclusive, meaning that we can use "compressed format".
         flag = 0 | 8
+        n_items = len_us
     except UnicodeEncodeError:
         encs = us.encode('utf_16_le')
         flag = 1 | 8
-    return pack('<HBH', len_us, flag, num_fr) + encs, fr
+        n_items = len(encs) // 2 # see comments in upack2 function above
+    return pack('<HBH', n_items, flag, num_fr) + encs, fr
 
 def upack1(s, encoding='ascii'):
     # Same as upack2(), but with a one-byte length field.
@@ -101,7 +110,9 @@ def upack1(s, encoding='ascii'):
     try:
         encs = us.encode('latin1')
         flag = 0
+        n_items = len_us
     except UnicodeEncodeError:
         encs = us.encode('utf_16_le')
         flag = 1
-    return pack('<BB', len_us, flag) + encs
+        n_items = len(encs) // 2 
+    return pack('<BB', n_items, flag) + encs
