@@ -2,7 +2,10 @@
 
 import ExcelFormulaParser, ExcelFormulaLexer
 import struct
-from antlr import ANTLRException
+try:
+   from antlr import ANTLRException
+except:
+   from bundled_libs.antlr import ANTLRException
 
 
 class Formula(object):

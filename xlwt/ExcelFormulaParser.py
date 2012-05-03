@@ -1,7 +1,10 @@
 ### $ANTLR 2.7.7 (20060930): "xlwt/excel-formula.g" -> "ExcelFormulaParser.py"$
 ### import antlr and other modules ..
 import sys
-import antlr
+try:
+    import antlr
+except:
+    import bundled_libs.antlr as antlr
 
 version = sys.version.split()[0]
 if version < '2.2.1':
@@ -29,7 +32,10 @@ class FormulaParseException(Exception):
 ### preamble action <<<
 
 ### import antlr.Token
-from antlr import Token
+try:
+    from antlr import Token
+except:
+    from bundled_libs.antlr import Token
 ### >>>The Known Token Types <<<
 SKIP                = antlr.SKIP
 INVALID_TYPE        = antlr.INVALID_TYPE
