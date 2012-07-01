@@ -371,10 +371,10 @@ for _line in _colour_map_text.splitlines():
         colour_map[_name.replace('gray', 'grey')] = _num
 del _colour_map_text, _line, _name, _num
 
-def add_palette_colour (colour_str, colour_index, debug=False):
+def add_palette_colour(colour_str, colour_index, debug=False):
     if not (8 <= colour_index <= len(excel_default_palette_b8)+7):
         raise Exception("add_palette_colour: colour_index (%d) not in range(8, %d)" % 
-                (colour_index, len(excel_default_palette_b8)+7))
+                (colour_index, len(excel_default_palette_b8)+8))
     if debug:
         if colour_map.has_key(colour_str):
             print "Add palette colour %s with index %x (previous index was %d)" % \
