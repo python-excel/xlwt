@@ -372,9 +372,9 @@ for _line in _colour_map_text.splitlines():
 del _colour_map_text, _line, _name, _num
 
 def add_palette_colour(colour_str, colour_index, debug=False):
-    if not (8 <= colour_index <= len(excel_default_palette_b8)+7):
-        raise Exception("add_palette_colour: colour_index (%d) not in range(8, %d)" % 
-                (colour_index, len(excel_default_palette_b8)+8))
+    if not (8 <= colour_index <= 63):
+        raise Exception("add_palette_colour: colour_index (%d) not in range(8, 64)" % 
+                (colour_index))
     if debug:
         if colour_map.has_key(colour_str):
             print "Add palette colour %s with index %x (previous index was %d)" % \
@@ -461,6 +461,8 @@ excel_default_palette_b8 = (
 0x99336600, 
 0x33339900, 
 0x33333300)
+
+assert len(excel_default_palette_b8) == 56
 
 pattern_map = {
     # Text values for pattern.pattern
