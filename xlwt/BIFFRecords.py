@@ -1077,6 +1077,7 @@ class PaletteRecord(BiffRecord):
     def __init__(self, custom_palette):
         n_colours = len(custom_palette)
         if n_colours:
+            assert n_colours == 56
             # Pack number of colors with little-endian, what xlrd and excel expect.
             self._rec_data = pack('<H', n_colours)
             # Microsoft lists colors in big-endian format with 24 bits/color.
@@ -1343,7 +1344,7 @@ class PanesRecord(BiffRecord):
     [9]         1           Not used (BIFF5-BIFF8 only, not written
                             in BIFF2-BIFF4)
 
-    If the panes are frozen, pane 0 is always active, regardless
+    If the panes are frozen, paneï¿½0 is always active, regardless
     of the cursor position. The correct identifiers for all possible
     combinations of visible panes are shown in the following pictures.
 
@@ -1733,10 +1734,10 @@ class RefModeRecord(BiffRecord):
     """
     This record is part of the Calculation Settings Block.
     It stores which method is used to show cell addresses in formulas.
-    The “RC” mode uses numeric indexes for rows and columns,
-    i.e. “R(1)C(-1)”, or “R1C1:R2C2”.
-    The “A1” mode uses characters for columns and numbers for rows,
-    i.e. “B1”, or “$A$1:$B$2”.
+    The ï¿½RCï¿½ mode uses numeric indexes for rows and columns,
+    i.e. ï¿½R(1)C(-1)ï¿½, or ï¿½R1C1:R2C2ï¿½.
+    The ï¿½A1ï¿½ mode uses characters for columns and numbers for rows,
+    i.e. ï¿½B1ï¿½, or ï¿½$A$1:$B$2ï¿½.
 
     Record REFMODE, BIFF2-BIFF8:
 
@@ -1784,7 +1785,7 @@ class DeltaRecord(BiffRecord):
 class SaveRecalcRecord(BiffRecord):
     """
     This record is part of the Calculation Settings Block.
-    It contains the “Recalculate before save” option in
+    It contains the ï¿½Recalculate before saveï¿½ option in
     Excel's calculation settings dialogue.
 
     Record SAVERECALC, BIFF3-BIFF8:
@@ -2450,7 +2451,7 @@ class ExternnameRecord(BiffRecord):
     0       0001H   0 = Standard name; 1 = Built-in name
     1       0002H   0 = Manual link; 1 = Automatic link (DDE links and OLE links only)
     2       0004H   1 = Picture link (DDE links and OLE links only)
-    3       0008H   1 = This is the “StdDocumentName” identifier (DDE links only)
+    3       0008H   1 = This is the ï¿½StdDocumentNameï¿½ identifier (DDE links only)
     4       0010H   1 = OLE link
     14-5    7FE0H   Clipboard format of last successful update (DDE links and OLE links only)
     15      8000H   1 = Iconified picture link (BIFF8 OLE links only)
