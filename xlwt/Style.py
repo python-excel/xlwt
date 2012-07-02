@@ -371,16 +371,10 @@ for _line in _colour_map_text.splitlines():
         colour_map[_name.replace('gray', 'grey')] = _num
 del _colour_map_text, _line, _name, _num
 
-def add_palette_colour(colour_str, colour_index, debug=False):
+def add_palette_colour(colour_str, colour_index):
     if not (8 <= colour_index <= 63):
         raise Exception("add_palette_colour: colour_index (%d) not in range(8, 64)" % 
                 (colour_index))
-    if debug:
-        if colour_map.has_key(colour_str):
-            print "Add palette colour %s with index %x (previous index was %d)" % \
-                    (colour_str, colour_index, colour_map[colour_str]) 
-        else:
-            print "Add new palette colour %s with index %x" % (colour_str, colour_index)
     colour_map[colour_str] = colour_index
 
 # user-defined palette defines 56 RGB colors from entry 8 - 64

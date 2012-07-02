@@ -298,7 +298,7 @@ class Workbook(object):
 
     #################################################################
 
-    def set_colour_RGB(self, colour_index, red, green, blue, debug=False):
+    def set_colour_RGB(self, colour_index, red, green, blue):
         if not(8 <= colour_index <= 63):
             raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" % 
                     colour_index)
@@ -311,10 +311,6 @@ class Workbook(object):
         # so subtract 8 from colour_index when placing in palette
         palette_index = colour_index - 8
         self.__custom_palette_b8[palette_index] = red << 24 | green << 16 | blue << 8
-        if (debug):
-            print "Set color at index %x to value %x %x %x, which is %x (default was %x)" % \
-                    (colour_index, red, green, blue, self.__custom_palette_b8[palette_index], 
-                    Style.excel_default_palette_b8[palette_index])
 
     ##################################################################
     ## Methods
