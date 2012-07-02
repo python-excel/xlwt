@@ -310,7 +310,7 @@ class Workbook(object):
         # User-defined Palette starts at colour index 8,
         # so subtract 8 from colour_index when placing in palette
         palette_index = colour_index - 8
-        self.__custom_palette_b8 [palette_index] = red << 24 | green << 16 | blue << 8
+        self.__custom_palette_b8[palette_index] = red << 24 | green << 16 | blue << 8
         if (debug):
             print "Set color at index %x to value %x %x %x, which is %x (default was %x)" % \
                     (colour_index, red, green, blue, self.__custom_palette_b8[palette_index], 
