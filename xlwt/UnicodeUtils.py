@@ -63,7 +63,7 @@ def upack2(s, encoding='ascii'):
         encs = us.encode('utf_16_le')
         flag = 1
         n_items = len(encs) // 2
-        # n_items is the number of "double byte characters".
+        # n_items is the number of "double byte characters" i.e. MS C wchars
         # Can't use len(us).
         # len(u"\U0001D400") -> 1 on a wide-unicode build 
         # and 2 on a narrow-unicode build.
@@ -73,25 +73,29 @@ def upack2(s, encoding='ascii'):
 def upack2rt(rt, encoding='ascii'):
     us = u''
     fr = ''
+    offset = 0
     # convert rt strings to unicode if not already unicode
     # also generate the formatting run for the styles added
-    for s, xf in rt:
-        if xf is not None:
-            fr += pack('<HH', len(us), xf)
-        if isinstance(s, unicode):
-            us += s
-        else:
-            us += unicode(s, encoding)
-    num_fr = len(fr) // 4 # // to ensure result is int
-    len_us = len(us)
-    if len_us > 32767:
+    for s, fontx in rt:
+        if not isinstance(s, unicode):
+            s = unicode(s, encoding)
+        us += s
+        if fontx is not None:
+            # code in Rows.py ensures that
+            # fontx can be None only for the first piece
+            fr += pack('<HH', offset, fontx)        
+        # offset is the number of MS C wchar characters.
+        # That is 1 if c <= u'\uFFFF' else 2 
+        offset += len(s.encode('utf_16_le')) // 2
+    num_fr = len(fr) // 4 # ensure result is int
+    if offset > 32767:
         raise Exception('String longer than 32767 characters')
     try:
         encs = us.encode('latin1')
         # Success here means all chars are in U+0000 to U+00FF
         # inclusive, meaning that we can use "compressed format".
         flag = 0 | 8
-        n_items = len_us
+        n_items = len(encs)
     except UnicodeEncodeError:
         encs = us.encode('utf_16_le')
         flag = 1 | 8
