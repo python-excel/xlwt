@@ -61,6 +61,7 @@ class Workbook(object):
         self.__vpos_twips = 0x005A
         self.__width_twips = 0x3FCF
         self.__height_twips = 0x2A4E
+        self.__custom_palette_b8 = None
 
         self.__active_sheet = 0
         self.__first_tab_index = 0
@@ -295,6 +296,22 @@ class Workbook(object):
 
     default_style = property(get_default_style)
 
+    #################################################################
+
+    def set_colour_RGB(self, colour_index, red, green, blue):
+        if not(8 <= colour_index <= 63):
+            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" % 
+                    colour_index)
+        if min(red, green, blue) < 0 or max(red, green, blue) > 255:
+            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)" 
+                    % (red, green, blue))
+        if self.__custom_palette_b8 is None: 
+            self.__custom_palette_b8 = list(Style.excel_default_palette_b8)
+        # User-defined Palette starts at colour index 8,
+        # so subtract 8 from colour_index when placing in palette
+        palette_index = colour_index - 8
+        self.__custom_palette_b8[palette_index] = red << 24 | green << 16 | blue << 8
+
     ##################################################################
     ## Methods
     ##################################################################
@@ -516,8 +533,10 @@ class Workbook(object):
         return self.__styles.get_biff_data()
 
     def __palette_rec(self):
-        result = ''
-        return result
+        if self.__custom_palette_b8 is None: 
+            return ''
+        info = BIFFRecords.PaletteRecord(self.__custom_palette_b8).get()
+        return info
 
     def __useselfs_rec(self):
         return BIFFRecords.UseSelfsRecord().get()

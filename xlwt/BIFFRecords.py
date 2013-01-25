@@ -187,7 +187,6 @@ class BiffRecord(object):
     def get(self):
         # data = self.get_rec_data()
         data = self._rec_data
-
         if len(data) > 0x2020: # limit for BIFF7/8
             chunks = []
             pos = 0
@@ -1075,6 +1074,15 @@ class PaletteRecord(BiffRecord):
     """
     _REC_ID = 0x0092
 
+    def __init__(self, custom_palette):
+        n_colours = len(custom_palette)
+        assert n_colours == 56
+        # Pack number of colors with little-endian, what xlrd and excel expect.
+        self._rec_data = pack('<H', n_colours)
+        # Microsoft lists colors in big-endian format with 24 bits/color.
+        # Pad LSB of each color with 0x00, and write out in big-endian.
+        fmt = '>%dI' % n_colours
+        self._rec_data += pack(fmt, *(custom_palette))
 
 class BoundSheetRecord(BiffRecord):
     """
