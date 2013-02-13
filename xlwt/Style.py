@@ -569,8 +569,8 @@ xf_dict = {
         'left_color':       'left_colour',
         'right_color':      'right_colour',
         'diag_color':       'diag_colour',
-        'need_diag_1':  bool_map,
-        'need_diag_2':  bool_map,
+        'need_diag1':  bool_map,
+        'need_diag2':  bool_map,
         },
     'font': {
         'bold': bool_map,
