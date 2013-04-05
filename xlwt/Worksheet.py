@@ -36,12 +36,10 @@
 
 import BIFFRecords
 import Bitmap
-import Formatting
 import Style
 import tempfile
 
 class Worksheet(object):
-    from Workbook import Workbook
 
     # a safe default value, 3 is always valid!
     active_pane = 3

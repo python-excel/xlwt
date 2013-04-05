@@ -1,6 +1,5 @@
 # -*- coding: windows-1252 -*-
 
-import sys
 import struct
         
 # This implementation writes only 'Root Entry', 'Workbook' streams

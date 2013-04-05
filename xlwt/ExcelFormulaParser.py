@@ -28,8 +28,6 @@ class FormulaParseException(Exception):
 
 ### preamble action <<<
 
-### import antlr.Token
-from antlr import Token
 ### >>>The Known Token Types <<<
 SKIP                = antlr.SKIP
 INVALID_TYPE        = antlr.INVALID_TYPE

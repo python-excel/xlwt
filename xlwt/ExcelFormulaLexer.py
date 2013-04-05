@@ -1,10 +1,8 @@
 # -*- coding: windows-1252 -*-
 
-import sys
 from antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
-import struct
 import ExcelFormulaParser
-from re import compile as recompile, match, LOCALE, UNICODE, IGNORECASE, VERBOSE
+from re import compile as recompile, LOCALE, IGNORECASE, VERBOSE
 
 
 int_const_pattern = r"\d+\b"
