@@ -33,17 +33,13 @@ KEYWORDS = (
     'xls excel spreadsheet workbook worksheet pyExcelerator'
     )
 
-SVN_URL = 'https://secure.simplistix.co.uk/svn/xlwt/trunk'
-
-DOWNLOAD_URL = 'http://pypi.python.org/pypi/xlwt'
-
 setup(
     name = 'xlwt',
     version = __VERSION__,
     maintainer = 'John Machin',
     maintainer_email = 'sjmachin@lexicon.net',
-    url = SVN_URL,
-    download_url = DOWNLOAD_URL,
+    url = 'http://www.python-excel.org/',
+    download_url = 'http://pypi.python.org/pypi/xlwt',
     description = DESCRIPTION,
     long_description = LONG_DESCRIPTION,
     license = 'BSD',
