@@ -1208,6 +1208,16 @@ class Worksheet(object):
                 self.__vert_split_first_visible = self.__vert_split_pos
             if self.__horz_split_first_visible is None:
                 self.__horz_split_first_visible = self.__horz_split_pos
+
+            # when frozen, the active pane has to be specifically set:
+            if self.__vert_split_pos > 0 and self.__horz_split_pos > 0:
+                active_pane = 0
+            elif self.__vert_split_pos > 0 and self.__horz_split_pos == 0:
+                active_pane = 1
+            elif self.__vert_split_pos == 0 and self.__horz_split_pos > 0:
+                active_pane = 2
+            else:
+                active_pane = 3
         else:
             if self.__vert_split_first_visible is None:
                 self.__vert_split_first_visible = 0
@@ -1220,12 +1230,15 @@ class Worksheet(object):
                 if self.__vert_split_pos > 0:
                     self.__vert_split_pos = 113.879 * self.__vert_split_pos + 390
 
+            # when split, the active pain can be set as required:
+            active_pane = self.active_pane
+
         result = BIFFRecords.PanesRecord(*map(int, (
             self.__vert_split_pos,
             self.__horz_split_pos,
             self.__horz_split_first_visible,
             self.__vert_split_first_visible,
-            self.active_pane
+            active_pane
             ))).get()
 
         return result
