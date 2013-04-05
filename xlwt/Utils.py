@@ -2,12 +2,8 @@
 
 # Utilities for work with reference to cells and with sheetnames
 
-
-__rev_id__ = """$Id$"""
-
 import re
 from ExcelMagic import MAX_ROW, MAX_COL
-
 
 _re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)", re.IGNORECASE)
 _re_row_range = re.compile(r"\$?(\d+):\$?(\d+)")
