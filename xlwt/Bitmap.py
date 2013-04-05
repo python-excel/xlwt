@@ -5,7 +5,7 @@
 #  Portions are Copyright (c) 2002-2004 John McNamara (Perl Spreadsheet::WriteExcel)
 
 from BIFFRecords import BiffRecord
-from struct import *
+from struct import pack, unpack
 
 
 def _size_col(sheet, col):
