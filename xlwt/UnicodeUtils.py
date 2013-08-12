@@ -42,7 +42,7 @@ var.     ln or
 
 from struct import pack
 
-def upack2(s, encoding='ascii'):
+def upack2(s, encoding='utf8'):
     # If not unicode, make it so.
     if isinstance(s, unicode):
         us = s
@@ -70,7 +70,7 @@ def upack2(s, encoding='ascii'):
         # We need n_items == 2 in this case.
     return pack('<HB', n_items, flag) + encs
 
-def upack2rt(rt, encoding='ascii'):
+def upack2rt(rt, encoding='utf8'):
     us = u''
     fr = ''
     offset = 0
@@ -102,7 +102,7 @@ def upack2rt(rt, encoding='ascii'):
         n_items = len(encs) // 2 # see comments in upack2 function above
     return pack('<HBH', n_items, flag, num_fr) + encs, fr
 
-def upack1(s, encoding='ascii'):
+def upack1(s, encoding='utf8'):
     # Same as upack2(), but with a one-byte length field.
     if isinstance(s, unicode):
         us = s
