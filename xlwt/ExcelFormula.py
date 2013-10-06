@@ -41,3 +41,48 @@ class Formula(object):
         '''
         return struct.pack("<H", len(self.__parser.rpn)) + self.__parser.rpn
 
+# RGRGRGRGRGRGRGRGRG
+class Formula3D(object):
+
+    def __init__(self,range1,range2=None):
+
+        assert type(range1) in (tuple,list)
+        assert range2==None or type(range2) in (tuple,list)
+
+        self.__sheet_refs=[]
+        self.__xcall_refs=[]
+
+        self.__sheet_refs.append([range1[0],range1[1],3])
+        self.__rpn=struct.pack('<BHHHHH',0x3B,0x01,*range1[2:])
+
+        if (range2!=None):
+
+            self.__sheet_refs.append([range2[0],range2[1],len(self.__rpn)+3])
+            self.__rpn+=struct.pack('<BHHHHHB',
+                    0x3B,
+                    0x00,
+                    range2[2],range2[3],range2[4],range2[5],
+                    0x10 # tList
+                )
+
+        self.__rpn=struct.pack('<H',len(self.__rpn))+self.__rpn
+
+    def get_references(self):
+        return self.__sheet_refs, self.__xcall_refs
+
+    def patch_references(self, patches):
+        for offset, idx in patches:
+            self.__rpn = self.__rpn[:offset] + struct.pack('<H', idx) + self.__rpn[offset+2:]
+
+    def patch_references(self, patches):
+        for offset, idx in patches:
+            self.__rpn = self.__rpn[:offset] + struct.pack('<H', idx) + self.__rpn[offset+2:]
+
+    def text(self):
+        return self.__s
+
+    def rpn(self):
+        return self.__rpn
+
+
+# RGRGRGRGRGRGRGRGRG

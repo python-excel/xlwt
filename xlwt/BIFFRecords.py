@@ -31,7 +31,7 @@ class SharedStringTable(object):
             idx = self._str_indexes[s]
             self._tally[idx] += 1
         return idx
-	
+
     def add_rt(self, rt):
         rtList = []
         for s, xf in rt:
@@ -102,7 +102,7 @@ class SharedStringTable(object):
 
         self._save_atom(u_str[0:atom_len])
         self._save_splitted(u_str[atom_len:], is_unicode_str)
-	
+
     def _add_rt_to_sst(self, rt):
         rt_str, rt_fr = upack2rt(rt, self.encoding)
         is_unicode_str = rt_str[2] == '\x09'
@@ -1369,7 +1369,7 @@ class PanesRecord(BiffRecord):
     ------------|-------------      ------------|-------------
     """
     _REC_ID = 0x0041
-    
+
     valid_active_pane = {
         # entries are of the form:
         # (int(px > 0),int(px>0)) -> allowed values
@@ -1378,7 +1378,7 @@ class PanesRecord(BiffRecord):
         (1,0):(1,3),
         (1,1):(0,1,2,3),
         }
-    
+
     def __init__(self, px, py, first_row_bottom, first_col_right, active_pane):
         allowed = self.valid_active_pane.get(
             (int(px > 0),int(py > 0))
@@ -2334,7 +2334,10 @@ class NameRecord(BiffRecord):
         if type(name) == int:
             uname = chr(name)
         else:
-            uname = upack1(name)[1:]
+# RGRGRGRGRGRGRGRGRG
+            uname = upack1(unicode(name))[2:]
+#            uname = upack1(name)[1:]
+# RGRGRGRGRGRGRGRGRG
         uname_len = len(uname)
 
         #~ self._rec_data = pack('<HBBHHHBBBB%ds%ds' % (uname_len, len(rpn)), options, keyboard_shortcut, uname_len, len(rpn), 0x0000, sheet_index, len(menu_text), len(desc_text), len(help_text), len(status_text), uname, rpn) + menu_text + desc_text + help_text + status_text

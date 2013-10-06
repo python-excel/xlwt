@@ -91,6 +91,9 @@ class Workbook(object):
         self._xcall_supbookx = None
         self._xcall_supbook_ref = None
 
+# RGRGRGRGRGRGRGRGRG
+        self.__definednames={}
+# RGRGRGRGRGRGRGRGRG
 
 
     #################################################################
@@ -300,12 +303,12 @@ class Workbook(object):
 
     def set_colour_RGB(self, colour_index, red, green, blue):
         if not(8 <= colour_index <= 63):
-            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" % 
+            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" %
                     colour_index)
         if min(red, green, blue) < 0 or max(red, green, blue) > 255:
-            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)" 
+            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)"
                     % (red, green, blue))
-        if self.__custom_palette_b8 is None: 
+        if self.__custom_palette_b8 is None:
             self.__custom_palette_b8 = list(Style.excel_default_palette_b8)
         # User-defined Palette starts at colour index 8,
         # so subtract 8 from colour_index when placing in palette
@@ -318,7 +321,7 @@ class Workbook(object):
 
     def add_style(self, style):
         return self.__styles.add(style)
-    
+
     def add_font(self, font):
         return self.__styles.add_font(font)
 
@@ -330,10 +333,10 @@ class Workbook(object):
 
     def str_index(self, s):
         return self.__sst.str_index(s)
-        
+
     def add_rt(self, rt):
         return self.__sst.add_rt(rt)
-    
+
     def rt_index(self, rt):
         return self.__sst.rt_index(rt)
 
@@ -533,7 +536,7 @@ class Workbook(object):
         return self.__styles.get_biff_data()
 
     def __palette_rec(self):
-        if self.__custom_palette_b8 is None: 
+        if self.__custom_palette_b8 is None:
             return ''
         info = BIFFRecords.PaletteRecord(self.__custom_palette_b8).get()
         return info
@@ -595,6 +598,52 @@ class Workbook(object):
             pieces.append(externsheet_record)
         return ''.join(pieces)
 
+# RGRGRGRGRGRGRGRGRG
+    def __definedname_rec(self):
+
+        # Sheet-Local names
+        definedname_rec=''
+        for sheet in self.__worksheets:
+            for name_rec in sheet._get_name_records():
+                definedname_rec+=name_rec.get()
+
+        # Global names
+        for (name,formula) in self.__definednames.iteritems():
+
+            options=0
+            if (type(name)==int):
+                options|=0x0020 # Global name
+
+            rpn=formula.rpn()
+
+            definedname_rec+=\
+                BIFFRecords.NameRecord(
+                    options=options,
+                    keyboard_shortcut=0,
+                    sheet_index=0,
+                    rpn=rpn[2:], # We get rid of formula length (first 2 bytes)
+                    name=name,
+                    menu_text='',
+                    desc_text='',
+                    help_text='',
+                    status_text=''
+                ).get()
+
+        return definedname_rec
+
+    def _get_sheet_idx_by_name(self,name):
+        try:
+            return self.__worksheet_idx_from_name[name]
+        except KeyError as e:
+            raise ValueError('Nonexistant sheet name {}'.format(name))
+
+    def add_definedname(self,name,formula):
+
+        self.add_sheet_reference(formula)
+        self.__definednames[name]=formula
+
+# RGRGRGRGRGRGRGRGRG
+
     def __sst_rec(self):
         return self.__sst.get_biff_record()
 
@@ -634,8 +683,15 @@ class Workbook(object):
         country            = self.__country_rec()
         all_links          = self.__all_links_rec()
 
+# RGRGRGRGRGRGRGRGRG
+#        shared_str_table   = self.__sst_rec()
+#        after = country + all_links + shared_str_table
+
+        definedname=self.__definedname_rec()
+
         shared_str_table   = self.__sst_rec()
-        after = country + all_links + shared_str_table
+        after = country + all_links + definedname + shared_str_table
+# RGRGRGRGRGRGRGRGRG
 
         ext_sst = self.__ext_sst_rec(0) # need fake cause we need calc stream pos
         eof = self.__eof_rec()
@@ -650,8 +706,13 @@ class Workbook(object):
 
         bundlesheets = self.__boundsheets_rec(len(before), len(after)+len(ext_sst)+len(eof), sheet_biff_lens)
 
-        sst_stream_pos = len(before) + len(bundlesheets) + len(country)  + len(all_links)
+# RGRGRGRGRGRGRGRGRG
+#        sst_stream_pos = len(before) + len(bundlesheets) + len(country)  + len(all_links)
+#        ext_sst = self.__ext_sst_rec(sst_stream_pos)
+        sst_stream_pos = len(before) + len(bundlesheets) + len(country)  + len(all_links) + len(definedname)
         ext_sst = self.__ext_sst_rec(sst_stream_pos)
+
+# RGRGRGRGRGRGRGRGRG
 
         return before + bundlesheets + after + ext_sst + eof + sheets
 
