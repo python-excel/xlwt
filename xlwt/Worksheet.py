@@ -39,11 +39,13 @@ import Bitmap
 import Style
 import tempfile
 
+import ExcelFormula
+
 class Worksheet(object):
 
     # a safe default value, 3 is always valid!
     active_pane = 3
-    
+
     #################################################################
     ## Constructor
     #################################################################
@@ -196,6 +198,8 @@ class Worksheet(object):
         self.row_tempfile = None
         self.__flushed_rows = {}
         self.__row_visible_levels = 0
+
+        self.__definednames={}
 
     #################################################################
     ## Properties, "getters", "setters"
@@ -1023,11 +1027,85 @@ class Worksheet(object):
     ## Methods
     ##################################################################
 
+    def _get_name_records(self):
+
+        sheet_index=self.parent._get_sheet_idx_by_name(self.__name.lower())
+
+        name_records=[]
+        for (name,formula) in self.__definednames.iteritems():
+
+            options=0
+            if (type(name)==int):
+                options|=0x0020 # Global name
+
+
+            rpn=formula.rpn()
+
+            name_records.append(
+                BIFFRecords.NameRecord(
+                    options=options,
+                    keyboard_shortcut=0,
+                    sheet_index=sheet_index+1,
+                    rpn=rpn[2:], # We get rid of formula length (first 2 bytes)
+                    name=name,
+                    menu_text='',
+                    desc_text='',
+                    help_text='',
+                    status_text=''
+                )
+            )
+
+        return name_records
+
+    def add_definedname(self,name,formula):
+
+        self.__parent.add_sheet_reference(formula)
+        self.__definednames[name]=formula
+
+    def repeat_rows_cols(self,irow=None,frow=None,icol=None,fcol=None):
+
+        if irow is not None:
+            if frow is None:
+                raise ValueError('Invalud irow/forw')
+            range1=(
+                    self.__name,
+                    self.__name,
+                    irow,
+                    frow,
+                    0,
+                    255
+            )
+        else:
+            range1=None
+
+        if icol is not None:
+            if fcol is None:
+                raise ValueError('Invalud icol/fcol')
+            range2=(
+                    self.__name,
+                    self.__name,
+                    0,
+                    65535,
+                    icol,
+                    fcol
+            )
+        else:
+            range2=None
+
+        if range1 is None:
+            range1=range2
+            range2=None
+
+        formula=ExcelFormula.Formula3D(range1,range2)
+
+        self.add_definedname(0x07,formula)
+
+
     def get_parent(self):
         return self.__parent
 
-    def write(self, r, c, label="", style=Style.default_style):
-        self.row(r).write(c, label, style)
+    def write(self, r, c, label="", style=Style.default_style, formula_result=None):
+        self.row(r).write(c, label, style, formula_result)
 
     def write_rich_text(self, r, c, rich_text_list, style=Style.default_style):
         self.row(r).set_cell_rich_text(c, rich_text_list, style)
@@ -1352,5 +1430,9 @@ class Worksheet(object):
             self.__flushed_rows[rowx] = 1
         self.__update_row_visible_levels()
         self.__rows = {}
+
+
+
+
 
 

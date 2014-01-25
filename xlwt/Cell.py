@@ -153,18 +153,24 @@ class ErrorCell(object):
             self.colx, self.xf_idx, self.number, 1).get()
 
 class FormulaCell(object):
-    __slots__ = ["rowx", "colx", "xf_idx", "frmla", "calc_flags"]
+    __slots__ = ["rowx", "colx", "xf_idx", "frmla", "calc_flags", "frmla_result"]
 
-    def __init__(self, rowx, colx, xf_idx, frmla, calc_flags=0):
+    def __init__(self, rowx, colx, xf_idx, frmla, calc_flags=0, frmla_result=None):
         self.rowx = rowx
         self.colx = colx
         self.xf_idx = xf_idx
         self.frmla = frmla
         self.calc_flags = calc_flags
+        self.frmla_result=frmla_result
 
     def get_biff_data(self):
-        return BIFFRecords.FormulaRecord(self.rowx,
-            self.colx, self.xf_idx, self.frmla.rpn(), self.calc_flags).get()
+        fr=BIFFRecords.FormulaRecord(self.rowx,
+               self.colx, self.xf_idx, self.frmla.rpn(), self.calc_flags, self.frmla_result)
+
+        if (isinstance(self.frmla_result,basestring)):
+            return fr.get()+BIFFRecords.StringRecord(self.frmla_result).get()
+
+        return fr.get()
 
 # module-level function for *internal* use by the Row module
 

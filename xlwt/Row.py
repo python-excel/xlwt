@@ -86,7 +86,7 @@ class Row(object):
             if iarg > sheet.last_used_col:
                 sheet.last_used_col = iarg
 
-    def __excel_date_dt(self, date): 
+    def __excel_date_dt(self, date):
         adj = False
         if isinstance(date, dt.date):
             if self.__parent_wb.dates_1904:
@@ -102,11 +102,11 @@ class Row(object):
             date = dt.datetime.combine(dt.datetime(1900, 1, 1), date)
             epoch = dt.datetime(1900, 1, 1)
         delta = date - epoch
-        xldate = delta.days + delta.seconds / 86400.0                      
+        xldate = delta.days + delta.seconds / 86400.0
         # Add a day for Excel's missing leap day in 1900
         if adj and xldate > 59:
             xldate += 1
-        return xldate    
+        return xldate
 
     def get_height_in_pixels(self):
         return self.__height_in_pixels
@@ -230,7 +230,7 @@ class Row(object):
         xf_index = self.__parent_wb.add_style(style)
         self.insert_cell(colx, ErrorCell(self.__idx, colx, xf_index, error_string_or_code))
 
-    def write(self, col, label, style=Style.default_style):
+    def write(self, col, label, style=Style.default_style,formula_result=None):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
         style_index = self.__parent_wb.add_style(style)
@@ -252,7 +252,24 @@ class Row(object):
             self.insert_cell(col, BlankCell(self.__idx, col, style_index))
         elif isinstance(label, ExcelFormula.Formula):
             self.__parent_wb.add_sheet_reference(label)
-            self.insert_cell(col, FormulaCell(self.__idx, col, style_index, label))
+
+            if isinstance(formula_result, basestring):
+                if len(formula_result) > 0:
+                    result=unicode(formula_result,self.__parent_wb.encoding)
+                else:
+                    result=None
+            elif isinstance(formula_result, bool): # bool is subclass of int; test bool first
+                result=formula_result
+            elif isinstance(formula_result, (float, int, long, Decimal)):
+                result=float(formula_result)
+            elif isinstance(formula_result, (dt.datetime, dt.date, dt.time)):
+                result=float(self.__excel_date_dt(formula_result))
+            elif formula_result is None:
+                result=formula_result
+            else:
+                raise Exception("Unexpected formula_result type %r" % type(formula_result))
+
+            self.insert_cell(col, FormulaCell(self.__idx, col, style_index, label, frmla_result=result))
         elif isinstance(label, (list, tuple)):
             self.__rich_text_helper(col, label, style, style_index)
         else:
@@ -268,7 +285,7 @@ class Row(object):
     def __rich_text_helper(self, col, rich_text_list, style, style_index=None):
         if style_index is None:
             style_index = self.__parent_wb.add_style(style)
-        default_font = None    
+        default_font = None
         rt = []
         for data in rich_text_list:
             if isinstance(data, basestring):
