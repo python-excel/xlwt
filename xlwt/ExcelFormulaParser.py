@@ -2,12 +2,10 @@
 ### import antlr and other modules ..
 import sys
 import antlr
+from Bytes import *
+if sys.version_info[0] < 3:
+    from Bool import *
 
-version = sys.version.split()[0]
-if version < '2.2.1':
-    False = 0
-if version < '2.3':
-    True = not False
 ### header action >>>
 import struct
 import Utils
@@ -76,7 +74,7 @@ class Parser(antlr.LLkParser):
         antlr.LLkParser.__init__(self, *args, **kwargs)
         self.tokenNames = _tokenNames
         ### __init__ header action >>>
-        self.rpn = ""
+        self.rpn = bytes()
         self.sheet_references = []
         self.xcall_references = []
         ### __init__ header action <<<
@@ -406,7 +404,7 @@ class Parser(antlr.LLkParser):
                choose_rpn.append(rpn_chunks[ic])
                choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x08, skiplens[ic])) # 0x08 is tAttrSkip
             choose_rpn.append(struct.pack("<BBH", ptgFuncVarV, nc+1, 100)) # 100 is CHOOSE fn
-            self.rpn += "".join(choose_rpn)
+            self.rpn += bytes().join(choose_rpn)
         elif la1 and la1 in [LP]:
             pass
             self.match(LP)
@@ -463,7 +461,7 @@ class Parser(antlr.LLkParser):
                 ref3d_ref2d = self.LT(1)
                 self.match(REF2D)
                 ptg = ptgRef3dR + _RVAdeltaRef[arg_type]
-                rpn_ref2d = ""
+                rpn_ref2d = bytes()
                 r1, c1 = Utils.cell_to_packed_rowcol(ref3d_ref2d.text)
                 rpn_ref2d = struct.pack("<3H", 0x0000, r1, c1)
                 la1 = self.LA(1)

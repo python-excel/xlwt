@@ -42,6 +42,7 @@ Record Order in BIFF8
 
 import BIFFRecords
 import Style
+from Bytes import *
 
 class Workbook(object):
 
@@ -50,7 +51,7 @@ class Workbook(object):
     #################################################################
     def __init__(self, encoding='ascii', style_compression=0):
         self.encoding = encoding
-        self.__owner = 'None'
+        self.__owner = bytes('None', 'windows-1252')
         self.__country_code = None # 0x07 is Russia :-)
         self.__wnd_protect = 0
         self.__obj_protect = 0
@@ -505,7 +506,7 @@ class Workbook(object):
 
     def __country_rec(self):
         if not self.__country_code:
-            return ''
+            return bytes()
         return BIFFRecords.CountryRecord(self.__country_code, self.__country_code).get()
 
     def __dsf_rec(self):
@@ -534,7 +535,7 @@ class Workbook(object):
 
     def __palette_rec(self):
         if self.__custom_palette_b8 is None: 
-            return ''
+            return bytes()
         info = BIFFRecords.PaletteRecord(self.__custom_palette_b8).get()
         return info
 
@@ -558,7 +559,7 @@ class Workbook(object):
 
         start = data_len_before + boundsheets_len + data_len_after
 
-        result = ''
+        result = bytes()
         for sheet_biff_len,  sheet in zip(sheet_biff_lens, self.__worksheets):
             result += BIFFRecords.BoundSheetRecord(
                 start, sheet.visibility, sheet.name, self.encoding
@@ -593,18 +594,18 @@ class Workbook(object):
             temp = [ref for idx, ref in temp]
             externsheet_record = BIFFRecords.ExternSheetRecord(temp).get()
             pieces.append(externsheet_record)
-        return ''.join(pieces)
+        return bytes().join(pieces)
 
     def __sst_rec(self):
         return self.__sst.get_biff_record()
 
     def __ext_sst_rec(self, abs_stream_pos):
-        return ''
+        return bytes()
         #return BIFFRecords.ExtSSTRecord(abs_stream_pos, self.sst_record.str_placement,
         #self.sst_record.portions_len).get()
 
     def get_biff_data(self):
-        before = ''
+        before = bytes()
         before += self.__bof_rec()
         before += self.__intf_hdr_rec()
         before += self.__intf_mms_rec()
@@ -641,7 +642,7 @@ class Workbook(object):
         eof = self.__eof_rec()
 
         self.__worksheets[self.__active_sheet].selected = True
-        sheets = ''
+        sheets = bytes()
         sheet_biff_lens = []
         for sheet in self.__worksheets:
             data = sheet.get_biff_data()

@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-
+import setuptools
 from distutils.core import setup
-from xlwt import __VERSION__
+import re
+
+__VERSION__ = re.match("__VERSION__\s*=\s*\'(.*)\'", open("xlwt/__init__.py").read()).group(1) 
 
 DESCRIPTION = (
     'Library to create spreadsheet files compatible with '
@@ -14,7 +16,7 @@ xlwt is a library for generating spreadsheet files that are compatible
 with Excel 97/2000/XP/2003, OpenOffice.org Calc, and Gnumeric. xlwt has
 full support for Unicode. Excel spreadsheets can be generated on any
 platform without needing Excel or a COM server. The only requirement is
-Python 2.3 to 2.7.
+Python 2.3 to 3.2.
 """
 
 CLASSIFIERS = [
@@ -47,6 +49,7 @@ setup(
     packages = ['xlwt'],
     keywords = KEYWORDS,
     classifiers = CLASSIFIERS,
+    use_2to3 = True,
     package_data = {
         'xlwt': [
             'doc/*.*',

@@ -2,6 +2,11 @@
 
 import Formatting
 from BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
+import sys
+
+version = sys.version.split()[0]
+if version < '3.0.0':
+    from Bytes import *
 
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
 
@@ -178,7 +183,7 @@ class StyleCollection(object):
 
 
     def get_biff_data(self):
-        result = ''
+        result = bytes()
         result += self._all_fonts()
         result += self._all_num_formats()
         result += self._all_cell_styles()
@@ -186,7 +191,7 @@ class StyleCollection(object):
         return result
 
     def _all_fonts(self):
-        result = ''
+        result = bytes()
         if self.style_compression:
             alist = self._font_x2id.items()
         else:
@@ -197,7 +202,7 @@ class StyleCollection(object):
         return result
 
     def _all_num_formats(self):
-        result = ''
+        result = bytes()
         alist = [
             (v, k)
             for k, v in self._num_formats.items()
@@ -209,7 +214,7 @@ class StyleCollection(object):
         return result
 
     def _all_cell_styles(self):
-        result = ''
+        result = bytes()
         for i in range(0, 16):
             result += XFRecord(self._default_xf, 'style').get()
         if self.style_compression == 2:

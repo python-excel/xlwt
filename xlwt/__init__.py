@@ -7,3 +7,10 @@ from Column import Column
 from Formatting import Font, Alignment, Borders, Pattern, Protection
 from Style import XFStyle, easyxf, easyfont, add_palette_colour
 from ExcelFormula import *
+
+import sys
+if sys.version_info[0] > 2:
+    Workbook.Workbook = Workbook
+    Worksheet.Worksheet = Worksheet
+    Row.Row = Row
+    Column.Column = Column

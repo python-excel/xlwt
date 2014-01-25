@@ -38,6 +38,7 @@ import BIFFRecords
 import Bitmap
 import Style
 import tempfile
+from Bytes import *
 
 class Worksheet(object):
 
@@ -61,7 +62,7 @@ class Worksheet(object):
         self.__rows = {}
         self.__cols = {}
         self.__merged_ranges = []
-        self.__bmp_rec = ''
+        self.__bmp_rec = bytes()
 
         self.__show_formulas = 0
         self.__show_grid = 1
@@ -187,7 +188,7 @@ class Worksheet(object):
         self.__obj_protect = 0
         self.__protect = 0
         self.__scen_protect = 0
-        self.__password = ''
+        self.__password = bytes()
 
         self.last_used_row = 0
         self.first_used_row = 65535
@@ -1143,7 +1144,7 @@ class Worksheet(object):
         return BIFFRecords.EOFRecord().get()
 
     def __colinfo_rec(self):
-        result = ''
+        result = bytes()
         for col in self.__cols:
             result += self.__cols[col].get_biff_record()
         return result
@@ -1194,7 +1195,7 @@ class Worksheet(object):
 
     def __panes_rec(self):
         if self.__vert_split_pos is None and self.__horz_split_pos is None:
-            return ""
+            return bytes()
 
         if self.__vert_split_pos is None:
             self.__vert_split_pos = 0
@@ -1246,7 +1247,7 @@ class Worksheet(object):
         for row in self.__rows.itervalues():
             result.append(row.get_row_biff_data())
             result.append(row.get_cells_biff_data())
-        return ''.join(result)
+        return bytes().join(result)
 
     def __merged_rec(self):
         return BIFFRecords.MergedCellsRecord(self.__merged_ranges).get()
@@ -1255,7 +1256,7 @@ class Worksheet(object):
         return self.__bmp_rec
 
     def __calc_settings_rec(self):
-        result = ''
+        result = bytes()
         result += BIFFRecords.CalcModeRecord(self.__calc_mode & 0x01).get()
         result += BIFFRecords.CalcCountRecord(self.__calc_count & 0xFFFF).get()
         result += BIFFRecords.RefModeRecord(self.__RC_ref_mode & 0x01).get()
@@ -1265,7 +1266,7 @@ class Worksheet(object):
         return result
 
     def __print_settings_rec(self):
-        result = ''
+        result = bytes()
         result += BIFFRecords.PrintHeadersRecord(self.__print_headers).get()
         result += BIFFRecords.PrintGridLinesRecord(self.__print_grid).get()
         result += BIFFRecords.GridSetRecord(self.__grid_set).get()
@@ -1305,7 +1306,7 @@ class Worksheet(object):
         return result
 
     def __protection_rec(self):
-        result = ''
+        result = bytes()
         result += BIFFRecords.ProtectRecord(self.__protect).get()
         result += BIFFRecords.ScenProtectRecord(self.__scen_protect).get()
         result += BIFFRecords.WindowProtectRecord(self.__wnd_protect).get()
@@ -1342,7 +1343,7 @@ class Worksheet(object):
             self.__panes_rec(),
             self.__eof_rec(),
             ])
-        return ''.join(result)
+        return bytes().join(result)
 
     def flush_row_data(self):
         if self.row_tempfile is None:

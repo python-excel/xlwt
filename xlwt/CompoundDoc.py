@@ -1,7 +1,8 @@
 # -*- coding: windows-1252 -*-
 
 import struct
-        
+from Bytes import *
+
 # This implementation writes only 'Root Entry', 'Workbook' streams
 # and 2 empty streams for aligning directory stream on sector boundary
 # 
@@ -28,24 +29,24 @@ class XlsDoc:
         #self.book_stream = ''                # padded
         self.book_stream_sect = []
 
-        self.dir_stream = ''
+        self.dir_stream = bytes()
         self.dir_stream_sect = []
 
-        self.packed_SAT = ''
+        self.packed_SAT = bytes()
         self.SAT_sect = []
 
-        self.packed_MSAT_1st = ''
-        self.packed_MSAT_2nd = ''
+        self.packed_MSAT_1st = bytes()
+        self.packed_MSAT_2nd = bytes()
         self.MSAT_sect_2nd = []
 
-        self.header = ''
+        self.header = bytes()
 
     def __build_directory(self): # align on sector boundary
-        self.dir_stream = ''
+        self.dir_stream = bytes()
 
-        dentry_name      = '\x00'.join('Root Entry\x00') + '\x00'
+        dentry_name      = bytes('\x00'.join('Root Entry\x00') + '\x00', 'windows-1252')
         dentry_name_sz   = len(dentry_name)
-        dentry_name_pad  = '\x00'*(64 - dentry_name_sz)
+        dentry_name_pad  = bytes('\x00'*(64 - dentry_name_sz), 'windows-1252')
         dentry_type      = 0x05 # root storage
         dentry_colour    = 0x01 # black
         dentry_did_left  = -1
@@ -68,9 +69,9 @@ class XlsDoc:
            0
         )
 
-        dentry_name      = '\x00'.join('Workbook\x00') + '\x00'
+        dentry_name      = bytes('\x00'.join('Workbook\x00') + '\x00', 'windows-1252')
         dentry_name_sz   = len(dentry_name)
-        dentry_name_pad  = '\x00'*(64 - dentry_name_sz)
+        dentry_name_pad  = bytes('\x00'*(64 - dentry_name_sz), 'windows-1252')
         dentry_type      = 0x02 # user stream
         dentry_colour    = 0x01 # black
         dentry_did_left  = -1
@@ -94,9 +95,9 @@ class XlsDoc:
         )
         
         # padding
-        dentry_name      = ''
+        dentry_name      = bytes()
         dentry_name_sz   = len(dentry_name)
-        dentry_name_pad  = '\x00'*(64 - dentry_name_sz)
+        dentry_name_pad  = bytes('\x00'*(64 - dentry_name_sz), 'windows-1252')
         dentry_type      = 0x00 # empty
         dentry_colour    = 0x01 # black
         dentry_did_left  = -1
@@ -205,17 +206,17 @@ class XlsDoc:
 
 
     def __build_header(self):
-        doc_magic             = '\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'
-        file_uid              = '\x00'*16
-        rev_num               = '\x3E\x00'
-        ver_num               = '\x03\x00'
-        byte_order            = '\xFE\xFF'
+        doc_magic             = bytes('\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1', 'windows-1252')
+        file_uid              = bytes('\x00'*16, 'windows-1252')
+        rev_num               = bytes('\x3E\x00', 'windows-1252')
+        ver_num               = bytes('\x03\x00', 'windows-1252')
+        byte_order            = bytes('\xFE\xFF', 'windows-1252')
         log_sect_size         = struct.pack('<H', 9)
         log_short_sect_size   = struct.pack('<H', 6)
-        not_used0             = '\x00'*10
+        not_used0             = bytes('\x00'*10, 'windows-1252')
         total_sat_sectors     = struct.pack('<L', len(self.SAT_sect))
         dir_start_sid         = struct.pack('<l', self.dir_stream_sect[0])
-        not_used1             = '\x00'*4        
+        not_used1             = bytes('\x00'*4, 'windows-1252')        
         min_stream_size       = struct.pack('<L', 0x1000)
         ssat_start_sid        = struct.pack('<l', -2)
         total_ssat_sectors    = struct.pack('<L', 0)
@@ -227,7 +228,7 @@ class XlsDoc:
 
         total_msat_sectors    = struct.pack('<L', len(self.MSAT_sect_2nd))
 
-        self.header =       ''.join([  doc_magic,
+        self.header =       bytes().join([  doc_magic,
                                         file_uid,
                                         rev_num,
                                         ver_num,
@@ -248,7 +249,7 @@ class XlsDoc:
 
     def save(self, file_name_or_filelike_obj, stream):
         # 1. Align stream on 0x1000 boundary (and therefore on sector boundary)
-        padding = '\x00' * (0x1000 - (len(stream) % 0x1000))
+        padding = bytes('\x00' * (0x1000 - (len(stream) % 0x1000)), 'windows-1252')
         self.book_stream_len = len(stream) + len(padding)
 
         self.__build_directory()
