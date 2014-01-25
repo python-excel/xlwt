@@ -38,8 +38,8 @@ class Row(object):
                  "space_below"]
 
     def __init__(self, rowx, parent_sheet):
-        if not (isinstance(rowx, int) and 0 <= rowx <= 65535):
-            raise ValueError("row index (%r) not an int in range(65536)" % rowx)
+        if not (isinstance(rowx, (int, long)) and 0 <= rowx <= 65535):
+            raise ValueError("row index was %r, not allowed by .xls format" % rowx)
         self.__idx = rowx
         self.__parent = parent_sheet
         self.__parent_wb = parent_sheet.get_parent()
