@@ -2,8 +2,13 @@
 
 # Utilities for work with reference to cells and with sheetnames
 
+from __future__ import absolute_import, unicode_literals
+from future.builtins import *
+from future import utils
+
 import re
-from ExcelMagic import MAX_ROW, MAX_COL
+import struct
+from .ExcelMagic import MAX_ROW, MAX_COL
 
 _re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)", re.IGNORECASE)
 _re_row_range = re.compile(r"\$?(\d+):\$?(\d+)")
@@ -12,12 +17,30 @@ _re_cell_range = re.compile(r"\$?([A-I]?[A-Z]\$?\d+):\$?([A-I]?[A-Z]\$?\d+)", re
 _re_cell_ref = re.compile(r"\$?([A-I]?[A-Z]\$?\d+)", re.IGNORECASE)
 
 
+def pack(*args, **kwargs):
+    """struct.pack() must take a native string as its first argument. So we
+    wrap it:
+    """
+    fmt = args[0]
+    rest = args[1:]
+    return struct.pack(utils.native_str(fmt), *rest, **kwargs)
+
+
+def unpack(*args, **kwargs):
+    """struct.unpack() must take a native string as its first argument. So we
+    wrap it:
+    """
+    fmt = args[0]
+    rest = args[1:]
+    return struct.unpack(utils.native_str(fmt), *rest, **kwargs)
+
+
 def col_by_name(colname):
     """'A' -> 0, 'Z' -> 25, 'AA' -> 26, etc
     """
     col = 0
     power = 1
-    for i in xrange(len(colname)-1, -1, -1):
+    for i in range(len(colname)-1, -1, -1):
         ch = colname[i]
         col += (ord(ch) - ord('A') + 1) * power
         power *= 26

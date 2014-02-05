@@ -1,6 +1,11 @@
 # -*- coding: cp1252 -*-
-from struct import pack
-from UnicodeUtils import upack1, upack2, upack2rt
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+from .UnicodeUtils import upack1, upack2, upack2rt
+from .Utils import pack, unpack
+from future.builtins import *
+from future import utils
 
 class SharedStringTable(object):
     _SST_ID = 0x00FC
@@ -20,8 +25,8 @@ class SharedStringTable(object):
         self._current_piece = None
 
     def add_str(self, s):
-        if self.encoding != 'ascii' and not isinstance(s, unicode):
-            s = unicode(s, self.encoding)
+        if self.encoding != 'ascii' and not isinstance(s, str):
+            s = str(s, self.encoding)
         self._add_calls += 1
         if s not in self._str_indexes:
             idx = len(self._str_indexes) + len(self._rt_indexes)
@@ -35,8 +40,8 @@ class SharedStringTable(object):
     def add_rt(self, rt):
         rtList = []
         for s, xf in rt:
-            if self.encoding != 'ascii' and not isinstance(s, unicode):
-                s = unicode(s, self.encoding)
+            if self.encoding != 'ascii' and not isinstance(s, str):
+                s = str(s, self.encoding)
             rtList.append((s, xf))
         rt = tuple(rtList)
         self._add_calls += 1
@@ -63,16 +68,16 @@ class SharedStringTable(object):
         return self._rt_indexes[rt]
 
     def get_biff_record(self):
-        self._sst_record = ''
+        self._sst_record = b''
         self._continues = [None, None]
         self._current_piece = pack('<II', 0, 0)
-        data = [(idx, s) for s, idx in self._str_indexes.iteritems()]
-        data.extend([(idx, s) for s, idx in self._rt_indexes.iteritems()])
+        data = [(idx, s) for s, idx in self._str_indexes.items()]
+        data.extend([(idx, s) for s, idx in self._rt_indexes.items()])
         data.sort() # in index order
         for idx, s in data:
             if self._tally[idx] == 0:
-                s = u''
-            if isinstance(s, str) or isinstance(s, unicode):
+                s = b''
+            if isinstance(s, bytes) or isinstance(s, str):
                 self._add_to_sst(s)
             else:
                 self._add_rt_to_sst(s)
@@ -82,7 +87,7 @@ class SharedStringTable(object):
         self._continues[1] = self._sst_record[8:]
         self._sst_record = None
         self._current_piece = None
-        result = ''.join(self._continues)
+        result = b''.join(self._continues)
         self._continues = None
         return result
 
@@ -90,7 +95,7 @@ class SharedStringTable(object):
     def _add_to_sst(self, s):
         u_str = upack2(s, self.encoding)
 
-        is_unicode_str = u_str[2] == '\x01'
+        is_unicode_str = u_str[2] == b'\x01'
         if is_unicode_str:
             atom_len = 5 # 2 byte -- len,
                          # 1 byte -- options,
@@ -105,7 +110,7 @@ class SharedStringTable(object):
 	
     def _add_rt_to_sst(self, rt):
         rt_str, rt_fr = upack2rt(rt, self.encoding)
-        is_unicode_str = rt_str[2] == '\x09'
+        is_unicode_str = rt_str[2] == b'\x09'
         if is_unicode_str:
             atom_len = 7 # 2 byte -- len,
                          # 1 byte -- options,
@@ -122,12 +127,12 @@ class SharedStringTable(object):
             self._save_atom(rt_fr[i:i+4])
 
     def _new_piece(self):
-        if self._sst_record == '':
+        if self._sst_record == b'':
             self._sst_record = self._current_piece
         else:
             curr_piece_len = len(self._current_piece)
             self._continues.append(pack('<2H%ds'%curr_piece_len, self._CONTINUE_ID, curr_piece_len, self._current_piece))
-        self._current_piece = ''
+        self._current_piece = b''
 
     def _save_atom(self, s):
         atom_len = len(s)
@@ -158,20 +163,16 @@ class SharedStringTable(object):
             if need_more_space:
                 self._new_piece()
                 if is_unicode_str:
-                    self._current_piece += '\x01'
+                    self._current_piece += b'\x01'
                 else:
-                    self._current_piece += '\x00'
+                    self._current_piece += b'\x00'
 
             i += atom_len
 
 
 class BiffRecord(object):
 
-    _rec_data = '' # class attribute; child classes need to set this.
-
-    # Sheer waste.
-    # def __init__(self):
-    #     self._rec_data = ''
+    _rec_data = b'' # class attribute; child classes need to set this.
 
     def get_rec_id(self):
         return _REC_ID
@@ -232,8 +233,8 @@ class Biff8BOFRecord(BiffRecord):
         version  = 0x0600
         build    = 0x0DBB
         year     = 0x07CC
-        file_hist_flags = 0x00L
-        ver_can_read    = 0x06L
+        file_hist_flags = 0x00
+        ver_can_read    = 0x06
 
         self._rec_data = pack('<4H2I', version, rec_type, build, year, file_hist_flags, ver_can_read)
 
@@ -249,7 +250,7 @@ class InteraceEndRecord(BiffRecord):
     _REC_ID = 0x00E2
 
     def __init__(self):
-        self._rec_data = ''
+        self._rec_data = b''
 
 
 class MMSRecord(BiffRecord):
@@ -272,7 +273,7 @@ class WriteAccessRecord(BiffRecord):
     def __init__(self, owner):
         uowner = owner[0:0x30]
         uowner_len = len(uowner)
-        self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner, ' '*(0x70 - uowner_len))
+        self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner.encode('ascii'), b' '*(0x70 - uowner_len))
 
 
 class DSFRecord(BiffRecord):
@@ -512,7 +513,7 @@ class EOFRecord(BiffRecord):
     _REC_ID = 0x000A
 
     def __init__(self):
-        self._rec_data = ''
+        self._rec_data = b''
 
 
 class DateModeRecord(BiffRecord):
@@ -1199,7 +1200,7 @@ class ExtSSTRecord(BiffRecord):
         portion_counter = 0
         while str_counter < len(str_placement):
             str_chunk_num, pos_in_chunk = str_placement[str_counter]
-            if str_chunk_num <> portion_counter:
+            if str_chunk_num != portion_counter:
                 portion_counter = str_chunk_num
                 abs_stream_pos += portions_len[portion_counter-1]
                 #print hex(abs_stream_pos)
@@ -1300,11 +1301,11 @@ class Window2Record(BiffRecord):
                                     grid_colour,
                                     0x00,
                                     preview_magn, normal_magn,
-                                    0x00L)
+                                    0x00)
         if scl_magn is not None:
             self._scl_rec = pack('<4H', 0x00A0, 4, scl_magn, 100)
         else:
-            self._scl_rec = ''
+            self._scl_rec = b''
 
     def get(self):
         return self.get_rec_header() + self._rec_data + self._scl_rec
@@ -1491,7 +1492,7 @@ class MergedCellsRecord(BiffRecord):
         i = len(merged_list) - 1
         while i >= 0:
             j = 0
-            merged = ''
+            merged = b''
             while (i >= 0) and (j < 0x403):
                 r1, r2, c1, c2 = merged_list[i]
                 merged += pack('<4H', r1, r2, c1, c2)
@@ -2378,7 +2379,7 @@ class ExternSheetRecord(BiffRecord):
     def get(self):
         res = []
         nrefs = len(self.refs)
-        for idx in xrange(0, nrefs, _maxRefPerRecord):
+        for idx in range(0, nrefs, _maxRefPerRecord):
             chunk = self.refs[idx:idx+_maxRefPerRecord]
             krefs = len(chunk)
             if idx: # CONTINUE record
@@ -2387,7 +2388,7 @@ class ExternSheetRecord(BiffRecord):
                 header = pack("<HHH", self._REC_ID, 6 * krefs + 2, nrefs)
             res.append(header)
             res.extend([pack("<HHH", *r) for r in chunk])
-        return ''.join(res)
+        return b''.join(res)
 
 class SupBookRecord(BiffRecord):
     """

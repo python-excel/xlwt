@@ -1,6 +1,8 @@
 # -*- coding: windows-1252 -*-
 
-from BIFFRecords import ColInfoRecord
+from __future__ import absolute_import, division
+from .BIFFRecords import ColInfoRecord
+from future.builtins import *
 
 class Column(object):
     def __init__(self, colx, parent_sheet):

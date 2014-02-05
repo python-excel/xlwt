@@ -28,7 +28,9 @@ is not set), it repeats the attributes of its style XF record.
 
 '''
 
-import BIFFRecords
+from __future__ import absolute_import
+
+from . import BIFFRecords
 
 class Font(object):
 

@@ -44,7 +44,7 @@ wb.add_style(st2)
 wb.add_style(st3)
 
 ws0 = wb.add_sheet('0')
-ws0.write(0, 0, 'Olya'*0x4000, st0)
+ws0.write(0, 0, b'Olya'*0x1000, st0)
 
 #for i in range(0, 0x10):
 #    ws0.write(i, 2, ('%d'%i)*0x4000, st1)

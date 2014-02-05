@@ -2,6 +2,8 @@
 # -*- coding: windows-1251 -*-
 # Copyright (C) 2005 Kiseliov Roman
 
+from __future__ import print_function
+from __future__ import absolute_import
 from xlwt import *
 from xlwt.ExcelFormulaParser import FormulaParseException
 
@@ -21,8 +23,8 @@ for n in sorted(ExcelMagic.std_func_by_name):
     text = n + "($A$1)"
     try:
         formula = Formula(text)
-    except FormulaParseException,e:
-        print "Could not parse %r: %s" % (text,e.args[0])
+    except FormulaParseException as e:
+        print("Could not parse %r: %s" % (text,e.args[0]))
         fail_count += 1
     else:
         ws.write(i, 3, formula)
@@ -31,4 +33,4 @@ for n in sorted(ExcelMagic.std_func_by_name):
 
 w.save('formula_names.xls')
 
-print "succeeded with %i functions, failed with %i" % (succeed_count,fail_count)
+print("succeeded with %i functions, failed with %i" % (succeed_count,fail_count))

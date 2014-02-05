@@ -1,8 +1,11 @@
 # -*- coding: windows-1252 -*-
 
-from antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
-import ExcelFormulaParser
+from __future__ import print_function
+from __future__ import absolute_import
+from .antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
+from . import ExcelFormulaParser
 from re import compile as recompile, LOCALE, IGNORECASE, VERBOSE
+from future.builtins import *
 
 
 int_const_pattern = r"\d+\b"
@@ -121,6 +124,6 @@ class Lexer(TokenStream):
 if __name__ == '__main__':
     try:
         for t in Lexer(""" 1.23 456 "abcd" R2C2 a1 iv65536 true false if choose a_name 'qname' <> >= <= """):
-            print t
-    except TokenStreamException, e:
-        print "error:", e
+            print(t)
+    except TokenStreamException as e:
+        print("error:", e)

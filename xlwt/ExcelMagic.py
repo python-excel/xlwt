@@ -2,6 +2,8 @@
 """
 lots of Excel Magic Numbers
 """
+from __future__ import absolute_import, unicode_literals
+from future.builtins import *
 
 # Boundaries BIFF8+
 

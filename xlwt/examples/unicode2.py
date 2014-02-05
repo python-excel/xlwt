@@ -2,6 +2,10 @@
 # -*- coding: windows-1251 -*-
 # Copyright (C) 2005 Kiseliov Roman
 
+from __future__ import absolute_import
+from __future__ import division
+from future.builtins import *
+
 from xlwt import *
 
 w = Workbook()
@@ -13,7 +17,7 @@ style = XFStyle()
 style.font = fnt
 
 for i in range(0x10000):
-    ws1.write(i/0x10, i%0x10, unichr(i), style)
+    ws1.write(i//0x10, i%0x10, chr(i), style)
 
 w.save('unicode2.xls')
 
