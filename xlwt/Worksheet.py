@@ -38,12 +38,13 @@ import BIFFRecords
 import Bitmap
 import Style
 import tempfile
+import hfpicture
 
 class Worksheet(object):
 
     # a safe default value, 3 is always valid!
     active_pane = 3
-    
+
     #################################################################
     ## Constructor
     #################################################################
@@ -62,6 +63,13 @@ class Worksheet(object):
         self.__cols = {}
         self.__merged_ranges = []
         self.__bmp_rec = ''
+
+        #it would be more correct and efficient to maintain dictionaries with
+        #hfpicture data and create records at save time, but binary data will
+        #suffice for now.
+        self.__hfpicture_header = '' #more than just the header, this contains everything that precedes blip store containers
+        self.__hfpicture_rec = ''
+        self.__hfpicture_rec_size = 0
 
         self.__show_formulas = 0
         self.__show_grid = 1
@@ -1066,6 +1074,17 @@ class Worksheet(object):
 
         self.__bmp_rec += obj.get() + bmp.get()
 
+    #add a header or footer picture to the worksheet. No duplication checks as of now
+    #ps_pos is a 2 letter unicode string with the first one (H or F) determining
+    #the vertical position and the second one (C, L, R) - horizontal position
+    #size is in pixels
+    def add_hfpicture(self, ps_filename, ps_pos, pi_hsize, pi_vsize, ps_name='hfpicture'):
+        li_nshapes = self.__parent._add_hfpicture(ps_filename)
+        self.__hfpicture_header = hfpicture.generate_ws_header_data(li_nshapes, ps_name, self.__hfpicture_rec_size)
+        ls_rec = hfpicture.generate_ws_rec_data(li_nshapes,ps_pos, pi_hsize, pi_vsize, ps_name)
+        self.__hfpicture_rec += ls_rec
+        self.__hfpicture_rec_size += len(ls_rec)
+
     def col(self, indx):
         if indx not in self.__cols:
             self.__cols[indx] = self.Column(indx, self)
@@ -1248,6 +1267,9 @@ class Worksheet(object):
             result.append(row.get_cells_biff_data())
         return ''.join(result)
 
+    def __hfp_final_rec(self):
+        return hfpicture.consolidate_record(self.__hfpicture_header, self.__hfpicture_rec)
+
     def __merged_rec(self):
         return BIFFRecords.MergedCellsRecord(self.__merged_ranges).get()
 
@@ -1336,6 +1358,7 @@ class Worksheet(object):
             # See http://bugs.python.org/issue3207
         result.extend([
             self.__row_blocks_rec(),
+            self.__hfp_final_rec(),
             self.__merged_rec(),
             self.__bitmaps_rec(),
             self.__window2_rec(),

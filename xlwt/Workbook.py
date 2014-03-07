@@ -35,6 +35,7 @@ Record Order in BIFF8
 
       COUNTRY
     ? Link Table
+      HFPicture
       SST
       ExtSST
       EOF
@@ -42,6 +43,8 @@ Record Order in BIFF8
 
 import BIFFRecords
 import Style
+import hfpicture
+import os
 
 class Workbook(object):
 
@@ -78,6 +81,12 @@ class Workbook(object):
 
         self.__dates_1904 = 0
         self.__use_cell_values = 1
+
+        #hfpicture binary records. Not the best implementation but works for now
+        self.__hfpicture_header=''
+        self.__hfpicture_rec=''
+        self.__hfpicture_ntot=0
+        self.__hfpicture_size=0
 
         self.__sst = BIFFRecords.SharedStringTable(self.encoding)
 
@@ -300,12 +309,12 @@ class Workbook(object):
 
     def set_colour_RGB(self, colour_index, red, green, blue):
         if not(8 <= colour_index <= 63):
-            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" % 
+            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" %
                     colour_index)
         if min(red, green, blue) < 0 or max(red, green, blue) > 255:
-            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)" 
+            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)"
                     % (red, green, blue))
-        if self.__custom_palette_b8 is None: 
+        if self.__custom_palette_b8 is None:
             self.__custom_palette_b8 = list(Style.excel_default_palette_b8)
         # User-defined Palette starts at colour index 8,
         # so subtract 8 from colour_index when placing in palette
@@ -318,7 +327,7 @@ class Workbook(object):
 
     def add_style(self, style):
         return self.__styles.add(style)
-    
+
     def add_font(self, font):
         return self.__styles.add_font(font)
 
@@ -330,10 +339,10 @@ class Workbook(object):
 
     def str_index(self, s):
         return self.__sst.str_index(s)
-        
+
     def add_rt(self, rt):
         return self.__sst.add_rt(rt)
-    
+
     def rt_index(self, rt):
         return self.__sst.rt_index(rt)
 
@@ -440,6 +449,15 @@ class Workbook(object):
 
         formula.patch_references(patches)
 
+    #hfpicture generation. Technically, an internal procedure but needs to
+    #be accessible from outside since it's called from worksheet.py
+    def _add_hfpicture(self, ps_filename):
+        self.__hfpicture_ntot += 1
+        self.__hfpicture_size += os.path.getsize(ps_filename)
+        self.__hfpicture_header = hfpicture.generate_wb_header_data(self.__hfpicture_ntot, self.__hfpicture_size)
+        self.__hfpicture_rec += hfpicture.generate_wb_rec_data(ps_filename, self.__hfpicture_ntot)
+        return self.__hfpicture_ntot
+
     ##################################################################
     ## BIFF records generation
     ##################################################################
@@ -533,7 +551,7 @@ class Workbook(object):
         return self.__styles.get_biff_data()
 
     def __palette_rec(self):
-        if self.__custom_palette_b8 is None: 
+        if self.__custom_palette_b8 is None:
             return ''
         info = BIFFRecords.PaletteRecord(self.__custom_palette_b8).get()
         return info
@@ -634,8 +652,10 @@ class Workbook(object):
         country            = self.__country_rec()
         all_links          = self.__all_links_rec()
 
+        hfp_final_rec = hfpicture.consolidate_record(self.__hfpicture_header, self.__hfpicture_rec, wb_footer=True)
+
         shared_str_table   = self.__sst_rec()
-        after = country + all_links + shared_str_table
+        after = country + all_links + hfp_final_rec + shared_str_table
 
         ext_sst = self.__ext_sst_rec(0) # need fake cause we need calc stream pos
         eof = self.__eof_rec()
