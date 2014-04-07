@@ -12,7 +12,7 @@ import unittest
 import filecmp
 from datetime import datetime
 
-import xlwt3 as xlwt
+import xlwt
 
 def from_tst_dir(filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)

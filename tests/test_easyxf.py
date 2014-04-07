@@ -12,7 +12,7 @@ import unittest
 import filecmp
 import datetime
 
-import xlwt3 as xlwt
+import xlwt as xlwt
 ezxf = xlwt.easyxf
 
 def write_xls(file_name, sheet_name, headings, data, heading_xf, data_xfs):
