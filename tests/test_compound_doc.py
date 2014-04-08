@@ -4,7 +4,7 @@
 # Purpose: test CompoundDoc
 # Created: 09.12.2010
 # Copyright (C) 2010, Manfred Moitzi
-# License: GPLv3
+# License: BSD licence
 
 import unittest
 
