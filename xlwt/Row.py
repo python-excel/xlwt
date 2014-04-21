@@ -15,6 +15,13 @@ except ImportError:
     class Decimal(object):
         pass
 
+try:
+    from cdecimal import Decimal as CDecimal
+except ImportError:
+    # cdecimal module not available
+    class CDecimal(object):
+        pass
+
 
 class Row(object):
     __slots__ = [# private variables
@@ -243,7 +250,7 @@ class Row(object):
                 self.insert_cell(col, BlankCell(self.__idx, col, style_index))
         elif isinstance(label, bool): # bool is subclass of int; test bool first
             self.insert_cell(col, BooleanCell(self.__idx, col, style_index, label))
-        elif isinstance(label, (float, int, long, Decimal)):
+        elif isinstance(label, (float, int, long, Decimal, CDecimal)):
             self.insert_cell(col, NumberCell(self.__idx, col, style_index, label))
         elif isinstance(label, (dt.datetime, dt.date, dt.time)):
             date_number = self.__excel_date_dt(label)
