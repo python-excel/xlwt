@@ -40,7 +40,7 @@ class XlsDoc:
 
         self.header = ''
 
-    def __build_directory(self): # align on sector boundary
+    def _build_directory(self): # align on sector boundary
         self.dir_stream = ''
 
         dentry_name      = '\x00'.join('Root Entry\x00') + '\x00'
@@ -119,7 +119,7 @@ class XlsDoc:
            0
         ) * 2
     
-    def __build_sat(self):
+    def _build_sat(self):
         # Build SAT
         book_sect_count = self.book_stream_len >> 9
         dir_sect_count  = len(self.dir_stream) >> 9
@@ -204,7 +204,7 @@ class XlsDoc:
         #print self.dir_stream_sect
 
 
-    def __build_header(self):
+    def _build_header(self):
         doc_magic             = '\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'
         file_uid              = '\x00'*16
         rev_num               = '\x3E\x00'
@@ -251,9 +251,9 @@ class XlsDoc:
         padding = '\x00' * (0x1000 - (len(stream) % 0x1000))
         self.book_stream_len = len(stream) + len(padding)
 
-        self.__build_directory()
-        self.__build_sat()
-        self.__build_header()
+        self._build_directory()
+        self._build_sat()
+        self._build_header()
         
         f = file_name_or_filelike_obj
         we_own_it = not hasattr(f, 'write')
