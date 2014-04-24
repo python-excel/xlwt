@@ -198,7 +198,7 @@ def _process_bitmap(bitmap):
         data = fh.read()
     finally:
         fh.close()
-    _process_bitmap_data(data)
+    return _process_bitmap_data(data)
 
 def _process_bitmap_data(data):
     # Check that the file is big enough to be a bitmap.
