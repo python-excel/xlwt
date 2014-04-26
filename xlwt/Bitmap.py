@@ -192,12 +192,10 @@ def _process_bitmap(bitmap):
 
     """
     # Open file and binmode the data in case the platform needs it.
-    fh = file(bitmap, "rb")
-    try:
+    with open(bitmap, "rb") as fh:
         # Slurp the file into a string.
         data = fh.read()
-    finally:
-        fh.close()
+
     # Check that the file is big enough to be a bitmap.
     if len(data) <= 0x36:
         raise Exception("bitmap doesn't contain enough data.")
