@@ -70,7 +70,7 @@ class Parser(antlr.LLkParser):
         antlr.LLkParser.__init__(self, *args, **kwargs)
         self.tokenNames = _tokenNames
         ### __init__ header action >>>
-        self.rpn = ""
+        self.rpn = b""
         self.sheet_references = []
         self.xcall_references = []
         ### __init__ header action <<<

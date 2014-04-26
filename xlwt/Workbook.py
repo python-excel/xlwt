@@ -507,7 +507,7 @@ class Workbook(object):
 
     def __country_rec(self):
         if not self.__country_code:
-            return ''
+            return b''
         return BIFFRecords.CountryRecord(self.__country_code, self.__country_code).get()
 
     def __dsf_rec(self):
@@ -536,7 +536,7 @@ class Workbook(object):
 
     def __palette_rec(self):
         if self.__custom_palette_b8 is None: 
-            return ''
+            return b''
         info = BIFFRecords.PaletteRecord(self.__custom_palette_b8).get()
         return info
 
@@ -560,7 +560,7 @@ class Workbook(object):
 
         start = data_len_before + boundsheets_len + data_len_after
 
-        result = ''
+        result = b''
         for sheet_biff_len,  sheet in zip(sheet_biff_lens, self.__worksheets):
             result += BIFFRecords.BoundSheetRecord(
                 start, sheet.visibility, sheet.name, self.encoding
@@ -595,18 +595,18 @@ class Workbook(object):
             temp = [ref for idx, ref in temp]
             externsheet_record = BIFFRecords.ExternSheetRecord(temp).get()
             pieces.append(externsheet_record)
-        return ''.join(pieces)
+        return b''.join(pieces)
 
     def __sst_rec(self):
         return self.__sst.get_biff_record()
 
     def __ext_sst_rec(self, abs_stream_pos):
-        return ''
+        return b''
         #return BIFFRecords.ExtSSTRecord(abs_stream_pos, self.sst_record.str_placement,
         #self.sst_record.portions_len).get()
 
     def get_biff_data(self):
-        before = ''
+        before = b''
         before += self.__bof_rec()
         before += self.__intf_hdr_rec()
         before += self.__intf_mms_rec()
@@ -643,7 +643,7 @@ class Workbook(object):
         eof = self.__eof_rec()
 
         self.__worksheets[self.__active_sheet].selected = True
-        sheets = ''
+        sheets = b''
         sheet_biff_lens = []
         for sheet in self.__worksheets:
             data = sheet.get_biff_data()

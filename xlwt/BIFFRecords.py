@@ -64,7 +64,7 @@ class SharedStringTable(object):
         return self._rt_indexes[rt]
 
     def get_biff_record(self):
-        self._sst_record = ''
+        self._sst_record = b''
         self._continues = [None, None]
         self._current_piece = pack('<II', 0, 0)
         data = [(idx, s) for s, idx in iteritems(self._str_indexes)]
@@ -83,7 +83,7 @@ class SharedStringTable(object):
         self._continues[1] = self._sst_record[8:]
         self._sst_record = None
         self._current_piece = None
-        result = ''.join(self._continues)
+        result = b''.join(self._continues)
         self._continues = None
         return result
 
@@ -123,12 +123,12 @@ class SharedStringTable(object):
             self._save_atom(rt_fr[i:i+4])
 
     def _new_piece(self):
-        if self._sst_record == '':
+        if self._sst_record == b'':
             self._sst_record = self._current_piece
         else:
             curr_piece_len = len(self._current_piece)
             self._continues.append(pack('<2H%ds'%curr_piece_len, self._CONTINUE_ID, curr_piece_len, self._current_piece))
-        self._current_piece = ''
+        self._current_piece = b''
 
     def _save_atom(self, s):
         atom_len = len(s)
@@ -168,14 +168,14 @@ class SharedStringTable(object):
 
 class BiffRecord(object):
 
-    _rec_data = '' # class attribute; child classes need to set this.
+    _rec_data = b'' # class attribute; child classes need to set this.
 
     # Sheer waste.
     # def __init__(self):
     #     self._rec_data = ''
 
     def get_rec_id(self):
-        return _REC_ID
+        return self._REC_ID
 
     def get_rec_header(self):
         return pack('<2H', self._REC_ID, len(self._rec_data))
@@ -250,7 +250,7 @@ class InteraceEndRecord(BiffRecord):
     _REC_ID = 0x00E2
 
     def __init__(self):
-        self._rec_data = ''
+        self._rec_data = b''
 
 
 class MMSRecord(BiffRecord):
@@ -273,7 +273,9 @@ class WriteAccessRecord(BiffRecord):
     def __init__(self, owner):
         uowner = owner[0:0x30]
         uowner_len = len(uowner)
-        self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner, ' '*(0x70 - uowner_len))
+        if isinstance(uowner, unicode_type):
+            uowner = uowner.encode('cp1252')  # cp1252 is a guess
+        self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner, b' '*(0x70 - uowner_len))
 
 
 class DSFRecord(BiffRecord):
@@ -513,7 +515,7 @@ class EOFRecord(BiffRecord):
     _REC_ID = 0x000A
 
     def __init__(self):
-        self._rec_data = ''
+        self._rec_data = b''
 
 
 class DateModeRecord(BiffRecord):
@@ -1305,7 +1307,7 @@ class Window2Record(BiffRecord):
         if scl_magn is not None:
             self._scl_rec = pack('<4H', 0x00A0, 4, scl_magn, 100)
         else:
-            self._scl_rec = ''
+            self._scl_rec = b''
 
     def get(self):
         return self.get_rec_header() + self._rec_data + self._scl_rec

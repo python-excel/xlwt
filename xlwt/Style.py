@@ -180,7 +180,7 @@ class StyleCollection(object):
 
 
     def get_biff_data(self):
-        result = ''
+        result = b''
         result += self._all_fonts()
         result += self._all_num_formats()
         result += self._all_cell_styles()
@@ -188,7 +188,7 @@ class StyleCollection(object):
         return result
 
     def _all_fonts(self):
-        result = ''
+        result = b''
         if self.style_compression:
             alist = self._font_x2id.items()
         else:
@@ -199,7 +199,7 @@ class StyleCollection(object):
         return result
 
     def _all_num_formats(self):
-        result = ''
+        result = b''
         alist = [
             (v, k)
             for k, v in self._num_formats.items()
@@ -211,7 +211,7 @@ class StyleCollection(object):
         return result
 
     def _all_cell_styles(self):
-        result = ''
+        result = b''
         for i in range(0, 16):
             result += XFRecord(self._default_xf, 'style').get()
         if self.style_compression == 2:
