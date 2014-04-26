@@ -4,6 +4,7 @@
 
 import re
 from .ExcelMagic import MAX_ROW, MAX_COL
+from .compat import xrange
 
 _re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)", re.IGNORECASE)
 _re_row_range = re.compile(r"\$?(\d+):\$?(\d+)")
