@@ -302,11 +302,11 @@ class MismatchedCharException(RecognitionException):
             if self.mismatchType == MismatchedCharException.NOT_RANGE:
                 sb.append("NOT ")
             sb.append("in range: ")
-            appendCharName(sb, self.expecting)
+            self.appendCharName(sb, self.expecting)
             sb.append("..")
-            appendCharName(sb, self.upper)
+            self.appendCharName(sb, self.upper)
             sb.append(", found ")
-            appendCharName(sb, self.foundChar)
+            self.appendCharName(sb, self.foundChar)
         elif self.mismatchType in [MismatchedCharException.SET, MismatchedCharException.NOT_SET]:
             sb.append("expecting ")
             if self.mismatchType == MismatchedCharException.NOT_SET:
@@ -419,9 +419,9 @@ class MismatchedTokenException(RecognitionException):
             if self.mismatchType == MismatchedTokenException.NOT_RANGE:
                 sb.append("NOT ")
             sb.append("in range: ")
-            appendTokenName(sb, self.expecting)
+            self.appendTokenName(sb, self.expecting)
             sb.append("..")
-            appendTokenName(sb, self.upper)
+            self.appendTokenName(sb, self.upper)
             sb.append(", found " + self.tokenText)
         elif self.mismatchType in [MismatchedTokenException.SET, MismatchedTokenException.NOT_SET]:
             sb.append("expecting ")
@@ -939,7 +939,7 @@ class TokenStreamSelector(TokenStream):
         while 1:
             try:
                 return self._input.nextToken()
-            except TokenStreamRetryException as r:
+            except TokenStreamRetryException:
                 ### just retry "forever"
                 pass
 
@@ -1383,9 +1383,6 @@ class CharScanner(TokenStream):
         print("CharScanner: panic: " + s)
         sys.exit(1)
 
-    def reportError(self,ex) :
-        print(ex)
-
     def reportError(self,s) :
         if not self.getFilename():
             print("error: " + str(s))
@@ -1528,8 +1525,7 @@ class CharScanner(TokenStream):
             self.commit();
             try:
                 func=args[0]
-                args=args[1:]
-                apply(func,args)
+                func(*args[1:])
             except RecognitionException as e:
                 ## catastrophic failure
                 self.reportError(e);
@@ -1684,7 +1680,7 @@ def illegalarg_ex(func):
        (func.func_name))
 
 def runtime_ex(func):
-    raise RuntimeException(
+    raise RuntimeError(
        "%s is only valid if parser is built for debugging" %
        (func.func_name))
 
@@ -1799,31 +1795,31 @@ class Parser(object):
 
     def addMessageListener(self, l):
         if not self.ignoreInvalidDebugCalls:
-            illegalarg_ex(addMessageListener)
+            illegalarg_ex(self.addMessageListener)
 
     def addParserListener(self,l) :
         if (not self.ignoreInvalidDebugCalls) :
-            illegalarg_ex(addParserListener)
+            illegalarg_ex(self.addParserListener)
 
     def addParserMatchListener(self, l) :
         if (not self.ignoreInvalidDebugCalls) :
-            illegalarg_ex(addParserMatchListener)
+            illegalarg_ex(self.addParserMatchListener)
 
     def addParserTokenListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            illegalarg_ex(addParserTokenListener)
+            illegalarg_ex(self.addParserTokenListener)
 
     def addSemanticPredicateListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            illegalarg_ex(addSemanticPredicateListener)
+            illegalarg_ex(self.addSemanticPredicateListener)
 
     def addSyntacticPredicateListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            illegalarg_ex(addSyntacticPredicateListener)
+            illegalarg_ex(self.addSyntacticPredicateListener)
 
     def addTraceListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            illegalarg_ex(addTraceListener)
+            illegalarg_ex(self.addTraceListener)
 
     def consume(self):
         raise NotImplementedError()
@@ -1904,37 +1900,37 @@ class Parser(object):
     def matchNot(self,t):
         if self.LA(1) == t:
             raise MismatchedTokenException(
-               tokenNames, self.LT(1), t, True, self.getFilename())
+               self.tokenNames, self.LT(1), t, True, self.getFilename())
         else:
             self.consume()
 
     def removeMessageListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(removeMessageListener)
+            runtime_ex(self.removeMessageListener)
 
     def removeParserListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(removeParserListener)
+            runtime_ex(self.removeParserListener)
 
     def removeParserMatchListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(removeParserMatchListener)
+            runtime_ex(self.removeParserMatchListener)
 
     def removeParserTokenListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(removeParserTokenListener)
+            runtime_ex(self.removeParserTokenListener)
 
     def removeSemanticPredicateListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(removeSemanticPredicateListener)
+            runtime_ex(self.removeSemanticPredicateListener)
 
     def removeSyntacticPredicateListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(removeSyntacticPredicateListener)
+            runtime_ex(self.removeSyntacticPredicateListener)
 
     def removeTraceListener(self, l) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(removeTraceListener)
+            runtime_ex(self.removeTraceListener)
 
     def reportError(self,x) :
         fmt = "syntax error:"
@@ -1953,9 +1949,9 @@ class Parser(object):
     def reportWarning(self,s):
         f = self.getFilename()
         if f:
-            print("%s:warning: %s" % (f,str(x)))
+            print("%s:warning: %s" % (f,str(s)))
         else:
-            print("warning: %s" % (str(x)))
+            print("warning: %s" % (str(s)))
 
     def rewind(self, pos) :
         self.inputState.input.rewind(pos)
@@ -1971,7 +1967,7 @@ class Parser(object):
 
     def setDebugMode(self, debugMode) :
         if (not self.ignoreInvalidDebugCalls):
-            runtime_ex(setDebugMode)
+            runtime_ex(self.setDebugMode)
 
     def setFilename(self, f) :
         self.inputState.filename = f
@@ -2143,7 +2139,7 @@ class TreeParser(object):
 
     def matchNot(self,t, ttype) :
         if not t or (t == ASTNULL) or (t.getType() == ttype):
-            raise MismatchedTokenException(getTokenNames(), t, ttype, True)
+            raise MismatchedTokenException(self.getTokenNames(), t, ttype, True)
 
     def reportError(self,ex):
         print("error:",ex, file=sys.stderr)
@@ -2280,10 +2276,7 @@ class AST(object):
     def getNumberOfChildren(self):
         return 0
 
-    def initialize(self, t, txt):
-        pass
-
-    def initialize(self, t):
+    def initialize(self, t, txt=None):
         pass
 
     def setFirstChild(self, c):
@@ -2475,15 +2468,15 @@ class BaseAST(AST):
         pass
 
     ### static
-    def setVerboseStringConversion(verbose,names):
-        verboseStringConversion = verbose
-        tokenNames = names
+    def setVerboseStringConversion(self, verbose,names):
+        self.verboseStringConversion = verbose
+        self.tokenNames = names
     setVerboseStringConversion = staticmethod(setVerboseStringConversion)
 
     ### Return an array of strings that maps token ID to it's text.
     ##  @since 2.7.3
-    def getTokenNames():
-        return tokenNames
+    def getTokenNames(self):
+        return self.tokenNames
 
     def toString(self):
         return self.getText()
@@ -2617,8 +2610,8 @@ class ASTPair(object):
         return tmp
 
     def toString(self):
-        r = ifelse(not root,"null",self.root.getText())
-        c = ifelse(not child,"null",self.child.getText())
+        r = ifelse(not self.root,"null",self.root.getText())
+        c = ifelse(not self.child,"null",self.child.getText())
         return "[%s,%s]" % (r,c)
 
     __str__ = toString
@@ -2770,13 +2763,13 @@ class ASTFactory(object):
     ### methods that have been moved to file scope - just listed
     ### here to be somewhat consistent with original API
     def dup(self,t):
-        return antlr.dup(t,self)
+        return dup(t,self)
 
     def dupList(self,t):
-        return antlr.dupList(t,self)
+        return dupList(t,self)
 
     def dupTree(self,t):
-        return antlr.dupTree(t,self)
+        return dupTree(t,self)
 
     ### methods moved to other classes
     ### 1. makeASTRoot  -> Parser
