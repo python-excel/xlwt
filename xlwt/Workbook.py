@@ -553,7 +553,7 @@ class Workbook(object):
         boundsheets_len = 0
         for sheet in self.__worksheets:
             boundsheets_len += len(BIFFRecords.BoundSheetRecord(
-                0x00L, sheet.visibility, sheet.name, self.encoding
+                0x00, sheet.visibility, sheet.name, self.encoding
                 ).get())
 
         start = data_len_before + boundsheets_len + data_len_after

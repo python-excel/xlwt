@@ -232,8 +232,8 @@ class Biff8BOFRecord(BiffRecord):
         version  = 0x0600
         build    = 0x0DBB
         year     = 0x07CC
-        file_hist_flags = 0x00L
-        ver_can_read    = 0x06L
+        file_hist_flags = 0x00
+        ver_can_read    = 0x06
 
         self._rec_data = pack('<4H2I', version, rec_type, build, year, file_hist_flags, ver_can_read)
 
@@ -1342,7 +1342,7 @@ class PanesRecord(BiffRecord):
     [9]         1           Not used (BIFF5-BIFF8 only, not written
                             in BIFF2-BIFF4)
 
-    If the panes are frozen, pane 0 is always active, regardless
+    If the panes are frozen, pane 0 is always active, regardless
     of the cursor position. The correct identifiers for all possible
     combinations of visible panes are shown in the following pictures.
 

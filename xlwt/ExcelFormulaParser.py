@@ -669,7 +669,7 @@ _tokenNames = [
 ### generate bit set
 def mk_tokenSet_0():
     ### var1
-    data = [ 37681618946L, 0L]
+    data = [ 37681618946, 0]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
 

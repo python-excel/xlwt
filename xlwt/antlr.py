@@ -1649,7 +1649,7 @@ class BitSet(object):
 
     def bitMask(self,bit):
         pos = bit & BitSet.MOD_MASK  ## bit mod BITS
-        return (1L << pos)
+        return (1 << pos)
 
     def set(self,bit,on=True):
         # grow bitset as required (use with care!)
@@ -1658,7 +1658,7 @@ class BitSet(object):
         if i>=len(self.data):
             d = i - len(self.data) + 1
             for x in xrange(0,d):
-                self.data.append(0L)
+                self.data.append(0)
             assert len(self.data) == i+1
         if on:
             self.data[i] |=  mask
