@@ -1,7 +1,7 @@
 # -*- coding: windows-1252 -*-
 
 from struct import unpack, pack
-import BIFFRecords
+from . import BIFFRecords
 
 class StrCell(object):
     __slots__ = ["rowx", "colx", "xf_idx", "sst_idx"]

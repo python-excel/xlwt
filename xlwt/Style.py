@@ -1,8 +1,8 @@
 from __future__ import print_function
 # -*- coding: windows-1252 -*-
 
-import Formatting
-from BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
+from . import Formatting
+from .BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
 
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
 

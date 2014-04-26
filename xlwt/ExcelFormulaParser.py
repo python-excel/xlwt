@@ -1,7 +1,7 @@
 ### $ANTLR 2.7.7 (20060930): "xlwt/excel-formula.g" -> "ExcelFormulaParser.py"$
 ### import antlr and other modules ..
 import sys
-import antlr
+from . import antlr
 
 version = sys.version.split()[0]
 if version < '2.2.1':
@@ -10,9 +10,9 @@ if version < '2.3':
     True = not False
 ### header action >>>
 import struct
-import Utils
-from UnicodeUtils import upack1
-from ExcelMagic import *
+from . import Utils
+from .UnicodeUtils import upack1
+from .ExcelMagic import *
 
 _RVAdelta =     {"R": 0, "V": 0x20, "A": 0x40}
 _RVAdeltaRef =  {"R": 0, "V": 0x20, "A": 0x40, "D": 0x20}

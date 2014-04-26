@@ -1,6 +1,6 @@
 # -*- coding: cp1252 -*-
 from struct import pack
-from UnicodeUtils import upack1, upack2, upack2rt
+from .UnicodeUtils import upack1, upack2, upack2rt
 
 class SharedStringTable(object):
     _SST_ID = 0x00FC

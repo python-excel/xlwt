@@ -34,9 +34,9 @@
             EOF
 '''
 
-import BIFFRecords
-import Bitmap
-import Style
+from . import BIFFRecords
+from . import Bitmap
+from . import Style
 import tempfile
 
 class Worksheet(object):
@@ -48,10 +48,10 @@ class Worksheet(object):
     ## Constructor
     #################################################################
     def __init__(self, sheetname, parent_book, cell_overwrite_ok=False):
-        import Row
+        from . import Row
         self.Row = Row.Row
 
-        import Column
+        from . import Column
         self.Column = Column.Column
 
         self.__name = sheetname

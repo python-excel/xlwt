@@ -1,8 +1,8 @@
 # -*- coding: windows-1252 -*-
 
-import ExcelFormulaParser, ExcelFormulaLexer
+from . import ExcelFormulaParser, ExcelFormulaLexer
 import struct
-from antlr import ANTLRException
+from .antlr import ANTLRException
 
 
 class Formula(object):

@@ -1,12 +1,12 @@
 # -*- coding: windows-1252 -*-
 
-import BIFFRecords
-import Style
-from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
+from . import BIFFRecords
+from . import Style
+from .Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
     _get_cells_biff_data_mul
-import ExcelFormula
+from . import ExcelFormula
 import datetime as dt
-from Formatting import Font
+from .Formatting import Font
 
 try:
     from decimal import Decimal
