@@ -1,6 +1,7 @@
 # -*- coding: windows-1252 -*-
 
 import struct
+from .compat import xrange
         
 # This implementation writes only 'Root Entry', 'Workbook' streams
 # and 2 empty streams for aligning directory stream on sector boundary

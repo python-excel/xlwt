@@ -2,6 +2,7 @@
 
 from struct import unpack, pack
 from . import BIFFRecords
+from .compat import xrange
 
 class StrCell(object):
     __slots__ = ["rowx", "colx", "xf_idx", "sst_idx"]
