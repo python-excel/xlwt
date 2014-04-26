@@ -1,3 +1,4 @@
+from __future__ import print_function
 # -*- coding: windows-1252 -*-
 
 from antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
@@ -121,6 +122,6 @@ class Lexer(TokenStream):
 if __name__ == '__main__':
     try:
         for t in Lexer(""" 1.23 456 "abcd" R2C2 a1 iv65536 true false if choose a_name 'qname' <> >= <= """):
-            print t
+            print(t)
     except TokenStreamException, e:
-        print "error:", e
+        print("error:", e)

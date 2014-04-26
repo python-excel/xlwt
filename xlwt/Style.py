@@ -1,3 +1,4 @@
+from __future__ import print_function
 # -*- coding: windows-1252 -*-
 
 import Formatting
@@ -691,7 +692,7 @@ def _parse_strg_to_obj(strg, obj, parse_dict,
                 orig = getattr(section_obj, k)
             except AttributeError:
                 raise EasyXFAuthorError('%s.%s in dictionary but not in supplied object' % (section, k))
-            if debug: print "+++ %s.%s = %r # %s; was %r" % (section, k, value, v, orig)
+            if debug: print("+++ %s.%s = %r # %s; was %r" % (section, k, value, v, orig))
             setattr(section_obj, k, value)
 
 def easyxf(strg_to_parse="", num_format_str=None,

@@ -1,3 +1,4 @@
+from __future__ import print_function
 ## This file is part of PyANTLR. See LICENSE.txt for license
 ## details..........Copyright (C) Wolfgang Haefelinger, 2004.
 
@@ -84,7 +85,7 @@ def version():
 
 def error(fmt,*args):
     if fmt:
-        print "error: ", fmt % tuple(args)
+        print("error: ", fmt % tuple(args))
 
 def ifelse(cond,_then,_else):
     if cond :
@@ -590,9 +591,9 @@ class Token(object):
 Token.badToken = Token( type=INVALID_TYPE, text="<no text>")
 
 if __name__ == "__main__":
-    print "testing .."
+    print("testing ..")
     T = Token.badToken
-    print T
+    print(T)
 
 ###xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx###
 ###                       CommonToken                              ###
@@ -663,16 +664,16 @@ class CommonToken(Token):
 
 if __name__ == '__main__' :
     T = CommonToken()
-    print T
+    print(T)
     T = CommonToken(col=15,line=1,text="some text", type=5)
-    print T
+    print(T)
     T = CommonToken()
     T.setLine(1).setColumn(15).setText("some text").setType(5)
-    print T
-    print T.getLine()
-    print T.getColumn()
-    print T.getText()
-    print T.getType()
+    print(T)
+    print(T.getLine())
+    print(T.getColumn())
+    print(T.getText())
+    print(T.getType())
 
 ###xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx###
 ###                    CommonHiddenStreamToken                     ###
@@ -1383,23 +1384,23 @@ class CharScanner(TokenStream):
         self.setColumn(nc)
 
     def panic(self,s='') :
-        print "CharScanner: panic: " + s
+        print("CharScanner: panic: " + s)
         sys.exit(1)
 
     def reportError(self,ex) :
-        print ex
+        print(ex)
 
     def reportError(self,s) :
         if not self.getFilename():
-            print "error: " + str(s)
+            print("error: " + str(s))
         else:
-            print self.getFilename() + ": error: " + str(s)
+            print(self.getFilename() + ": error: " + str(s))
 
     def reportWarning(self,s) :
         if not self.getFilename():
-            print "warning: " + str(s)
+            print("warning: " + str(s))
         else:
-            print self.getFilename() + ": warning: " + str(s)
+            print(self.getFilename() + ": warning: " + str(s))
 
     def resetText(self) :
         self.text.setLength(0)
@@ -1459,16 +1460,16 @@ class CharScanner(TokenStream):
         return c.__class__.lower()
 
     def traceIndent(self):
-        print ' ' * self.traceDepth
+        print(' ' * self.traceDepth)
 
     def traceIn(self,rname):
         self.traceDepth += 1
         self.traceIndent()
-        print "> lexer %s c== %s" % (rname,self.LA(1))
+        print("> lexer %s c== %s" % (rname,self.LA(1)))
 
     def traceOut(self,rname):
         self.traceIndent()
-        print "< lexer %s c== %s" % (rname,self.LA(1))
+        print("< lexer %s c== %s" % (rname,self.LA(1)))
         self.traceDepth -= 1
 
     def uponEOF(self):
@@ -1949,16 +1950,16 @@ class Parser(object):
             col  = x.getLine()
             text = x.getText()
             fmt  = fmt + 'unexpected symbol at line %s (column %s) : "%s"'
-            print >>sys.stderr, fmt % (line,col,text)
+            print(fmt % (line,col,text), file=sys.stderr)
         else:
-            print >>sys.stderr, fmt,str(x)
+            print(fmt,str(x), file=sys.stderr)
 
     def reportWarning(self,s):
         f = self.getFilename()
         if f:
-            print "%s:warning: %s" % (f,str(x))
+            print("%s:warning: %s" % (f,str(x)))
         else:
-            print "warning: %s" % (str(x))
+            print("warning: %s" % (str(x)))
 
     def rewind(self, pos) :
         self.inputState.input.rewind(pos)
@@ -1986,7 +1987,7 @@ class Parser(object):
         self.inputState.input = t
 
     def traceIndent(self):
-        print " " * self.traceDepth
+        print(" " * self.traceDepth)
 
     def traceIn(self,rname):
         self.traceDepth += 1
@@ -2075,12 +2076,12 @@ class LLkParser(Parser):
             self.k = 1
 
     def trace(self,ee,rname):
-        print type(self)
+        print(type(self))
         self.traceIndent()
         guess = ""
         if self.inputState.guessing > 0:
             guess = " [guessing]"
-        print(ee + rname + guess)
+        print((ee + rname + guess))
         for i in xrange(1,self.k+1):
             if i != 1:
                 print(", ")
@@ -2088,7 +2089,7 @@ class LLkParser(Parser):
                 v = self.LT(i).getText()
             else:
                 v = "null"
-            print "LA(%s) == %s" % (i,v)
+            print("LA(%s) == %s" % (i,v))
         print("\n")
 
     def traceIn(self,rname):
@@ -2149,10 +2150,10 @@ class TreeParser(object):
             raise MismatchedTokenException(getTokenNames(), t, ttype, True)
 
     def reportError(self,ex):
-        print >>sys.stderr,"error:",ex
+        print("error:",ex, file=sys.stderr)
 
     def  reportWarning(self, s):
-        print "warning:",s
+        print("warning:",s)
 
     def setASTFactory(self,f):
         self.astFactory = f
@@ -2164,20 +2165,20 @@ class TreeParser(object):
         self.astFactory.setASTNodeType(nodeType)
 
     def traceIndent(self):
-        print " " * self.traceDepth
+        print(" " * self.traceDepth)
 
     def traceIn(self,rname,t):
         self.traceDepth += 1
         self.traceIndent()
-        print("> " + rname + "(" +
+        print(("> " + rname + "(" +
               ifelse(t,str(t),"null") + ")" +
-              ifelse(self.inputState.guessing>0,"[guessing]",""))
+              ifelse(self.inputState.guessing>0,"[guessing]","")))
 
     def traceOut(self,rname,t):
         self.traceIndent()
-        print("< " + rname + "(" +
+        print(("< " + rname + "(" +
               ifelse(t,str(t),"null") + ")" +
-              ifelse(self.inputState.guessing>0,"[guessing]",""))
+              ifelse(self.inputState.guessing>0,"[guessing]","")))
         self.traceDepth -= 1
 
     ### wh: moved from ASTFactory to TreeParser
@@ -2724,7 +2725,7 @@ class ASTFactory(object):
 
     def error(self, e):
         import sys
-        print >> sys.stderr, e
+        print(e, file=sys.stderr)
 
     def setTokenTypeASTNodeType(self, tokenType, className):
         """
