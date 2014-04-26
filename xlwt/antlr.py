@@ -44,6 +44,7 @@ from __future__ import print_function
 ## get sys module
 import sys
 
+from .compat import long, basestring, int_types, xrange
 
 ###xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx###
 ###                     global symbols                             ###
@@ -1597,7 +1598,7 @@ class BitSet(object):
             raise TypeError("BitSet requires integer, long, or " +
                             "list argument")
         for x in data:
-            if not isinstance(x,long):
+            if not isinstance(x, int_types):
                 raise TypeError(self,"List argument item is " +
                                 "not a long: %s" % (x))
         self.data = data
