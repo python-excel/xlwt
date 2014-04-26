@@ -49,11 +49,11 @@ class Worksheet(object):
     ## Constructor
     #################################################################
     def __init__(self, sheetname, parent_book, cell_overwrite_ok=False):
-        from . import Row
-        self.Row = Row.Row
+        from .Row import Row
+        self.Row = Row
 
-        from . import Column
-        self.Column = Column.Column
+        from .Column import Column
+        self.Column = Column
 
         self.__name = sheetname
         self.__parent = parent_book

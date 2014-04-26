@@ -339,7 +339,8 @@ class Workbook(object):
         return self.__sst.rt_index(rt)
 
     def add_sheet(self, sheetname, cell_overwrite_ok=False):
-        from . import Worksheet, Utils
+        from . import Utils
+        from .Worksheet import Worksheet
         if not isinstance(sheetname, unicode_type):
             sheetname = sheetname.decode(self.encoding)
         if not Utils.valid_sheet_name(sheetname):
@@ -348,7 +349,7 @@ class Workbook(object):
         if lower_name in self.__worksheet_idx_from_name:
             raise Exception("duplicate worksheet name %r" % sheetname)
         self.__worksheet_idx_from_name[lower_name] = len(self.__worksheets)
-        self.__worksheets.append(Worksheet.Worksheet(sheetname, self, cell_overwrite_ok))
+        self.__worksheets.append(Worksheet(sheetname, self, cell_overwrite_ok))
         return self.__worksheets[-1]
 
     def get_sheet(self, sheetnum):
