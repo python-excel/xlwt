@@ -7,7 +7,7 @@ from .Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, Boo
 from . import ExcelFormula
 import datetime as dt
 from .Formatting import Font
-from .compat import basestring, xrange, int_types
+from .compat import basestring, xrange, int_types, iteritems
 
 try:
     from decimal import Decimal
@@ -170,7 +170,7 @@ class Row(object):
             self.insert_cell(col_index, None)
 
     def get_cells_biff_data(self):
-        cell_items = [item for item in self.__cells.iteritems() if item[1] is not None]
+        cell_items = [item for item in iteritems(self.__cells) if item[1] is not None]
         cell_items.sort() # in column order
         return _get_cells_biff_data_mul(self.__idx, cell_items)
         # previously:

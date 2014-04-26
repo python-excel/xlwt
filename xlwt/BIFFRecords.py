@@ -1,7 +1,7 @@
 # -*- coding: cp1252 -*-
 from struct import pack
 from .UnicodeUtils import upack1, upack2, upack2rt
-from .compat import basestring, unicode, unicode_type, xrange
+from .compat import basestring, unicode, unicode_type, xrange, iteritems
 
 class SharedStringTable(object):
     _SST_ID = 0x00FC
@@ -67,8 +67,8 @@ class SharedStringTable(object):
         self._sst_record = ''
         self._continues = [None, None]
         self._current_piece = pack('<II', 0, 0)
-        data = [(idx, s) for s, idx in self._str_indexes.iteritems()]
-        data.extend([(idx, s) for s, idx in self._rt_indexes.iteritems()])
+        data = [(idx, s) for s, idx in iteritems(self._str_indexes)]
+        data.extend([(idx, s) for s, idx in iteritems(self._rt_indexes)])
         data.sort() # in index order
         for idx, s in data:
             if self._tally[idx] == 0:

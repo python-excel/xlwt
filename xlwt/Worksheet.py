@@ -37,7 +37,7 @@
 from . import BIFFRecords
 from . import Bitmap
 from . import Style
-from .compat import unicode
+from .compat import unicode, itervalues
 import tempfile
 
 class Worksheet(object):
@@ -1244,7 +1244,7 @@ class Worksheet(object):
 
     def __row_blocks_rec(self):
         result = []
-        for row in self.__rows.itervalues():
+        for row in itervalues(self.__rows):
             result.append(row.get_row_biff_data())
             result.append(row.get_cells_biff_data())
         return ''.join(result)
