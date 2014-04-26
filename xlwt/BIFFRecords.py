@@ -1199,7 +1199,7 @@ class ExtSSTRecord(BiffRecord):
         portion_counter = 0
         while str_counter < len(str_placement):
             str_chunk_num, pos_in_chunk = str_placement[str_counter]
-            if str_chunk_num <> portion_counter:
+            if str_chunk_num != portion_counter:
                 portion_counter = str_chunk_num
                 abs_stream_pos += portions_len[portion_counter-1]
                 #print hex(abs_stream_pos)
