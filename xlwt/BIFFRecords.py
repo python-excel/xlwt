@@ -1,6 +1,7 @@
 # -*- coding: cp1252 -*-
 from struct import pack
 from .UnicodeUtils import upack1, upack2, upack2rt
+from .compat import basestring, unicode, unicode_type
 
 class SharedStringTable(object):
     _SST_ID = 0x00FC
@@ -20,7 +21,7 @@ class SharedStringTable(object):
         self._current_piece = None
 
     def add_str(self, s):
-        if self.encoding != 'ascii' and not isinstance(s, unicode):
+        if self.encoding != 'ascii' and not isinstance(s, unicode_type):
             s = unicode(s, self.encoding)
         self._add_calls += 1
         if s not in self._str_indexes:
@@ -35,7 +36,7 @@ class SharedStringTable(object):
     def add_rt(self, rt):
         rtList = []
         for s, xf in rt:
-            if self.encoding != 'ascii' and not isinstance(s, unicode):
+            if self.encoding != 'ascii' and not isinstance(s, unicode_type):
                 s = unicode(s, self.encoding)
             rtList.append((s, xf))
         rt = tuple(rtList)
@@ -72,7 +73,7 @@ class SharedStringTable(object):
         for idx, s in data:
             if self._tally[idx] == 0:
                 s = u''
-            if isinstance(s, str) or isinstance(s, unicode):
+            if isinstance(s, basestring):
                 self._add_to_sst(s)
             else:
                 self._add_rt_to_sst(s)

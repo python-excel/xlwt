@@ -42,6 +42,7 @@ Record Order in BIFF8
 
 from . import BIFFRecords
 from . import Style
+from .compat import unicode_type
 
 class Workbook(object):
 
@@ -339,7 +340,7 @@ class Workbook(object):
 
     def add_sheet(self, sheetname, cell_overwrite_ok=False):
         from . import Worksheet, Utils
-        if not isinstance(sheetname, unicode):
+        if not isinstance(sheetname, unicode_type):
             sheetname = sheetname.decode(self.encoding)
         if not Utils.valid_sheet_name(sheetname):
             raise Exception("invalid worksheet name %r" % sheetname)
@@ -430,7 +431,7 @@ class Workbook(object):
                 self.setup_xcall()
             # print funcname, self._supbook_xref
             patches.append((offset, self._xcall_supbook_ref))
-            if not isinstance(funcname, unicode):
+            if not isinstance(funcname, unicode_type):
                 funcname = funcname.decode(self.encoding)
             if funcname in self._xcall_xref:
                 idx = self._xcall_xref[funcname]

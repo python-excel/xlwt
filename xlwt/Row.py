@@ -7,6 +7,7 @@ from .Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, Boo
 from . import ExcelFormula
 import datetime as dt
 from .Formatting import Font
+from .compat import basestring
 
 try:
     from decimal import Decimal

@@ -37,6 +37,7 @@
 from . import BIFFRecords
 from . import Bitmap
 from . import Style
+from .compat import unicode
 import tempfile
 
 class Worksheet(object):
