@@ -520,7 +520,7 @@ class Parser(antlr.LLkParser):
                 arg_count=self.expr_list(arg_type_list, min_argc, max_argc)
                 self.match(RP)
                 if arg_count > max_argc or arg_count < min_argc:
-                   raise Exception, "%d parameters for function: %s" % (arg_count, func_tok.text)
+                   raise Exception("%d parameters for function: %s" % (arg_count, func_tok.text))
                 if xcall:
                    func_ptg = ptgFuncVarR + _RVAdelta[func_type]
                    self.rpn += struct.pack("<2BH", func_ptg, arg_count + 1, 255) # 255 is magic XCALL function

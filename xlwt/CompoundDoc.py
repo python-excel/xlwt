@@ -268,7 +268,7 @@ class XlsDoc:
         # The fallback is to write the stream in 4 MB chunks.
         try:
             f.write(stream)
-        except IOError, e:
+        except IOError as e:
             if e.errno != 22: # "Invalid argument" i.e. 'stream' is too big
                 raise # some other problem
             chunk_size = 4 * 1024 * 1024

@@ -22,7 +22,7 @@ for n in sorted(ExcelMagic.std_func_by_name):
     text = n + "($A$1)"
     try:
         formula = Formula(text)
-    except FormulaParseException,e:
+    except FormulaParseException as e:
         print("Could not parse %r: %s" % (text,e.args[0]))
         fail_count += 1
     else:

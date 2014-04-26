@@ -853,7 +853,7 @@ class CharBuffer(InputBuffer):
 
                 ### use unicode chars instead of ASCII ..
                 self.queue.append(c)
-        except Exception,e:
+        except Exception as e:
             raise CharStreamIOException(e)
         ##except: # (mk) Cannot happen ...
             ##error ("unexpected exception caught ..")
@@ -943,7 +943,7 @@ class TokenStreamSelector(TokenStream):
         while 1:
             try:
                 return self._input.nextToken()
-            except TokenStreamRetryException,r:
+            except TokenStreamRetryException as r:
                 ### just retry "forever"
                 pass
 
@@ -1534,7 +1534,7 @@ class CharScanner(TokenStream):
                 func=args[0]
                 args=args[1:]
                 apply(func,args)
-            except RecognitionException, e:
+            except RecognitionException as e:
                 ## catastrophic failure
                 self.reportError(e);
                 self.consume();

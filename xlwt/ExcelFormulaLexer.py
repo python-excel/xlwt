@@ -123,5 +123,5 @@ if __name__ == '__main__':
     try:
         for t in Lexer(""" 1.23 456 "abcd" R2C2 a1 iv65536 true false if choose a_name 'qname' <> >= <= """):
             print(t)
-    except TokenStreamException, e:
+    except TokenStreamException as e:
         print("error:", e)
