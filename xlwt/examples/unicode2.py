@@ -15,7 +15,13 @@ style.font = fnt
 
 unichr = chr if PY3 else unichr
 
-for i in range(0x10000):
+for i in range(0xD800):
+    ws1.write(i//0x10, i%0x10, unichr(i), style)
+
+for i in range(0xD800, 0xE000):
+    ws1.write(i//0x10, i%0x10, "Surrogate", style)
+
+for i in range(0xE000, 0x10000):
     ws1.write(i//0x10, i%0x10, unichr(i), style)
 
 w.save('unicode2.xls')
