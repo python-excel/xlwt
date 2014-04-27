@@ -200,7 +200,7 @@ def _process_bitmap(bitmap):
     if len(data) <= 0x36:
         raise Exception("bitmap doesn't contain enough data.")
     # The first 2 bytes are used to identify the bitmap.
-    if (data[:2] != "BM"):
+    if (data[:2] != b"BM"):
         raise Exception("bitmap doesn't appear to to be a valid bitmap image.")
     # Remove bitmap data: ID.
     data = data[2:]
