@@ -13,22 +13,22 @@ ws5 = w.add_sheet('sheet 5')
 ws6 = w.add_sheet('sheet 6')
 
 for i in range(0x100):
-    ws1.write(i/0x10, i%0x10, i)
+    ws1.write(i//0x10, i%0x10, i)
 
 for i in range(0x100):
-    ws2.write(i/0x10, i%0x10, i)
+    ws2.write(i//0x10, i%0x10, i)
 
 for i in range(0x100):
-    ws3.write(i/0x10, i%0x10, i)
+    ws3.write(i//0x10, i%0x10, i)
 
 for i in range(0x100):
-    ws4.write(i/0x10, i%0x10, i)
+    ws4.write(i//0x10, i%0x10, i)
 
 for i in range(0x100):
-    ws5.write(i/0x10, i%0x10, i)
+    ws5.write(i//0x10, i%0x10, i)
 
 for i in range(0x100):
-    ws6.write(i/0x10, i%0x10, i)
+    ws6.write(i//0x10, i%0x10, i)
 
 ws1.panes_frozen = True
 ws1.horz_split_pos = 2
