@@ -91,7 +91,7 @@ class SharedStringTable(object):
     def _add_to_sst(self, s):
         u_str = upack2(s, self.encoding)
 
-        is_unicode_str = u_str[2] == '\x01'
+        is_unicode_str = u_str[2] == b'\x01'
         if is_unicode_str:
             atom_len = 5 # 2 byte -- len,
                          # 1 byte -- options,
@@ -106,7 +106,7 @@ class SharedStringTable(object):
 	
     def _add_rt_to_sst(self, rt):
         rt_str, rt_fr = upack2rt(rt, self.encoding)
-        is_unicode_str = rt_str[2] == '\x09'
+        is_unicode_str = rt_str[2] == b'\x09'
         if is_unicode_str:
             atom_len = 7 # 2 byte -- len,
                          # 1 byte -- options,
@@ -159,9 +159,9 @@ class SharedStringTable(object):
             if need_more_space:
                 self._new_piece()
                 if is_unicode_str:
-                    self._current_piece += '\x01'
+                    self._current_piece += b'\x01'
                 else:
-                    self._current_piece += '\x00'
+                    self._current_piece += b'\x00'
 
             i += atom_len
 
@@ -1494,7 +1494,7 @@ class MergedCellsRecord(BiffRecord):
         i = len(merged_list) - 1
         while i >= 0:
             j = 0
-            merged = ''
+            merged = b''
             while (i >= 0) and (j < 0x403):
                 r1, r2, c1, c2 = merged_list[i]
                 merged += pack('<4H', r1, r2, c1, c2)
