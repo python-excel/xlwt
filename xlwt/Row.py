@@ -38,7 +38,7 @@ class Row(object):
                  "space_below"]
 
     def __init__(self, rowx, parent_sheet):
-        if not (isinstance(rowx, (int, long)) and 0 <= rowx <= 65535):
+        if not (isinstance(rowx, (int, long)) and 0 <= rowx <= 1048575):
             raise ValueError("row index was %r, not allowed by .xls format" % rowx)
         self.__idx = rowx
         self.__parent = parent_sheet
@@ -74,8 +74,8 @@ class Row(object):
     def __adjust_bound_col_idx(self, *args):
         for arg in args:
             iarg = int(arg)
-            if not ((0 <= iarg <= 255) and arg == iarg):
-                raise ValueError("column index (%r) not an int in range(256)" % arg)
+            if not ((0 <= iarg <= 16383) and arg == iarg):
+                raise ValueError("column index (%r) not an int in range(16384)" % arg)
             sheet = self.__parent
             if iarg < self.__min_col_idx:
                 self.__min_col_idx = iarg
@@ -86,7 +86,7 @@ class Row(object):
             if iarg > sheet.last_used_col:
                 sheet.last_used_col = iarg
 
-    def __excel_date_dt(self, date): 
+    def __excel_date_dt(self, date):
         adj = False
         if isinstance(date, dt.date):
             if self.__parent_wb.dates_1904:
@@ -102,11 +102,11 @@ class Row(object):
             date = dt.datetime.combine(dt.datetime(1900, 1, 1), date)
             epoch = dt.datetime(1900, 1, 1)
         delta = date - epoch
-        xldate = delta.days + delta.seconds / 86400.0                      
+        xldate = delta.days + delta.seconds / 86400.0
         # Add a day for Excel's missing leap day in 1900
         if adj and xldate > 59:
             xldate += 1
-        return xldate    
+        return xldate
 
     def get_height_in_pixels(self):
         return self.__height_in_pixels
@@ -191,7 +191,7 @@ class Row(object):
         self.insert_cell(colx, BlankCell(self.__idx, colx, xf_index))
 
     def set_cell_mulblanks(self, first_colx, last_colx, style=Style.default_style):
-        assert 0 <= first_colx <= last_colx <= 255
+        assert 0 <= first_colx <= last_colx <= 16383
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(first_colx, last_colx)
         xf_index = self.__parent_wb.add_style(style)
@@ -268,7 +268,7 @@ class Row(object):
     def __rich_text_helper(self, col, rich_text_list, style, style_index=None):
         if style_index is None:
             style_index = self.__parent_wb.add_style(style)
-        default_font = None    
+        default_font = None
         rt = []
         for data in rich_text_list:
             if isinstance(data, basestring):

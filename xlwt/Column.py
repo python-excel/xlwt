@@ -4,8 +4,8 @@ from BIFFRecords import ColInfoRecord
 
 class Column(object):
     def __init__(self, colx, parent_sheet):
-        if not(isinstance(colx, int) and 0 <= colx <= 255):
-            raise ValueError("column index (%r) not an int in range(256)" % colx)
+        if not(isinstance(colx, int) and 0 <= colx <= 16383):
+            raise ValueError("column index (%r) not an int in range(16384)" % colx)
         self._index = colx
         self._parent = parent_sheet
         self._parent_wb = parent_sheet.get_parent()
@@ -18,7 +18,7 @@ class Column(object):
         self.user_set = 0
         self.best_fit = 0
         self.unused = 0
-        
+
     def set_width(self, width):
         if not(isinstance(width, int) and 0 <= width <= 65535):
             raise ValueError("column width (%r) not an int in range(65536)" % width)

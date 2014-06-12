@@ -33,10 +33,10 @@ Offset  Size    Contents
                                1 = Contains Rich-Text settings
 [2 or 3] 2      (optional, only if richtext=1) Number of Rich-Text formatting runs (rt)
 [var.]   4      (optional, only if phonetic=1) Size of Asian phonetic settings block (in bytes, sz)
-var.     ln or 
+var.     ln or
          2·ln   Character array (8-bit characters or 16-bit characters, dependent on ccompr)
-[var.]   4·rt   (optional, only if richtext=1) List of rt formatting runs 
-[var.]   sz     (optional, only if phonetic=1) Asian Phonetic Settings Block 
+[var.]   4·rt   (optional, only if richtext=1) List of rt formatting runs
+[var.]   sz     (optional, only if phonetic=1) Asian Phonetic Settings Block
 '''
 
 
@@ -52,6 +52,7 @@ def upack2(s, encoding='ascii'):
     # (not on number of bytes in packed result)
     len_us = len(us)
     if len_us > 32767:
+        __traceback_info__ = us
         raise Exception('String longer than 32767 characters')
     try:
         encs = us.encode('latin1')
@@ -65,7 +66,7 @@ def upack2(s, encoding='ascii'):
         n_items = len(encs) // 2
         # n_items is the number of "double byte characters" i.e. MS C wchars
         # Can't use len(us).
-        # len(u"\U0001D400") -> 1 on a wide-unicode build 
+        # len(u"\U0001D400") -> 1 on a wide-unicode build
         # and 2 on a narrow-unicode build.
         # We need n_items == 2 in this case.
     return pack('<HB', n_items, flag) + encs
@@ -83,9 +84,9 @@ def upack2rt(rt, encoding='ascii'):
         if fontx is not None:
             # code in Rows.py ensures that
             # fontx can be None only for the first piece
-            fr += pack('<HH', offset, fontx)        
+            fr += pack('<HH', offset, fontx)
         # offset is the number of MS C wchar characters.
-        # That is 1 if c <= u'\uFFFF' else 2 
+        # That is 1 if c <= u'\uFFFF' else 2
         offset += len(s.encode('utf_16_le')) // 2
     num_fr = len(fr) // 4 # ensure result is int
     if offset > 32767:
@@ -118,5 +119,5 @@ def upack1(s, encoding='ascii'):
     except UnicodeEncodeError:
         encs = us.encode('utf_16_le')
         flag = 1
-        n_items = len(encs) // 2 
+        n_items = len(encs) // 2
     return pack('<BB', n_items, flag) + encs

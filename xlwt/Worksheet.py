@@ -43,7 +43,7 @@ class Worksheet(object):
 
     # a safe default value, 3 is always valid!
     active_pane = 3
-    
+
     #################################################################
     ## Constructor
     #################################################################
@@ -121,7 +121,7 @@ class Worksheet(object):
         #     xlwt_worksheet.split_position_units_are_twips = True
         # because that's what's actually in the file.
 
-		# There are 20 twips to a point. There are 72 points to an inch.
+    # There are 20 twips to a point. There are 72 points to an inch.
 
         self.__row_gut_width = 0
         self.__col_gut_height = 0
@@ -190,9 +190,9 @@ class Worksheet(object):
         self.__password = ''
 
         self.last_used_row = 0
-        self.first_used_row = 65535
+        self.first_used_row = 1048575
         self.last_used_col = 0
-        self.first_used_col = 255
+        self.first_used_col = 16383
         self.row_tempfile = None
         self.__flushed_rows = {}
         self.__row_visible_levels = 0
@@ -1051,8 +1051,8 @@ class Worksheet(object):
         self.__merged_ranges.append((r1, r2, c1, c2))
 
     def write_merge(self, r1, r2, c1, c2, label="", style=Style.default_style):
-        assert 0 <= c1 <= c2 <= 255
-        assert 0 <= r1 <= r2 <= 65535
+        assert 0 <= c1 <= c2 <= 16383
+        assert 0 <= r1 <= r2 <= 1048575
         self.write(r1, c1, label, style)
         if c2 > c1:
             self.row(r1).write_blanks(c1 + 1, c2,  style) # skip (r1, c1)
