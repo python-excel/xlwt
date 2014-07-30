@@ -375,6 +375,18 @@ class Workbook(object):
 
     def get_sheet(self, sheetnum):
         return self.__worksheets[sheetnum]
+    
+    def sheet_index(self, sheetname):
+        try:
+            sheetnum = self.__worksheet_idx_from_name[sheetname.lower()] 
+        except KeyError:
+            self.raise_bad_sheetname(sheetname)
+            
+        return sheetnum
+                    
+    def get_sheet_by_name(self, sheetname):
+        sheetnum = self.sheet_index(sheetname)
+        return self.get_sheet(sheetnum)        
 
     def raise_bad_sheetname(self, sheetname):
         raise Exception("Formula: unknown sheet name %s" % sheetname)
