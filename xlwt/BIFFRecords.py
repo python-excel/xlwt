@@ -170,13 +170,6 @@ class BiffRecord(object):
 
     _rec_data = b'' # class attribute; child classes need to set this.
 
-    # Sheer waste.
-    # def __init__(self):
-    #     self._rec_data = ''
-
-    def get_rec_id(self):
-        return self._REC_ID
-
     def get_rec_header(self):
         return pack('<2H', self._REC_ID, len(self._rec_data))
 
