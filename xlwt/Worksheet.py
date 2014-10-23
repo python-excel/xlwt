@@ -37,6 +37,8 @@
 from . import BIFFRecords
 from . import Bitmap
 from . import Style
+from .Row import Row
+from .Column import Column
 from .compat import unicode, itervalues
 import tempfile
 
@@ -49,10 +51,7 @@ class Worksheet(object):
     ## Constructor
     #################################################################
     def __init__(self, sheetname, parent_book, cell_overwrite_ok=False):
-        from .Row import Row
         self.Row = Row
-
-        from .Column import Column
         self.Column = Column
 
         self.__name = sheetname
