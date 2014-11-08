@@ -267,7 +267,7 @@ class WriteAccessRecord(BiffRecord):
         uowner = owner[0:0x30]
         uowner_len = len(uowner)
         if isinstance(uowner, unicode_type):
-            uowner = uowner.encode('cp1252')  # cp1252 is a guess
+            uowner = uowner.encode('ascii')  # probably not ascii, but play it safe until we know more
         self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner, b' '*(0x70 - uowner_len))
 
 
