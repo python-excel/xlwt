@@ -2276,7 +2276,7 @@ class AST(object):
     def getNumberOfChildren(self):
         return 0
 
-    def initialize(self, t, txt=None):
+    def initialize(self, t):
         pass
 
     def setFirstChild(self, c):
@@ -2468,15 +2468,15 @@ class BaseAST(AST):
         pass
 
     ### static
-    def setVerboseStringConversion(self, verbose,names):
-        self.verboseStringConversion = verbose
-        self.tokenNames = names
+    def setVerboseStringConversion(verbose,names):
+        verboseStringConversion = verbose
+        tokenNames = names
     setVerboseStringConversion = staticmethod(setVerboseStringConversion)
 
     ### Return an array of strings that maps token ID to it's text.
     ##  @since 2.7.3
-    def getTokenNames(self):
-        return self.tokenNames
+    def getTokenNames():
+        return tokenNames
 
     def toString(self):
         return self.getText()
@@ -2610,8 +2610,8 @@ class ASTPair(object):
         return tmp
 
     def toString(self):
-        r = ifelse(not self.root,"null",self.root.getText())
-        c = ifelse(not self.child,"null",self.child.getText())
+        r = ifelse(not root,"null",self.root.getText())
+        c = ifelse(not child,"null",self.child.getText())
         return "[%s,%s]" % (r,c)
 
     __str__ = toString
