@@ -8,14 +8,14 @@ def cellname(rowx, colx):
 
 def RK_pack_check(num, anint, case=None):
     if not(-0x7fffffff - 1 <= anint <= 0x7fffffff):
-        print "RK_pack_check: not a signed 32-bit int: %r (%r); case: %r" \
-            % (anint, hex(anint), case)
+        print("RK_pack_check: not a signed 32-bit int: %r (%r); case: %r" \
+            % (anint, hex(anint), case))
     pstr = pack("<i", anint)
     actual = unpack_RK(pstr)
     if actual != num:
-        print "RK_pack_check: round trip failure: %r (%r); case %r;  %r in, %r out" \
-            % (anint, hex(anint), case, num, actual)
- 
+        print("RK_pack_check: round trip failure: %r (%r); case %r;  %r in, %r out" \
+            % (anint, hex(anint), case, num, actual))
+
 
 def RK_encode(num, blah=0):
     """\
@@ -25,12 +25,12 @@ def RK_encode(num, blah=0):
     rk_encoded = 0
     packed = pack('<d', num)
 
-    if blah: print
-    if blah: print repr(num)
+    if blah: print()
+    if blah: print(repr(num))
     w01, w23 = unpack('<2i', packed)
     if not w01 and not(w23 & 3):
         # 34 lsb are 0
-        if blah: print "float RK", w23, hex(w23)
+        if blah: print("float RK", w23, hex(w23))
         return RK_pack_check(num, w23, 0)
         # return RKRecord(
         #    self.__parent.get_index(), self.__idx, self.__xf_idx, w23).get()
@@ -38,9 +38,9 @@ def RK_encode(num, blah=0):
     if -0x20000000 <= num < 0x20000000:
         inum = int(num)
         if inum == num:
-            if blah: print "30-bit integer RK", inum, hex(inum)
+            if blah: print("30-bit integer RK", inum, hex(inum))
             rk_encoded = 2 | (inum << 2)
-            if blah: print "rk", rk_encoded, hex(rk_encoded)
+            if blah: print("rk", rk_encoded, hex(rk_encoded))
             return RK_pack_check(num, rk_encoded, 2)
             # return RKRecord(
             #     self.__parent.get_index(), self.__idx, self.__xf_idx, rk_encoded).get()
@@ -50,22 +50,22 @@ def RK_encode(num, blah=0):
     w01, w23 = unpack('<2i', packed100)
     if not w01 and not(w23 & 3):
         # 34 lsb are 0
-        if blah: print "float RK*100", w23, hex(w23)
+        if blah: print("float RK*100", w23, hex(w23))
         return RK_pack_check(num, w23 | 1, 1)
         # return RKRecord(
         #    self.__parent.get_index(), self.__idx, self.__xf_idx, w23 | 1).get()
 
     if -0x20000000 <= temp < 0x20000000:
         itemp = int(round(temp, 0))
-        if blah: print (itemp == temp), (itemp / 100.0 == num)
+        if blah: print((itemp == temp), (itemp / 100.0 == num))
         if itemp / 100.0 == num:
-            if blah: print "30-bit integer RK*100", itemp, hex(itemp)
+            if blah: print("30-bit integer RK*100", itemp, hex(itemp))
             rk_encoded = 3 | (itemp << 2)
             return RK_pack_check(num, rk_encoded, 3)
             # return RKRecord(
             #    self.__parent.get_index(), self.__idx, self.__xf_idx, rk_encoded).get()
 
-    if blah: print "Number" 
+    if blah: print("Number" )
     # return NumberRecord(
     #    self.__parent.get_index(), self.__idx, self.__xf_idx, num).get()
 
