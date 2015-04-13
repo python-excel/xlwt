@@ -49,7 +49,7 @@ class Workbook(object):
     #################################################################
     ## Constructor
     #################################################################
-    def __init__(self, encoding='ascii', style_compression=0):
+    def __init__(self, encoding='ascii', style_compression=0, default_style=None):
         self.encoding = encoding
         self.__owner = 'None'
         self.__country_code = None # 0x07 is Russia :-)
@@ -75,7 +75,7 @@ class Workbook(object):
         self.__vscroll_visible = 1
         self.__tabs_visible = 1
 
-        self.__styles = Style.StyleCollection(style_compression)
+        self.__styles = Style.StyleCollection(style_compression, default_style=default_style)
 
         self.__dates_1904 = 0
         self.__use_cell_values = 1

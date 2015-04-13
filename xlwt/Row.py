@@ -231,7 +231,8 @@ class Row(object):
         xf_index = self.__parent_wb.add_style(style)
         self.insert_cell(colx, ErrorCell(self.__idx, colx, xf_index, error_string_or_code))
 
-    def write(self, col, label, style=Style.default_style):
+    def write(self, col, label, style=None):
+        style = style or self.__parent_wb.default_style
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
         style_index = self.__parent_wb.add_style(style)

@@ -59,7 +59,7 @@ class StyleCollection(object):
             '@'
     ]
 
-    def __init__(self, style_compression=0):
+    def __init__(self, style_compression=0, default_style=None):
         self.style_compression = style_compression
         self.stats = [0, 0, 0, 0, 0, 0]
         self._font_id2x = {}
@@ -83,7 +83,7 @@ class StyleCollection(object):
         for fmtidx, fmtstr in zip(range(37, 50), StyleCollection._std_num_fmt_list[23:]):
             self._num_formats[fmtstr] = fmtidx
 
-        self.default_style = XFStyle()
+        self.default_style = default_style or XFStyle()
         self._default_xf = self._add_style(self.default_style)[0]
 
     def add(self, style):
