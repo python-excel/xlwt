@@ -1,5 +1,17 @@
 language: python
-python:
-  - "2.7"
-# command to run tests, e.g. python setup.py test
-script: nosetests
+
+sudo: false
+env:
+  - TOXENV=py27
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=pypy
+
+install:
+  - travis_retry pip install tox coveralls
+
+script:
+  - tox
+
+after_success:
+  - coveralls

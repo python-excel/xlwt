@@ -1,6 +1,7 @@
 # -*- coding: windows-1252 -*-
 
 import struct
+from .compat import xrange
         
 # This implementation writes only 'Root Entry', 'Workbook' streams
 # and 2 empty streams for aligning directory stream on sector boundary
@@ -41,11 +42,11 @@ class XlsDoc:
         self.header = ''
 
     def _build_directory(self): # align on sector boundary
-        self.dir_stream = ''
+        self.dir_stream = b''
 
-        dentry_name      = '\x00'.join('Root Entry\x00') + '\x00'
+        dentry_name      = u'Root Entry\x00'.encode('utf-16-le')
         dentry_name_sz   = len(dentry_name)
-        dentry_name_pad  = '\x00'*(64 - dentry_name_sz)
+        dentry_name_pad  = b'\x00'*(64 - dentry_name_sz)
         dentry_type      = 0x05 # root storage
         dentry_colour    = 0x01 # black
         dentry_did_left  = -1
@@ -68,9 +69,9 @@ class XlsDoc:
            0
         )
 
-        dentry_name      = '\x00'.join('Workbook\x00') + '\x00'
+        dentry_name      = u'Workbook\x00'.encode('utf-16-le')
         dentry_name_sz   = len(dentry_name)
-        dentry_name_pad  = '\x00'*(64 - dentry_name_sz)
+        dentry_name_pad  = b'\x00'*(64 - dentry_name_sz)
         dentry_type      = 0x02 # user stream
         dentry_colour    = 0x01 # black
         dentry_did_left  = -1
@@ -94,9 +95,9 @@ class XlsDoc:
         )
         
         # padding
-        dentry_name      = ''
+        dentry_name      = b''
         dentry_name_sz   = len(dentry_name)
-        dentry_name_pad  = '\x00'*(64 - dentry_name_sz)
+        dentry_name_pad  = b'\x00'*(64 - dentry_name_sz)
         dentry_type      = 0x00 # empty
         dentry_colour    = 0x01 # black
         dentry_did_left  = -1
@@ -205,17 +206,17 @@ class XlsDoc:
 
 
     def _build_header(self):
-        doc_magic             = '\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'
-        file_uid              = '\x00'*16
-        rev_num               = '\x3E\x00'
-        ver_num               = '\x03\x00'
-        byte_order            = '\xFE\xFF'
+        doc_magic             = b'\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'
+        file_uid              = b'\x00'*16
+        rev_num               = b'\x3E\x00'
+        ver_num               = b'\x03\x00'
+        byte_order            = b'\xFE\xFF'
         log_sect_size         = struct.pack('<H', 9)
         log_short_sect_size   = struct.pack('<H', 6)
-        not_used0             = '\x00'*10
+        not_used0             = b'\x00'*10
         total_sat_sectors     = struct.pack('<L', len(self.SAT_sect))
         dir_start_sid         = struct.pack('<l', self.dir_stream_sect[0])
-        not_used1             = '\x00'*4        
+        not_used1             = b'\x00'*4
         min_stream_size       = struct.pack('<L', 0x1000)
         ssat_start_sid        = struct.pack('<l', -2)
         total_ssat_sectors    = struct.pack('<L', 0)
@@ -227,7 +228,7 @@ class XlsDoc:
 
         total_msat_sectors    = struct.pack('<L', len(self.MSAT_sect_2nd))
 
-        self.header =       ''.join([  doc_magic,
+        self.header =       b''.join([  doc_magic,
                                         file_uid,
                                         rev_num,
                                         ver_num,
@@ -248,7 +249,7 @@ class XlsDoc:
 
     def save(self, file_name_or_filelike_obj, stream):
         # 1. Align stream on 0x1000 boundary (and therefore on sector boundary)
-        padding = '\x00' * (0x1000 - (len(stream) % 0x1000))
+        padding = b'\x00' * (0x1000 - (len(stream) % 0x1000))
         self.book_stream_len = len(stream) + len(padding)
 
         self._build_directory()
@@ -268,7 +269,7 @@ class XlsDoc:
         # The fallback is to write the stream in 4 MB chunks.
         try:
             f.write(stream)
-        except IOError, e:
+        except IOError as e:
             if e.errno != 22: # "Invalid argument" i.e. 'stream' is too big
                 raise # some other problem
             chunk_size = 4 * 1024 * 1024

@@ -12,10 +12,9 @@ import unittest
 import filecmp
 from datetime import datetime
 
-import xlwt
+from utils import in_tst_dir, in_tst_output_dir
 
-def from_tst_dir(filename):
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+import xlwt
 
 class TestSimple(unittest.TestCase):
     def create_simple_xls(self):
@@ -39,12 +38,12 @@ class TestSimple(unittest.TestCase):
         ws.write(2, 1, 1)
         ws.write(2, 2, xlwt.Formula("A3+B3"))
 
-        wb.save('simple.xls')
+        wb.save(in_tst_output_dir('simple.xls'))
 
     def test_create_simple_xls(self):
         self.create_simple_xls()
-        self.assertTrue(filecmp.cmp(from_tst_dir('simple.xls'),
-                                    from_tst_dir(os.path.join('output-0.7.2', 'simple.xls')),
+        self.assertTrue(filecmp.cmp(in_tst_dir('simple.xls'),
+                                    in_tst_output_dir('simple.xls'),
                                     shallow=False))
 
 if __name__=='__main__':

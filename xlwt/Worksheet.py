@@ -34,9 +34,12 @@
             EOF
 '''
 
-import BIFFRecords
-import Bitmap
-import Style
+from . import BIFFRecords
+from . import Bitmap
+from . import Style
+from .Row import Row
+from .Column import Column
+from .compat import unicode, itervalues
 import tempfile
 
 class Worksheet(object):
@@ -48,11 +51,8 @@ class Worksheet(object):
     ## Constructor
     #################################################################
     def __init__(self, sheetname, parent_book, cell_overwrite_ok=False):
-        import Row
-        self.Row = Row.Row
-
-        import Column
-        self.Column = Column.Column
+        self.Row = Row
+        self.Column = Column
 
         self.__name = sheetname
         self.__parent = parent_book
@@ -61,7 +61,7 @@ class Worksheet(object):
         self.__rows = {}
         self.__cols = {}
         self.__merged_ranges = []
-        self.__bmp_rec = ''
+        self.__bmp_rec = b''
 
         self.__show_formulas = 0
         self.__show_grid = 1
@@ -1143,7 +1143,7 @@ class Worksheet(object):
         return BIFFRecords.EOFRecord().get()
 
     def __colinfo_rec(self):
-        result = ''
+        result = b''
         for col in self.__cols:
             result += self.__cols[col].get_biff_record()
         return result
@@ -1194,7 +1194,7 @@ class Worksheet(object):
 
     def __panes_rec(self):
         if self.__vert_split_pos is None and self.__horz_split_pos is None:
-            return ""
+            return b""
 
         if self.__vert_split_pos is None:
             self.__vert_split_pos = 0
@@ -1243,10 +1243,10 @@ class Worksheet(object):
 
     def __row_blocks_rec(self):
         result = []
-        for row in self.__rows.itervalues():
+        for row in itervalues(self.__rows):
             result.append(row.get_row_biff_data())
             result.append(row.get_cells_biff_data())
-        return ''.join(result)
+        return b''.join(result)
 
     def __merged_rec(self):
         return BIFFRecords.MergedCellsRecord(self.__merged_ranges).get()
@@ -1255,7 +1255,7 @@ class Worksheet(object):
         return self.__bmp_rec
 
     def __calc_settings_rec(self):
-        result = ''
+        result = b''
         result += BIFFRecords.CalcModeRecord(self.__calc_mode & 0x01).get()
         result += BIFFRecords.CalcCountRecord(self.__calc_count & 0xFFFF).get()
         result += BIFFRecords.RefModeRecord(self.__RC_ref_mode & 0x01).get()
@@ -1265,7 +1265,7 @@ class Worksheet(object):
         return result
 
     def __print_settings_rec(self):
-        result = ''
+        result = b''
         result += BIFFRecords.PrintHeadersRecord(self.__print_headers).get()
         result += BIFFRecords.PrintGridLinesRecord(self.__print_grid).get()
         result += BIFFRecords.GridSetRecord(self.__grid_set).get()
@@ -1305,7 +1305,7 @@ class Worksheet(object):
         return result
 
     def __protection_rec(self):
-        result = ''
+        result = b''
         result += BIFFRecords.ProtectRecord(self.__protect).get()
         result += BIFFRecords.ScenProtectRecord(self.__scen_protect).get()
         result += BIFFRecords.WindowProtectRecord(self.__wnd_protect).get()
@@ -1342,7 +1342,7 @@ class Worksheet(object):
             self.__panes_rec(),
             self.__eof_rec(),
             ])
-        return ''.join(result)
+        return b''.join(result)
 
     def flush_row_data(self):
         if self.row_tempfile is None:

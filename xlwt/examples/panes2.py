@@ -5,7 +5,7 @@
 import xlwt
 
 w = xlwt.Workbook()
-sheets = [w.add_sheet('sheet ' + str(sheetx+1)) for sheetx in xrange(7)]
+sheets = [w.add_sheet('sheet ' + str(sheetx+1)) for sheetx in range(7)]
 ws1, ws2, ws3, ws4, ws5, ws6, ws7 = sheets
 for sheet in sheets:
     for i in range(0x100):

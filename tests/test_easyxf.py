@@ -6,11 +6,11 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: BSD licence
 
-import sys
-import os
 import unittest
 import filecmp
 import datetime
+
+from utils import in_tst_dir, in_tst_output_dir
 
 import xlwt as xlwt
 ezxf = xlwt.easyxf
@@ -30,13 +30,10 @@ def write_xls(file_name, sheet_name, headings, data, heading_xf, data_xfs):
             sheet.write(rowx, colx, value, data_xfs[colx])
     book.save(file_name)
 
-def from_tst_dir(filename):
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
-
 EXAMPLE_XLS = 'xlwt_easyxf_simple_demo.xls'
 
 class TestUnicode0(unittest.TestCase):
-    def create_example_xls(self):
+    def create_example_xls(self, filename):
         mkd = datetime.date
         hdngs = ['Date', 'Stock Code', 'Quantity', 'Unit Price', 'Value', 'Message']
         kinds =  'date    text          int         price         money    text'.split()
@@ -57,12 +54,12 @@ class TestUnicode0(unittest.TestCase):
             'text': ezxf(),
             }
         data_xfs = [kind_to_xf_map[k] for k in kinds]
-        write_xls(EXAMPLE_XLS, 'Demo', hdngs, data, heading_xf, data_xfs)
+        write_xls(filename, 'Demo', hdngs, data, heading_xf, data_xfs)
 
     def test_example_xls(self):
-        self.create_example_xls()
-        self.assertTrue(filecmp.cmp(from_tst_dir(EXAMPLE_XLS),
-                                    from_tst_dir('output-0.7.2/'+EXAMPLE_XLS),
+        self.create_example_xls(in_tst_output_dir(EXAMPLE_XLS))
+        self.assertTrue(filecmp.cmp(in_tst_dir(EXAMPLE_XLS),
+                                    in_tst_output_dir(EXAMPLE_XLS),
                                     shallow=False))
 
 if __name__=='__main__':

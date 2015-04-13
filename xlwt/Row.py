@@ -1,12 +1,13 @@
 # -*- coding: windows-1252 -*-
 
-import BIFFRecords
-import Style
-from Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
+from . import BIFFRecords
+from . import Style
+from .Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
     _get_cells_biff_data_mul
-import ExcelFormula
+from . import ExcelFormula
 import datetime as dt
-from Formatting import Font
+from .Formatting import Font
+from .compat import basestring, xrange, int_types, iteritems
 
 try:
     from decimal import Decimal
@@ -38,7 +39,7 @@ class Row(object):
                  "space_below"]
 
     def __init__(self, rowx, parent_sheet):
-        if not (isinstance(rowx, (int, long)) and 0 <= rowx <= 65535):
+        if not (isinstance(rowx, int_types) and 0 <= rowx <= 65535):
             raise ValueError("row index was %r, not allowed by .xls format" % rowx)
         self.__idx = rowx
         self.__parent = parent_sheet
@@ -169,7 +170,7 @@ class Row(object):
             self.insert_cell(col_index, None)
 
     def get_cells_biff_data(self):
-        cell_items = [item for item in self.__cells.iteritems() if item[1] is not None]
+        cell_items = [item for item in iteritems(self.__cells) if item[1] is not None]
         cell_items.sort() # in column order
         return _get_cells_biff_data_mul(self.__idx, cell_items)
         # previously:
@@ -243,7 +244,7 @@ class Row(object):
                 self.insert_cell(col, BlankCell(self.__idx, col, style_index))
         elif isinstance(label, bool): # bool is subclass of int; test bool first
             self.insert_cell(col, BooleanCell(self.__idx, col, style_index, label))
-        elif isinstance(label, (float, int, long, Decimal)):
+        elif isinstance(label, int_types+(float, Decimal)):
             self.insert_cell(col, NumberCell(self.__idx, col, style_index, label))
         elif isinstance(label, (dt.datetime, dt.date, dt.time)):
             date_number = self.__excel_date_dt(label)

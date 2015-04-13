@@ -28,7 +28,7 @@ is not set), it repeats the attributes of its style XF record.
 
 '''
 
-import BIFFRecords
+from . import BIFFRecords
 
 class Font(object):
 

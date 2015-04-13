@@ -1,3 +1,4 @@
+from __future__ import print_function
 #!/usr/bin/env python
 # tries stress SST, SAT and MSAT
 
@@ -19,12 +20,12 @@ for col in xrange(colcount):
         ws0.write(row, col, "BIG(%d, %d)" % (row, col))
 
 t1 = time() - t0
-print "\nsince starting elapsed %.2f s" % (t1)
+print("\nsince starting elapsed %.2f s" % (t1))
 
-print "Storing..."
+print("Storing...")
 wb.save('big-35Mb.xls')
 
 t2 = time() - t0
-print "since starting elapsed %.2f s" % (t2)
+print("since starting elapsed %.2f s" % (t2))
 
 

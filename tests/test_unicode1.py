@@ -6,15 +6,13 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: BSD licence
 
-import sys
 import os
 import unittest
 import filecmp
 
 import xlwt
 
-def from_tst_dir(filename):
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+from utils import in_tst_dir, in_tst_output_dir
 
 def create_example_xls(filename):
     w = xlwt.Workbook()
@@ -44,9 +42,9 @@ EXAMPLE_XLS = 'unicode1.xls'
 class TestUnicode1(unittest.TestCase):
 
     def test_example_xls(self):
-        create_example_xls(EXAMPLE_XLS)
-        self.assertTrue(filecmp.cmp(from_tst_dir(EXAMPLE_XLS),
-                                    from_tst_dir(os.path.join('output-0.7.2', EXAMPLE_XLS)),
+        create_example_xls(in_tst_output_dir(EXAMPLE_XLS))
+        self.assertTrue(filecmp.cmp(in_tst_dir(EXAMPLE_XLS),
+                                    in_tst_output_dir(EXAMPLE_XLS),
                                     shallow=False))
 if __name__=='__main__':
     unittest.main()

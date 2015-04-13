@@ -1,7 +1,9 @@
+from __future__ import print_function
 # -*- coding: windows-1252 -*-
 
-import Formatting
-from BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
+from . import Formatting
+from .BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
+from .compat import basestring, xrange
 
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
 
@@ -178,7 +180,7 @@ class StyleCollection(object):
 
 
     def get_biff_data(self):
-        result = ''
+        result = b''
         result += self._all_fonts()
         result += self._all_num_formats()
         result += self._all_cell_styles()
@@ -186,7 +188,7 @@ class StyleCollection(object):
         return result
 
     def _all_fonts(self):
-        result = ''
+        result = b''
         if self.style_compression:
             alist = self._font_x2id.items()
         else:
@@ -197,7 +199,7 @@ class StyleCollection(object):
         return result
 
     def _all_num_formats(self):
-        result = ''
+        result = b''
         alist = [
             (v, k)
             for k, v in self._num_formats.items()
@@ -209,7 +211,7 @@ class StyleCollection(object):
         return result
 
     def _all_cell_styles(self):
-        result = ''
+        result = b''
         for i in range(0, 16):
             result += XFRecord(self._default_xf, 'style').get()
         if self.style_compression == 2:
@@ -691,7 +693,7 @@ def _parse_strg_to_obj(strg, obj, parse_dict,
                 orig = getattr(section_obj, k)
             except AttributeError:
                 raise EasyXFAuthorError('%s.%s in dictionary but not in supplied object' % (section, k))
-            if debug: print "+++ %s.%s = %r # %s; was %r" % (section, k, value, v, orig)
+            if debug: print("+++ %s.%s = %r # %s; was %r" % (section, k, value, v, orig))
             setattr(section_obj, k, value)
 
 def easyxf(strg_to_parse="", num_format_str=None,
