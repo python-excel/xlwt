@@ -40,7 +40,7 @@ xlwt/examples/merged0.py
 xlwt/examples/merged1.py
 xlwt/examples/mini.py
 xlwt/examples/num_formats.py
-xlwt/examples/numbers.py
+xlwt/examples/numbers_demo.py
 xlwt/examples/outline.py
 xlwt/examples/panes.py
 xlwt/examples/parse-fmla.py
