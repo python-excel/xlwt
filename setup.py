@@ -1,21 +1,11 @@
-#!/usr/bin/env python
-
 from setuptools import setup, find_packages
 from xlwt import __VERSION__
 
 DESCRIPTION = (
     'Library to create spreadsheet files compatible with '
     'MS Excel 97/2000/XP/2003 XLS files, '
-    'on any platform, with Python 2.3 to 2.7'
+    'on any platform, with Python 2.6, 2.6, 3.3+'
     )
-
-LONG_DESCRIPTION = """\
-xlwt is a library for generating spreadsheet files that are compatible
-with Excel 97/2000/XP/2003, OpenOffice.org Calc, and Gnumeric. xlwt has
-full support for Unicode. Excel spreadsheets can be generated on any
-platform without needing Excel or a COM server. The only requirement is
-Python 2.3 to 2.7.
-"""
 
 CLASSIFIERS = [
     'Operating System :: OS Independent',
@@ -27,6 +17,12 @@ CLASSIFIERS = [
     'Topic :: Office/Business :: Financial :: Spreadsheet',
     'Topic :: Database',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries',
+    'Programming Language :: Python :: 2',
+    'Programming Language :: Python :: 2.6',
+    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.3',
+    'Programming Language :: Python :: 3.4',
     ]
 
 KEYWORDS = (
@@ -34,18 +30,18 @@ KEYWORDS = (
     )
 
 setup(
-    name = 'xlwt',
-    version = __VERSION__,
-    maintainer = 'John Machin',
-    maintainer_email = 'sjmachin@lexicon.net',
-    url = 'http://www.python-excel.org/',
-    download_url = 'http://pypi.python.org/pypi/xlwt',
-    description = DESCRIPTION,
-    long_description = LONG_DESCRIPTION,
-    license = 'BSD',
-    platforms = 'Platform Independent',
-    keywords = KEYWORDS,
-    classifiers = CLASSIFIERS,
+    name='xlwt',
+    version=__VERSION__,
+    maintainer='John Machin',
+    maintainer_email='sjmachin@lexicon.net',
+    url='http://www.python-excel.org/',
+    download_url='http://pypi.python.org/pypi/xlwt',
+    description=DESCRIPTION,
+    long_description=DESCRIPTION,
+    license='BSD',
+    platforms='Platform Independent',
+    keywords=KEYWORDS,
+    classifiers=CLASSIFIERS,
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
