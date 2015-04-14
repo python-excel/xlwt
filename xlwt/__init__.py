@@ -1,4 +1,4 @@
-__VERSION__ = '0.7.5'
+__VERSION__ = '0.8.0dev'
 
 from .Workbook import Workbook
 from .Worksheet import Worksheet
