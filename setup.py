@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 from xlwt import __VERSION__
 
 DESCRIPTION = (
@@ -44,14 +44,12 @@ setup(
     long_description = LONG_DESCRIPTION,
     license = 'BSD',
     platforms = 'Platform Independent',
-    packages = ['xlwt'],
     keywords = KEYWORDS,
     classifiers = CLASSIFIERS,
-    package_data = {
-        'xlwt': [
-            'doc/*.*',
-            'examples/*.*',
-            'tests/*.*',
-            ],
-        },
-    )
+    packages=find_packages(),
+    zip_safe=False,
+    include_package_data=True,
+    extras_require=dict(
+        test=['nose', 'nose_fixes', 'nose-cov', 'coveralls'],
+        build=['sphinx', 'pkginfo', 'setuptools-git']
+    ))
