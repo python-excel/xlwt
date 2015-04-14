@@ -3,4 +3,3 @@
 *.egg-info
 /build
 /tests/output
-.tox

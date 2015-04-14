@@ -1,17 +1,17 @@
 language: python
 
-sudo: false
-env:
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=pypy
+python:
+  - "3.5"
+  - "3.4"
+  - "3.3"
+  - "2.7"
+  - "2.6"
 
-install:
-  - travis_retry pip install tox coveralls
+# command to install dependencies
+install: "pip install -e .[test]"
 
-script:
-  - tox
+# command to run tests, e.g. python setup.py test
+script: nosetests --with-cov --cov=xlwt
 
 after_success:
   - coveralls
