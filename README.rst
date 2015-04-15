@@ -7,7 +7,7 @@
 .. _Coveralls: https://coveralls.io/r/python-excel/xlwt?branch=master
 
 .. |Docs| image:: https://readthedocs.org/projects/xlwt/badge/?version=latest
-.. _Docs: https://readthedocs.org/projects/xlwt/?badge=latest
+.. _Docs: http://xlwt.readthedocs.org/en/latest/
 
 xlwt
 ====
