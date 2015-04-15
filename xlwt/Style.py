@@ -697,7 +697,36 @@ def _parse_strg_to_obj(strg, obj, parse_dict,
             setattr(section_obj, k, value)
 
 def easyxf(strg_to_parse="", num_format_str=None,
-    field_sep=",", line_sep=";", intro_sep=":", esc_char="\\", debug=False):
+           field_sep=",", line_sep=";", intro_sep=":", esc_char="\\", debug=False):
+    """
+    This function is used to create and configure
+    :class:`XFStyle` objects for use with (for example) the
+    :meth:`Worksheet.write` method.
+
+    It takes a string to be parsed to obtain attribute values for
+    :class:`Alignment`, :class:`Borders`, :class:`Font`, :class:`Pattern` and
+    :class:`Protection` objects.
+
+    Refer to the examples in the file `examples/xlwt_easyxf_simple_demo.py`
+    and to the `xf_dict` dictionary in :mod:`xlwt.Style`.
+
+    Various synonyms including color/colour, center/centre and gray/grey are
+    allowed. Case is irrelevant (except maybe in font names). ``-`` may be used
+    instead of ``_``.
+
+    Example: ``font: bold on; align: wrap on, vert centre, horiz center``
+
+    :param num_format_str:
+
+      To get the "number format string" of an existing
+      cell whose format you want to reproduce, select the cell and click on
+      Format/Cells/Number/Custom. Otherwise, refer to Excel help.
+
+      Examples: ``"#,##0.00"``, ``"dd/mm/yyyy"``
+
+    :return: An :class:`XFstyle` object.
+
+    """
     xfobj = XFStyle()
     if num_format_str is not None:
         xfobj.num_format_str = num_format_str

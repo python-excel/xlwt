@@ -41,7 +41,15 @@ from .compat import unicode, itervalues
 import tempfile
 
 class Worksheet(object):
+    """
+    This is a class
+    representing the contents of a sheet in a workbook.
 
+    .. warning::
+
+      You don't normally create instances of this class yourself.
+      They are returned from calls to :meth:`~xlwt.Workbook.Workbook.add_sheet`.
+    """
     # a safe default value, 3 is always valid!
     active_pane = 3
     
@@ -1025,6 +1033,58 @@ class Worksheet(object):
         return self.__parent
 
     def write(self, r, c, label="", style=Style.default_style):
+        """
+        This method is used to write a cell to a :class:`Worksheet`.
+
+        :param r:
+
+           The zero-relative number of the row in the worksheet to which
+           the cell should be written.
+
+        :param c:
+
+           The zero-relative number of the column in the worksheet to which
+           the cell should be written.
+
+        :param label:
+
+           The data value to be written.
+
+           An :class:`int`, :class:`long`, or
+           :class:`~decimal.Decimal` instance is converted to :class:`float`.
+
+           A :class:`unicode` instance is written as is. A :class:`bytes`
+           instance is converted to :class:`unicode` using the
+           encoding, which defaults to ``ascii``, specified when the
+           :class:`Workbook` instance was created.
+
+           A :class:`~datetime.datetime`, :class:`~datetime.date` or
+           :class:`~datetime.time` instance is converted into Excel date format
+           (a float representing the number of days since (typically)
+           ``1899-12-31T00:00:00``, under the pretence that
+           1900 was a leap year).
+
+           A :class:`bool` instance will show up as ``TRUE`` or ``FALSE`` in
+           Excel.
+
+           ``None`` causes the cell to be blank: no data, only formatting.
+
+           An :class:`xlwt.Formula` instance causes an Excel formula to be
+           written.
+
+        :param style:
+
+           A style, also known as an XF (extended format), is an
+           :class:`~xlwt.Style.XFStyle` object, which encapsulates the
+           formatting applied to the cell and its contents.
+
+           :class:`~xlwt.Style.XFStyle` objects are best set up using the
+           :func:`~xlwt.Style.easyxf` function. They may also be set up by
+           setting attributes in :class:`Alignment`, :class:`Borders`,
+           :class:`Pattern`, :class:`Font` and :class:`Protection` objects then
+           setting those objects and a format string as attributes of an
+           :class:`~xlwt.Style.XFStyle` object.
+        """
         self.row(r).write(c, label, style)
 
     def write_rich_text(self, r, c, rich_text_list, style=Style.default_style):

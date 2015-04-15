@@ -43,6 +43,11 @@ from . import Style
 from .compat import unicode_type
 
 class Workbook(object):
+    """
+    This is a class representing a workbook and all its contents. When creating
+    Excel files with xlwt, you will normally start by instantiating an
+    object of this class.
+    """
 
     #################################################################
     ## Constructor
@@ -337,6 +342,24 @@ class Workbook(object):
         return self.__sst.rt_index(rt)
 
     def add_sheet(self, sheetname, cell_overwrite_ok=False):
+        """
+        This method is used to create Worksheets in a Workbook.
+
+        :param sheetname:
+
+          The name to use for this sheet, as it will appear in the
+          tabs at the bottom of the Excel application.
+
+        :param cell_overwrite_ok:
+
+          If ``True``, cells in the added worksheet will not raise an
+          exception if written to more than once.
+
+        :return:
+
+          The :class:`~xlwt.Worksheet.Worksheet` that was added.
+
+        """
         from . import Utils
         from .Worksheet import Worksheet
         if not isinstance(sheetname, unicode_type):
@@ -655,10 +678,21 @@ class Workbook(object):
 
         return before + bundlesheets + after + ext_sst + eof + sheets
 
-    def save(self, filename):
+    def save(self, filename_or_stream):
+        """
+        This method is used to save the Workbook to a file in native Excel
+        format.
+
+        :param filename_or_stream:
+          This can be a string containing a filename of
+          the file, in which case the excel file is saved to disk using the name
+          provided. It can also be a stream object with a write method, such as
+          a :class:`~io.StringIO`, in which case the data for the excel
+          file is written to the stream.
+        """
         from . import CompoundDoc
 
         doc = CompoundDoc.XlsDoc()
-        doc.save(filename, self.get_biff_data())
+        doc.save(filename_or_stream, self.get_biff_data())
 
 
