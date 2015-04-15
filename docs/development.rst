@@ -42,3 +42,18 @@ the virtualenv above, from the directory containing setup.py::
   $ cd docs
   $ make html
 
+Making a release
+----------------
+
+The following will build the distribution, upload it to PyPI and register
+the metadata with PyPI::
+
+  $ bin/pip install -e .
+  $ python setup.py sdist bdist_wheel
+  $ twine upload dist/xlwt-<version>*
+
+Running pip again will make sure the correct package information is
+used.
+
+This should all be done on a unix box so that a `.tgz` source
+distribution is produced.

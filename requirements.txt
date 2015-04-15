@@ -9,3 +9,5 @@ sphinx
 pkginfo
 # for build
 setuptools-git
+wheel
+twine
