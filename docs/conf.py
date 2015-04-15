@@ -13,4 +13,4 @@ exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 html_theme = 'classic'
 htmlhelp_basename = project+'doc'
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'python': ('http://docs.python.org', None)}
