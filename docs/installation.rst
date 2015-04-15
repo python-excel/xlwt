@@ -20,4 +20,4 @@ parameter in your call to ``setup`` as follows:
 .. topic:: Python version requirements
 
   This package has been tested with Python 2.6, 2.7, 3.3+ on Linux,
-  Mac OS X and Windows.
+  and is also expected to work on Mac OS X and Windows.
