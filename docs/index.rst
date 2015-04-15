@@ -24,6 +24,7 @@ development, please see the sections below:
 
    installation.rst
    development.rst
+   changes.rst
    licenses.rst
 
 Indices and tables
