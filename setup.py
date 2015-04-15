@@ -44,8 +44,5 @@ setup(
     classifiers=CLASSIFIERS,
     packages=find_packages(),
     zip_safe=False,
-    include_package_data=True,
-    extras_require=dict(
-        test=['nose', 'nose_fixes', 'nose-cov', 'coveralls'],
-        build=['sphinx', 'pkginfo', 'setuptools-git']
-    ))
+    include_package_data=True
+)

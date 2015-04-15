@@ -1,0 +1,11 @@
+-e .
+# for testing
+nose
+nose_fixes
+nose-cov
+coveralls
+# for docs
+sphinx
+pkginfo
+# for build
+setuptools-git

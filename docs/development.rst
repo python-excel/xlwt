@@ -24,7 +24,7 @@ your checkout into a virtualenv and then install the package in
 editable form as follows::
 
   $ virtualenv .
-  $ bin/pip install -U -e .[test,build]
+  $ bin/pip install -Ur requirements.txt
 
 Running the tests
 -----------------
