@@ -3,6 +3,27 @@ Changes
 
 .. currentmodule:: xlwt
 
+1.0.0 (15 April 2015)
+---------------------
+
+- Python 3 support.
+
+- Initial set of unit tests.
+
+- An initial set of Sphinx documentation.
+
+- Move to setuptools for packaging.
+
+- Wire up Travis, Coveralls and ReadTheDocs.
+
+- Allow longs as row indexes.
+
+Big thanks to Thomas Kluyver for his work on Python 3 support, Manfred Moitzi
+for donating his unit tests.
+
+Belated thanks to Landon Jurgens for his help on converting the documentation
+to Sphinx.
+
 0.7.5 (5 April 2013)
 --------------------
 
