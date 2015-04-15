@@ -56,6 +56,9 @@ Documentation can be found in the ``docs`` directory of the xlwt package.
 If these aren't sufficient, please consult the code in the
 examples directory and the source code itself.
 
+The latest documentation can also be found at:
+http://xlwt.readthedocs.org/en/latest/
+
 Problems?
 =========
 Try the following in this order:
