@@ -1,10 +1,13 @@
-|Travis|_ |Coveralls|_
+|Travis|_ |Coveralls|_ |Docs|_
 
 .. |Travis| image:: https://api.travis-ci.org/python-excel/xlwt.png?branch=master
 .. _Travis: https://travis-ci.org/python-excel/xlwt
 
 .. |Coveralls| image:: https://coveralls.io/repos/python-excel/xlwt/badge.png?branch=master
 .. _Coveralls: https://coveralls.io/r/python-excel/xlwt?branch=master
+
+.. |Docs| image:: https://readthedocs.org/projects/xlwt/badge/?version=latest
+.. _Docs: https://readthedocs.org/projects/xlwt/?badge=latest
 
 xlwt
 ====
