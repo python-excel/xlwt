@@ -1,38 +1,36 @@
 # -*- coding: windows-1252 -*-
-'''
-            BOF
-            UNCALCED
-            INDEX
-            Calculation Settings Block
-            PRINTHEADERS
-            PRINTGRIDLINES
-            GRIDSET
-            GUTS
-            DEFAULTROWHEIGHT
-            WSBOOL
-            Page Settings Block
-            Worksheet Protection Block
-            DEFCOLWIDTH
-            COLINFO
-            SORT
-            DIMENSIONS
-            Row Blocks
-            WINDOW2
-            SCL
-            PANE
-            SELECTION
-            STANDARDWIDTH
-            MERGEDCELLS
-            LABELRANGES
-            PHONETIC
-            Conditional Formatting Table
-            Hyperlink Table
-            Data Validity Table
-            SHEETLAYOUT (BIFF8X only)
-            SHEETPROTECTION (BIFF8X only)
-            RANGEPROTECTION (BIFF8X only)
-            EOF
-'''
+#             BOF
+#             UNCALCED
+#             INDEX
+#             Calculation Settings Block
+#             PRINTHEADERS
+#             PRINTGRIDLINES
+#             GRIDSET
+#             GUTS
+#             DEFAULTROWHEIGHT
+#             WSBOOL
+#             Page Settings Block
+#             Worksheet Protection Block
+#             DEFCOLWIDTH
+#             COLINFO
+#             SORT
+#             DIMENSIONS
+#             Row Blocks
+#             WINDOW2
+#             SCL
+#             PANE
+#             SELECTION
+#             STANDARDWIDTH
+#             MERGEDCELLS
+#             LABELRANGES
+#             PHONETIC
+#             Conditional Formatting Table
+#             Hyperlink Table
+#             Data Validity Table
+#             SHEETLAYOUT (BIFF8X only)
+#             SHEETPROTECTION (BIFF8X only)
+#             RANGEPROTECTION (BIFF8X only)
+#             EOF
 
 from . import BIFFRecords
 from . import Bitmap

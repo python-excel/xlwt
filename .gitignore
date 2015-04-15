@@ -4,3 +4,4 @@
 /build
 /tests/output
 .coverage
+/docs/_build

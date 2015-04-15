@@ -1,44 +1,42 @@
 # -*- coding: windows-1252 -*-
-'''
-Record Order in BIFF8
-  Workbook Globals Substream
-      BOF Type = workbook globals
-      Interface Header
-      MMS
-      Interface End
-      WRITEACCESS
-      CODEPAGE
-      DSF
-      TABID
-      FNGROUPCOUNT
-      Workbook Protection Block
-            WINDOWPROTECT
-            PROTECT
-            PASSWORD
-            PROT4REV
-            PROT4REVPASS
-      BACKUP
-      HIDEOBJ
-      WINDOW1
-      DATEMODE
-      PRECISION
-      REFRESHALL
-      BOOKBOOL
-      FONT +
-      FORMAT *
-      XF +
-      STYLE +
-    ? PALETTE
-      USESELFS
-
-      BOUNDSHEET +
-
-      COUNTRY
-    ? Link Table
-      SST
-      ExtSST
-      EOF
-'''
+# Record Order in BIFF8
+#   Workbook Globals Substream
+#       BOF Type = workbook globals
+#       Interface Header
+#       MMS
+#       Interface End
+#       WRITEACCESS
+#       CODEPAGE
+#       DSF
+#       TABID
+#       FNGROUPCOUNT
+#       Workbook Protection Block
+#             WINDOWPROTECT
+#             PROTECT
+#             PASSWORD
+#             PROT4REV
+#             PROT4REVPASS
+#       BACKUP
+#       HIDEOBJ
+#       WINDOW1
+#       DATEMODE
+#       PRECISION
+#       REFRESHALL
+#       BOOKBOOL
+#       FONT +
+#       FORMAT *
+#       XF +
+#       STYLE +
+#     ? PALETTE
+#       USESELFS
+#
+#       BOUNDSHEET +
+#
+#       COUNTRY
+#     ? Link Table
+#       SST
+#       ExtSST
+#       EOF
 
 from . import BIFFRecords
 from . import Style

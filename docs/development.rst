@@ -32,3 +32,13 @@ Running the tests
 Once you've set up a virtualenv, the tests can be run as follows::
 
   $ bin/nosetests
+
+Building the documentation
+--------------------------
+
+The Sphinx documentation is built by doing the following, having activated
+the virtualenv above, from the directory containing setup.py::
+
+  $ cd docs
+  $ make html
+
