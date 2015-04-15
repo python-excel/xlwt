@@ -3,6 +3,56 @@ Changes
 
 .. currentmodule:: xlwt
 
+0.7.5 (5 April 2013)
+--------------------
+
+- Fixes a bug that could cause a corrupt SST in .xls files written by a
+  wide-unicode Python build.
+
+- A :class:`ValueError` is now raised immediately if an attempt is made to set
+  column width to other than an int in ``range(65536)``
+
+- Added the ability to set a custom RGB colour in the palette to use for
+  colours. Thanks to Alan Rotman for the work, although this could really
+  use an example in the examples folder...
+
+- Fixed an issue trying to set a diagonal border using easyxf. Thanks to
+  Neil Etheridge for the fix.
+
+- Fixed a regression from 0.7.2 when writing sheets with frozen panes.
+
+0.7.4 (13 April 2012)
+---------------------
+
+- Python 2.3 to 2.7 are now the officially supported versions, no Python
+  3 yet, sorry.
+
+- The ``datemode`` in an xlwt :class:`Workbook` can be set to 1904 by doing
+  ``workbook.dates_1904 = 1`` and is written to the output file. However the
+  datemode was not being reflected in conversions from
+  :class:`datetime.datetime` and :class:`datetime.date` objects to floats for
+  output, resulting in dates that were 4 years too high when seen in Excel.
+
+0.7.3 (21 February 2012)
+------------------------
+
+- Added user_set and best_fit attributes to Column class.
+
+- Fixed an ``[Errno 0] Error`` raised when :meth:`Worksheet.flush_row_data` was
+  called after :meth:`Workbook.save`
+
+- Fixed an error on Windows that occurred when writing large blocks to
+  files.
+
+- Added the ability to write rich text cells
+
+- Fixed a bug when writing ``MULBLANK`` records on big-endian platforms.
+
+- allow the ``active_pane`` on worksheets to be specified
+
+- added support for zoom (magn) factors and improved possibilities when
+  generating split panes
+
 0.7.2 (1 June 2009)
 -------------------
 
