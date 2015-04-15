@@ -57,3 +57,7 @@ used.
 
 This should all be done on a unix box so that a `.tgz` source
 distribution is produced.
+
+Once the above is done, make sure to go to
+https://readthedocs.org/projects/xlwt/versions/
+and make sure the new release is marked as an Active Version.
