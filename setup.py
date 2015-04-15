@@ -1,3 +1,4 @@
+import os
 from setuptools import setup, find_packages
 from xlwt import __VERSION__
 
@@ -37,7 +38,9 @@ setup(
     url='http://www.python-excel.org/',
     download_url='http://pypi.python.org/pypi/xlwt',
     description=DESCRIPTION,
-    long_description=DESCRIPTION,
+    long_description=open(os.path.join(
+        os.path.dirname(__file__), 'README.rst')
+    ).read(),
     license='BSD',
     platforms='Platform Independent',
     keywords=KEYWORDS,
