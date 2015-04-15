@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-#coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
-# Purpose: test CompoundDoc
-# Created: 09.12.2010
-# Copyright (C) 2010, Manfred Moitzi
-# License: BSD licence
-
 import unittest
 
 from xlwt.CompoundDoc import XlsDoc
@@ -47,6 +39,3 @@ class TestXlsDoc(unittest.TestCase):
         xlsdoc._build_sat()
         xlsdoc._build_header()
         self.assertEqual(HEADER, xlsdoc.header)
-
-if __name__=='__main__':
-    unittest.main()

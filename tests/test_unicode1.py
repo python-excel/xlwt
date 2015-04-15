@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-#coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
-# Purpose: test_mini
-# Created: 03.12.2010
-# Copyright (C) 2010, Manfred Moitzi
-# License: BSD licence
-
 import os
 import unittest
 import filecmp
@@ -46,5 +38,3 @@ class TestUnicode1(unittest.TestCase):
         self.assertTrue(filecmp.cmp(in_tst_dir(EXAMPLE_XLS),
                                     in_tst_output_dir(EXAMPLE_XLS),
                                     shallow=False))
-if __name__=='__main__':
-    unittest.main()

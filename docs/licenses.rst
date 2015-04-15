@@ -35,6 +35,15 @@ The license for the work John Machin has done since xlwt was created::
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
     THE POSSIBILITY OF SUCH DAMAGE.
 
+The licensing for the unit tests added as part of the work for Python 3
+compatibility is as follows::
+
+  Author:  mozman --<mozman@gmx.at>
+  Purpose: test_mini
+  Created: 03.12.2010
+  Copyright (C) 2010, Manfred Moitzi
+  License: BSD licence
+
 The license for pyExcelerator, from which xlwt was forked::
 
       Copyright (C) 2005 Roman V. Kiseliov

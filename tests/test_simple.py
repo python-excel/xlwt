@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-#coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
-# Purpose: test_simple
-# Created: 05.12.2010
-# Copyright (C) 2010, Manfred Moitzi
-# License: BSD licence
-
 import sys
 import os
 import unittest
@@ -45,6 +37,3 @@ class TestSimple(unittest.TestCase):
         self.assertTrue(filecmp.cmp(in_tst_dir('simple.xls'),
                                     in_tst_output_dir('simple.xls'),
                                     shallow=False))
-
-if __name__=='__main__':
-    unittest.main()

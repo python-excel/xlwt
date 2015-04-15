@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-#coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
-# Purpose: test_mini
-# Created: 03.12.2010
-# Copyright (C) 2010, Manfred Moitzi
-# License: BSD licence
-
 import sys
 import os
 import unittest
@@ -27,6 +19,3 @@ class TestMini(unittest.TestCase):
         self.assertTrue(filecmp.cmp(in_tst_dir('mini.xls'),
                                     in_tst_output_dir('mini.xls'),
                                     shallow=False))
-
-if __name__=='__main__':
-    unittest.main()

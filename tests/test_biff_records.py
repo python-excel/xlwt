@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-#coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
-# Purpose: test BIFF records
-# Created: 09.12.2010
-# Copyright (C) 2010, Manfred Moitzi
-# License: BSD licence
-
 import unittest
 
 from xlwt import BIFFRecords
@@ -16,6 +8,3 @@ class TestSharedStringTable(unittest.TestCase):
         string_record = BIFFRecords.SharedStringTable(encoding='cp1251')
         string_record.add_str(u'Оля')
         self.assertEqual(expected_result, string_record.get_biff_record())
-
-if __name__=='__main__':
-    unittest.main()
