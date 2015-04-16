@@ -25,6 +25,7 @@ editable form as follows::
 
   $ virtualenv .
   $ bin/pip install -Ur requirements.txt
+  $ bin/pip install -e .
 
 Running the tests
 -----------------
@@ -32,6 +33,15 @@ Running the tests
 Once you've set up a virtualenv, the tests can be run as follows::
 
   $ bin/nosetests
+
+To run tests on all the versions of Python that are supported, you can do::
+
+  $ bin/tox
+
+If you change the supported python versions in ``.travis.yml``, please remember
+to do the following to update ``tox.ini``::
+
+  $ bin/panci --to=tox .travis.yml > tox.ini
 
 Building the documentation
 --------------------------

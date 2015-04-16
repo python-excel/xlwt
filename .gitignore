@@ -5,3 +5,4 @@
 /tests/output
 .coverage
 /docs/_build
+.tox
