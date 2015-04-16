@@ -6,3 +6,6 @@
 .coverage
 /docs/_build
 .tox
+/bin
+/include
+/lib
