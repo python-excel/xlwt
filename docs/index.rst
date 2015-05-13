@@ -11,7 +11,7 @@ Documentation is sparse, please see the API reference or code for help:
 
    api.rst
 
-Perhaps more useful is to consul the `tutorial`__ and the examples in the
+Perhaps more useful is to consult the `tutorial`__ and the examples in the
 `examples` folder of the distribution.
 
 __ https://github.com/python-excel/tutorial
