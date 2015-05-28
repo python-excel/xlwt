@@ -40,7 +40,7 @@
 
 from . import BIFFRecords
 from . import Style
-from .compat import unicode_type
+from .compat import unicode_type, int_types, basestring
 
 class Workbook(object):
     """
@@ -374,7 +374,7 @@ class Workbook(object):
         return self.__worksheets[-1]
 
     def get_sheet(self, sheet):
-        if isinstance(sheet, int):
+        if isinstance(sheet, int_types):
             return self.__worksheets[sheet]
         elif isinstance(sheet, basestring):
             sheetnum = self.sheet_index(sheet)

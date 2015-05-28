@@ -32,10 +32,12 @@ class TestByName(unittest.TestCase):
     
     def test_invalid_sheet_parameter(self):
         'Raises exception when sheet is not string or integer'
-        with self.assertRaises(Exception) as context:
+        try:
             self.wb.get_sheet(1.1)
-        #print context.exception
-        self.assertTrue('sheet must be integer or string' in context.exception)
+        except Exception, e:
+            self.assertTrue('sheet must be integer or string', e)
+        else:
+            self.fail('exception not raised')
 
 if __name__=='__main__':
     unittest.main()
