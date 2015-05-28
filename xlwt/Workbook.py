@@ -373,8 +373,14 @@ class Workbook(object):
         self.__worksheets.append(Worksheet(sheetname, self, cell_overwrite_ok))
         return self.__worksheets[-1]
 
-    def get_sheet(self, sheetnum):
-        return self.__worksheets[sheetnum]
+    def get_sheet(self, sheet):
+        if isinstance(sheet, int):
+            return self.__worksheets[sheet]
+        elif isinstance(sheet, basestring):
+            sheetnum = self.sheet_index(sheet)
+            return self.__worksheets[sheetnum]
+        else:
+            raise Exception("sheet must be integer or string")
     
     def sheet_index(self, sheetname):
         try:
@@ -382,11 +388,7 @@ class Workbook(object):
         except KeyError:
             self.raise_bad_sheetname(sheetname)
             
-        return sheetnum
-                    
-    def get_sheet_by_name(self, sheetname):
-        sheetnum = self.sheet_index(sheetname)
-        return self.get_sheet(sheetnum)        
+        return sheetnum       
 
     def raise_bad_sheetname(self, sheetname):
         raise Exception("Formula: unknown sheet name %s" % sheetname)
