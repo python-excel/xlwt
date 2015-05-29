@@ -34,7 +34,7 @@ class TestByName(unittest.TestCase):
         'Raises exception when sheet is not string or integer'
         try:
             self.wb.get_sheet(1.1)
-        except Exception, e:
+        except Exception as e:
             self.assertTrue('sheet must be integer or string', e)
         else:
             self.fail('exception not raised')
