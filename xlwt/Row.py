@@ -75,8 +75,8 @@ class Row(object):
     def __adjust_bound_col_idx(self, *args):
         for arg in args:
             iarg = int(arg)
-            if not ((0 <= iarg <= 255) and arg == iarg):
-                raise ValueError("column index (%r) not an int in range(256)" % arg)
+            if not ((0 <= iarg) and arg == iarg):
+                raise ValueError("column index (%r) not an int >= 0" % arg)
             sheet = self.__parent
             if iarg < self.__min_col_idx:
                 self.__min_col_idx = iarg
