@@ -1,3 +1,6 @@
+# for container-y goodness:
+sudo: false
+
 language: python
 
 python:
