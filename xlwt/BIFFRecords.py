@@ -91,7 +91,7 @@ class SharedStringTable(object):
     def _add_to_sst(self, s):
         u_str = upack2(s, self.encoding)
 
-        is_unicode_str = u_str[2] == b'\x01'
+        is_unicode_str = u_str[2] == b'\x01'[0]
         if is_unicode_str:
             atom_len = 5 # 2 byte -- len,
                          # 1 byte -- options,
@@ -106,7 +106,7 @@ class SharedStringTable(object):
 	
     def _add_rt_to_sst(self, rt):
         rt_str, rt_fr = upack2rt(rt, self.encoding)
-        is_unicode_str = rt_str[2] == b'\x09'
+        is_unicode_str = rt_str[2] == b'\x09'[0]
         if is_unicode_str:
             atom_len = 7 # 2 byte -- len,
                          # 1 byte -- options,
