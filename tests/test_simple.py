@@ -52,8 +52,8 @@ class TestSimple(unittest.TestCase):
             filename='less_simple.xls',
             more_content=[
                 [
-                    u'A{}'.format(i),
-                    u'Zażółć gęślą jaźń {} {}'.format(i, LOREM_IPSUM),
+                    u'A{0}'.format(i),
+                    u'Zażółć gęślą jaźń {0} {1}'.format(i, LOREM_IPSUM),
                 ]
                 for idx, i in enumerate(range(1000, 1050))
             ]
