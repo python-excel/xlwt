@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sys
 import os
 import unittest
@@ -8,8 +10,11 @@ from utils import in_tst_dir, in_tst_output_dir
 
 import xlwt
 
+LOREM_IPSUM = u'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+
+
 class TestSimple(unittest.TestCase):
-    def create_simple_xls(self):
+    def create_simple_xls(self, filename='simple.xls', more_content=None):
         font0 = xlwt.Font()
         font0.name = 'Times New Roman'
         font0.colour_index = 2
@@ -29,11 +34,30 @@ class TestSimple(unittest.TestCase):
         ws.write(2, 0, 1)
         ws.write(2, 1, 1)
         ws.write(2, 2, xlwt.Formula("A3+B3"))
+        if more_content is not None:
+            for r_idx, content_row in enumerate(more_content, 3):
+                for c_idx, cell in enumerate(content_row):
+                    ws.write(r_idx, c_idx, cell)
 
-        wb.save(in_tst_output_dir('simple.xls'))
+        wb.save(in_tst_output_dir(filename))
 
     def test_create_simple_xls(self):
         self.create_simple_xls()
         self.assertTrue(filecmp.cmp(in_tst_dir('simple.xls'),
                                     in_tst_output_dir('simple.xls'),
+                                    shallow=False))
+
+    def test_create_less_simple_xls(self):
+        self.create_simple_xls(
+            filename='less_simple.xls',
+            more_content=[
+                [
+                    u'A{0}'.format(i),
+                    u'Zażółć gęślą jaźń {0} {1}'.format(i, LOREM_IPSUM),
+                ]
+                for idx, i in enumerate(range(1000, 1050))
+            ]
+        )
+        self.assertTrue(filecmp.cmp(in_tst_dir('less_simple.xls'),
+                                    in_tst_output_dir('less_simple.xls'),
                                     shallow=False))
