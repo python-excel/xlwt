@@ -2383,7 +2383,7 @@ class ExternSheetRecord(BiffRecord):
                 header = pack("<HHH", self._REC_ID, 6 * krefs + 2, nrefs)
             res.append(header)
             res.extend([pack("<HHH", *r) for r in chunk])
-        return ''.join(res)
+        return b''.join(res)
 
 class SupBookRecord(BiffRecord):
     """
