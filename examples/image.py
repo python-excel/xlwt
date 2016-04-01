@@ -7,6 +7,10 @@ from xlwt import *
 w = Workbook()
 ws = w.add_sheet('Image')
 ws.insert_bitmap('python.bmp', 2, 2)
-ws.insert_bitmap('python.bmp', 10, 2)
+
+# Also works if you already have the image bitmap data in memory...
+with open ("python.bmp", "r") as bmpfile:
+    bmpdata = bmpfile.read()
+    ws.insert_bitmap_data(bmpdata, 10, 2)
 
 w.save('image.xls')
