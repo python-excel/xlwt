@@ -15,7 +15,7 @@ class TestBitmaps(unittest.TestCase):
         book = xlwt.Workbook()
         sheet = book.add_sheet('bitmap test')
         
-        with open ("tests/python.bmp", "r") as bmpfile:
+        with open ("tests/python.bmp", "rb") as bmpfile:
             bmpdata = bmpfile.read()
             sheet.insert_bitmap_data(bmpdata, 1, 1)
         
