@@ -8,8 +8,6 @@ from datetime import datetime
 
 from utils import in_tst_dir, in_tst_output_dir
 
-import md5
-
 import xlwt
 
 class TestBitmaps(unittest.TestCase):
