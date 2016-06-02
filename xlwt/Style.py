@@ -190,7 +190,7 @@ class StyleCollection(object):
     def _all_fonts(self):
         result = b''
         if self.style_compression:
-            alist = self._font_x2id.items()
+            alist = list(self._font_x2id.items())
         else:
             alist = [(x, o) for o, x in self._font_id2x.items()]
         alist.sort()
@@ -204,7 +204,7 @@ class StyleCollection(object):
             (v, k)
             for k, v in self._num_formats.items()
             if v >= FIRST_USER_DEFINED_NUM_FORMAT_IDX
-            ]
+        ]
         alist.sort()
         for fmtidx, fmtstr in alist:
             result += NumberFormatRecord(fmtidx, fmtstr).get()
@@ -215,7 +215,7 @@ class StyleCollection(object):
         for i in range(0, 16):
             result += XFRecord(self._default_xf, 'style').get()
         if self.style_compression == 2:
-            alist = self._xf_x2id.items()
+            alist = list(self._xf_x2id.items())
         else:
             alist = [(x, o) for o, x in self._xf_id2x.items()]
         alist.sort()
