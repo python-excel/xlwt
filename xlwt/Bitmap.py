@@ -195,7 +195,9 @@ def _process_bitmap(bitmap):
     with open(bitmap, "rb") as fh:
         # Slurp the file into a string.
         data = fh.read()
+    return _process_bitmap_data(data)
 
+def _process_bitmap_data(data):
     # Check that the file is big enough to be a bitmap.
     if len(data) <= 0x36:
         raise Exception("bitmap doesn't contain enough data.")
@@ -240,9 +242,27 @@ def _process_bitmap(bitmap):
     return (width, height, size, data)
 
 
-class ImDataBmpRecord(BiffRecord):
+class ImRawDataBmpRecord(BiffRecord):
     _REC_ID = 0x007F
 
+    def __init__(self, data):
+        """Insert a 24bit bitmap image in a worksheet. The main record required is
+        IMDATA but it must be proceeded by a OBJ record to define its position.
+
+        """
+        BiffRecord.__init__(self)
+
+        self.width, self.height, self.size, data = _process_bitmap_data(data)
+        self._write_imdata(data)
+
+    def _write_imdata(self, data):
+        # Write the IMDATA record to store the bitmap data
+        cf = 0x09
+        env = 0x01
+        lcb = self.size
+        self._rec_data = pack("<HHL", cf, env, lcb) + data
+
+class ImDataBmpRecord(ImRawDataBmpRecord):
     def __init__(self, filename):
         """Insert a 24bit bitmap image in a worksheet. The main record required is
         IMDATA but it must be proceeded by a OBJ record to define its position.
@@ -251,10 +271,5 @@ class ImDataBmpRecord(BiffRecord):
         BiffRecord.__init__(self)
 
         self.width, self.height, self.size, data = _process_bitmap(filename)
-        # Write the IMDATA record to store the bitmap data
-        cf = 0x09
-        env = 0x01
-        lcb = self.size
-        self._rec_data = pack("<HHL", cf, env, lcb) + data
-
+        self._write_imdata(data)
 

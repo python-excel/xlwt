@@ -1124,6 +1124,12 @@ class Worksheet(object):
 
         self.__bmp_rec += obj.get() + bmp.get()
 
+    def insert_bitmap_data(self, data, row, col, x = 0, y = 0, scale_x = 1, scale_y = 1):
+        bmp = Bitmap.ImRawDataBmpRecord(data)
+        obj = Bitmap.ObjBmpRecord(row, col, self, bmp, x, y, scale_x, scale_y)
+
+        self.__bmp_rec += obj.get() + bmp.get()
+
     def col(self, indx):
         if indx not in self.__cols:
             self.__cols[indx] = self.Column(indx, self)
