@@ -55,7 +55,7 @@ the virtualenv above, from the directory containing setup.py::
 Making a release
 ----------------
 
-To make a release, just update the version in ``setup.py``,
+To make a release, just update the version in ``xlwt/__init__.py``,
 update the change log, tag it
 and push to https://github.com/python-excel/xlwt
 and Travis CI should take care of the rest.

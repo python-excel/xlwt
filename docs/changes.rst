@@ -3,6 +3,11 @@ Changes
 
 .. currentmodule:: xlwt
 
+1.1.1 (2 June 2016)
+-------------------
+
+- Fix release problems.
+
 1.1.0 (2 June 2016)
 -------------------
 
