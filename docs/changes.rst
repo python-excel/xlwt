@@ -3,6 +3,20 @@ Changes
 
 .. currentmodule:: xlwt
 
+1.1.0 (2 June 2016)
+-------------------
+
+- Fix SST BIFF record in Python 3.
+
+- Fix for writing :class:`ExternSheetRecord` in Python 3.
+
+- Add ability to insert bitmap images from buffers as well as files.
+
+- Official support Python 3.5.
+
+Thanks to "thektulu" and Lele Gaifax for the Python 3 fixes.
+Thanks to Ross Golder for the support for inserting images from buffers.
+
 1.0.0 (15 April 2015)
 ---------------------
 
