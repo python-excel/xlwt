@@ -15,9 +15,9 @@ Changes
 
 - Fix for writing :class:`ExternSheetRecord` in Python 3.
 
-- Add ability to insert bitmap images from buffers as well as files.
+- Add the ability to insert bitmap images from buffers as well as files.
 
-- Official support Python 3.5.
+- Official support for Python 3.5.
 
 Thanks to "thektulu" and Lele Gaifax for the Python 3 fixes.
 Thanks to Ross Golder for the support for inserting images from buffers.
