@@ -1,6 +1,6 @@
 |Travis|_ |Coveralls|_ |Docs|_ |PyPI|_
 
-.. |Travis| image:: https://api.travis-ci.org/python-excel/xlwt.png?branch=master
+.. |Travis| image:: https://api.travis-ci.org/python-excel/xlwt.svg?branch=master
 .. _Travis: https://travis-ci.org/python-excel/xlwt
 
 .. |Coveralls| image:: https://coveralls.io/repos/python-excel/xlwt/badge.svg?branch=master
