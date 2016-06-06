@@ -10,7 +10,7 @@
 .. _Docs: http://xlwt.readthedocs.org/en/latest/
 
 .. |PyPI| image:: https://badge.fury.io/py/xlwt.svg
-.. _PyPI: https://badge.fury.io/py/xlwtxlwt
+.. _PyPI: https://badge.fury.io/py/xlwt
     
 xlwt
 ====
