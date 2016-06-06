@@ -1,15 +1,17 @@
-|Travis|_ |Coveralls|_ |Docs|_
+|Travis|_ |Coveralls|_ |Docs|_ |PyPI|_
 
 .. |Travis| image:: https://api.travis-ci.org/python-excel/xlwt.png?branch=master
 .. _Travis: https://travis-ci.org/python-excel/xlwt
 
-.. |Coveralls| image:: https://coveralls.io/repos/python-excel/xlwt/badge.png?branch=master
+.. |Coveralls| image:: https://coveralls.io/repos/python-excel/xlwt/badge.svg?branch=master
 .. _Coveralls: https://coveralls.io/r/python-excel/xlwt?branch=master
 
 .. |Docs| image:: https://readthedocs.org/projects/xlwt/badge/?version=latest
 .. _Docs: http://xlwt.readthedocs.org/en/latest/
 
-xlwt
+.. |PyPI| image:: https://badge.fury.io/py/xlwt.svg
+.. _PyPI: https://badge.fury.io/py/xlwtxlwt
+    
 ====
 
 This is a library for developers to use to generate
@@ -28,7 +30,7 @@ Do the following in your virtualenv::
 Quick start
 ===========
 
-::
+.. code-block:: python
 
     import xlwt
     from datetime import datetime
