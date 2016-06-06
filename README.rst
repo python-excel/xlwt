@@ -12,6 +12,9 @@
 .. |PyPI| image:: https://badge.fury.io/py/xlwt.svg
 .. _PyPI: https://badge.fury.io/py/xlwtxlwt
     
+xlwt
+====
+
 This is a library for developers to use to generate
 spreadsheet files compatible with Microsoft Excel versions 95 to 2003.
 
