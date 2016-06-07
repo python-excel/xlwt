@@ -190,11 +190,10 @@ class StyleCollection(object):
     def _all_fonts(self):
         result = b''
         if self.style_compression:
-            alist = self._font_x2id.items()
+            fonts = self._font_x2id.items()
         else:
-            alist = [(x, o) for o, x in self._font_id2x.items()]
-        alist.sort()
-        for font_idx, font in alist:
+            fonts = [(x, o) for o, x in self._font_id2x.items()]
+        for font_idx, font in sorted(fonts):
             result += font.get_biff_record().get()
         return result
 
@@ -215,11 +214,10 @@ class StyleCollection(object):
         for i in range(0, 16):
             result += XFRecord(self._default_xf, 'style').get()
         if self.style_compression == 2:
-            alist = self._xf_x2id.items()
+            styles = self._xf_x2id.items()
         else:
-            alist = [(x, o) for o, x in self._xf_id2x.items()]
-        alist.sort()
-        for xf_idx, xf in alist:
+            styles = [(x, o) for o, x in self._xf_id2x.items()]
+        for xf_idx, xf in sorted(styles):
             result += XFRecord(xf).get()
         return result
 
