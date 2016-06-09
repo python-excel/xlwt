@@ -3,6 +3,15 @@ Changes
 
 .. currentmodule:: xlwt
 
+1.1.2 (9 June 2016)
+-------------------
+
+- Fix failure in style compression under Python 3.
+
+- Officially support Python 3.5
+
+- Documentation tweaks.
+
 1.1.1 (2 June 2016)
 -------------------
 
