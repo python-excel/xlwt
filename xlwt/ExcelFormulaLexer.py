@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from .antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
 from . import ExcelFormulaParser
-from re import compile as recompile, LOCALE, IGNORECASE, VERBOSE
+from re import compile as recompile, IGNORECASE, VERBOSE
 
 
 int_const_pattern = r"\d+\b"
@@ -50,7 +50,7 @@ pattern_type_tuples = (
 
 _re = recompile(
     '(' + ')|('.join([i[0] for i in pattern_type_tuples]) + ')',
-    VERBOSE+LOCALE+IGNORECASE)
+    VERBOSE+IGNORECASE)
 
 _toktype = [None] + [i[1] for i in pattern_type_tuples]
 # need dummy at start because re.MatchObject.lastindex counts from 1
