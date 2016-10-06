@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding:utf-8
-# Author:  Fabio --<fabio_ferreiradasilva@yahoo.com.br>
-# Purpose: test functions by sheet name
-# Created: 30.07.2014
-
 import unittest
 import xlwt
 
@@ -39,5 +33,3 @@ class TestByName(unittest.TestCase):
         else:
             self.fail('exception not raised')
 
-if __name__=='__main__':
-    unittest.main()
