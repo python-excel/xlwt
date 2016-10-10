@@ -16,20 +16,15 @@ class TestByName(unittest.TestCase):
 
     def test_get_by_name(self):
         'Get sheet by name'
-        ws = self.wb.get_sheet(1)
+        ws = self.wb.get_sheet('Plan2')
         self.assertEqual('Plan2', ws.name)
     
     def test_get_by_index(self):
         'Get sheet by index'
-        ws = self.wb.get_sheet('Plan2')
+        ws = self.wb.get_sheet(1)
         self.assertEqual('Plan2', ws.name)
     
     def test_invalid_sheet_parameter(self):
         'Raises exception when sheet is not string or integer'
-        try:
-            self.wb.get_sheet(1.1)
-        except Exception as e:
-            self.assertTrue('sheet must be integer or string', e)
-        else:
-            self.fail('exception not raised')
+        self.assertRaises(Exception, self.wb.get_sheet, 1.1)
 
