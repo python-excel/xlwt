@@ -40,7 +40,7 @@
 
 from . import BIFFRecords
 from . import Style
-from .compat import unicode_type
+from .compat import unicode_type, int_types, basestring
 
 class Workbook(object):
     """
@@ -373,8 +373,22 @@ class Workbook(object):
         self.__worksheets.append(Worksheet(sheetname, self, cell_overwrite_ok))
         return self.__worksheets[-1]
 
-    def get_sheet(self, sheetnum):
-        return self.__worksheets[sheetnum]
+    def get_sheet(self, sheet):
+        if isinstance(sheet, int_types):
+            return self.__worksheets[sheet]
+        elif isinstance(sheet, basestring):
+            sheetnum = self.sheet_index(sheet)
+            return self.__worksheets[sheetnum]
+        else:
+            raise Exception("sheet must be integer or string")
+    
+    def sheet_index(self, sheetname):
+        try:
+            sheetnum = self.__worksheet_idx_from_name[sheetname.lower()] 
+        except KeyError:
+            self.raise_bad_sheetname(sheetname)
+            
+        return sheetnum       
 
     def raise_bad_sheetname(self, sheetname):
         raise Exception("Formula: unknown sheet name %s" % sheetname)
