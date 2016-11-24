@@ -1,5 +1,7 @@
 # -*- coding: windows-1252 -*-
 
+import math
+
 from . import BIFFRecords
 from . import Style
 from .Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
@@ -245,7 +247,12 @@ class Row(object):
         elif isinstance(label, bool): # bool is subclass of int; test bool first
             self.insert_cell(col, BooleanCell(self.__idx, col, style_index, label))
         elif isinstance(label, int_types+(float, Decimal)):
-            self.insert_cell(col, NumberCell(self.__idx, col, style_index, label))
+            if math.isnan(label):
+                self.insert_cell(col,
+                    StrCell(self.__idx, col, style_index, self.__parent_wb.add_str('#NUM!'))
+                    )
+            else:
+                self.insert_cell(col, NumberCell(self.__idx, col, style_index, label))
         elif isinstance(label, (dt.datetime, dt.date, dt.time)):
             date_number = self.__excel_date_dt(label)
             self.insert_cell(col, NumberCell(self.__idx, col, style_index, date_number))
