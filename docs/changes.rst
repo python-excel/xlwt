@@ -3,6 +3,17 @@ Changes
 
 .. currentmodule:: xlwt
 
+1.2.0 (4 January 2017)
+----------------------
+
+- Remove ``LOCALE`` from regular expression that caused
+  :class:`DeprecationWarning` that become an exception in Python 3.6
+
+- Add :meth:`Workbook.sheet_index` helper.
+
+- :meth:`Workbook.get_sheet` now takes either a string name or an integer
+  index.
+
 1.1.2 (9 June 2016)
 -------------------
 
