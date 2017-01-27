@@ -1,5 +1,6 @@
 # -*- coding: windows-1252 -*-
 
+from decimal import Decimal
 from . import BIFFRecords
 from . import Style
 from .Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
@@ -8,13 +9,6 @@ from . import ExcelFormula
 import datetime as dt
 from .Formatting import Font
 from .compat import basestring, xrange, int_types, iteritems
-
-try:
-    from decimal import Decimal
-except ImportError:
-    # Python 2.3: decimal not supported; create dummy Decimal class
-    class Decimal(object):
-        pass
 
 
 class Row(object):
