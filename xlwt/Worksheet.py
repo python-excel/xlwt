@@ -1168,14 +1168,14 @@ class Worksheet(object):
 
     def __update_row_visible_levels(self):
         if self.__rows:
-            temp = max([self.__rows[r].level for r in self.__rows]) + 1
+            temp = max(self.__rows[r].level for r in self.__rows) + 1
             self.__row_visible_levels = max(temp, self.__row_visible_levels)
 
     def __guts_rec(self):
         self.__update_row_visible_levels()
         col_visible_levels = 0
         if len(self.__cols) != 0:
-            col_visible_levels = max([self.__cols[c].level for c in self.__cols]) + 1
+            col_visible_levels = max(self.__cols[c].level for c in self.__cols) + 1
         return BIFFRecords.GutsRecord(
             self.__row_gut_width, self.__col_gut_height, self.__row_visible_levels, col_visible_levels).get()
 

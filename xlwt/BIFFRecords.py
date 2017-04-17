@@ -68,7 +68,7 @@ class SharedStringTable(object):
         self._continues = [None, None]
         self._current_piece = pack('<II', 0, 0)
         data = [(idx, s) for s, idx in iteritems(self._str_indexes)]
-        data.extend([(idx, s) for s, idx in iteritems(self._rt_indexes)])
+        data.extend((idx, s) for s, idx in iteritems(self._rt_indexes))
         data.sort() # in index order
         for idx, s in data:
             if self._tally[idx] == 0:
@@ -2382,7 +2382,7 @@ class ExternSheetRecord(BiffRecord):
             else: # ExternSheetRecord
                 header = pack("<HHH", self._REC_ID, 6 * krefs + 2, nrefs)
             res.append(header)
-            res.extend([pack("<HHH", *r) for r in chunk])
+            res.extend(pack("<HHH", *r) for r in chunk)
         return b''.join(res)
 
 class SupBookRecord(BiffRecord):

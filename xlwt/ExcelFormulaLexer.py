@@ -49,7 +49,7 @@ pattern_type_tuples = (
 )
 
 _re = recompile(
-    '(' + ')|('.join([i[0] for i in pattern_type_tuples]) + ')',
+    '(' + ')|('.join(i[0] for i in pattern_type_tuples) + ')',
     VERBOSE+IGNORECASE)
 
 _toktype = [None] + [i[1] for i in pattern_type_tuples]
