@@ -72,7 +72,7 @@ def upack2(s, encoding='ascii'):
 
 def upack2rt(rt, encoding='ascii'):
     us = u''
-    fr = ''
+    fr = b''
     offset = 0
     # convert rt strings to unicode if not already unicode
     # also generate the formatting run for the styles added
