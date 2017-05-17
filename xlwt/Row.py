@@ -90,12 +90,12 @@ class Row(object):
                 epoch_tuple = (1899, 12, 31)
                 adj = True
             if isinstance(date, dt.datetime):
-                epoch = dt.datetime(*epoch_tuple)
+                epoch = dt.datetime(*epoch_tuple, tzinfo=date.tzinfo)
             else:
-                epoch = dt.date(*epoch_tuple)
+                epoch = dt.date(*epoch_tuple, tzinfo=date.tzinfo)
         else: # it's a datetime.time instance
             date = dt.datetime.combine(dt.datetime(1900, 1, 1), date)
-            epoch = dt.datetime(1900, 1, 1)
+            epoch = dt.datetime(1900, 1, 1, tzinfo=date.tzinfo)
         delta = date - epoch
         xldate = delta.days + delta.seconds / 86400.0                      
         # Add a day for Excel's missing leap day in 1900
