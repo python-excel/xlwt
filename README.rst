@@ -21,6 +21,9 @@ spreadsheet files compatible with Microsoft Excel versions 95 to 2003.
 The package itself is pure Python with no dependencies on modules or packages
 outside the standard Python distribution.
 
+Please read this before using this package:
+https://groups.google.com/d/msg/python-excel/P6TjJgFVjMI/g8d0eWxTBQAJ
+
 Installation
 ============
 
