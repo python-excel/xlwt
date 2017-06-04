@@ -181,6 +181,7 @@ class Worksheet(object):
         self.__print_not_colour = 0
         self.__print_draft = 0
         self.__print_notes = 0
+        self.__use_start_page_number = 1
         self.__print_notes_at_end = 0
         self.__print_omit_errors = 0
         self.__print_hres = 0x012C # 300 dpi
@@ -907,6 +908,25 @@ class Worksheet(object):
 
     #################################################################
 
+    def set_use_start_page_number(self, value):
+        self.__use_start_page_number = int(value)
+
+    def get_use_start_page_number(self):
+        """Change page numbering logic when printing multiple worksheets.
+
+            Default: True
+            True:  The first page number will be the value of
+                   Worksheet.start_page_number.
+            False: Automatic start page number. The first page of the
+                   second worksheet will be one more than the last page
+                   of the first worksheet. Ignore Worksheet.start_page_number.
+        """
+        return bool(self.__use_start_page_number)
+
+    use_start_page_number = property(get_use_start_page_number, set_use_start_page_number)
+
+    #################################################################
+
     def set_print_notes_at_end(self, value):
         self.__print_notes_at_end = int(value)
 
@@ -1351,7 +1371,7 @@ class Worksheet(object):
         setup_page_options |=  (self.__print_draft & 0x01) << 4
         setup_page_options |=  (self.__print_notes & 0x01) << 5
         setup_page_options |=  (0x00 & 0x01) << 6
-        setup_page_options |=  (0x01 & 0x01) << 7
+        setup_page_options |=  (self.__use_start_page_number & 0x01) << 7
         setup_page_options |=  (self.__print_notes_at_end & 0x01) << 9
         setup_page_options |=  (self.__print_omit_errors & 0x03) << 10
 
