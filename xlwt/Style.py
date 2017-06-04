@@ -1,5 +1,5 @@
 from __future__ import print_function
-# -*- coding: windows-1252 -*-
+# -*- coding: utf-8 -*-
 
 from . import Formatting
 from .BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord

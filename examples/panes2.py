@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: ascii -*-
+# -*- coding: utf-8 -*-
 # portions Copyright (C) 2005 Kiseliov Roman
 
 import xlwt

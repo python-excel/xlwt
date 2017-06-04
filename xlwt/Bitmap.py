@@ -1,4 +1,4 @@
-# -*- coding: windows-1251 -*-
+# -*- coding: utf-8 -*-
 
 #  Portions are Copyright (C) 2005 Roman V. Kiseliov
 #  Portions are Copyright (c) 2004 Evgeny Filatov <fufff@users.sourceforge.net>

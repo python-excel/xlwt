@@ -1,4 +1,4 @@
-# -*- coding: cp1252 -*-
+# -*- coding: utf-8 -*-
 from struct import pack
 from .UnicodeUtils import upack1, upack2, upack2rt
 from .compat import basestring, unicode, unicode_type, xrange, iteritems
@@ -1728,10 +1728,10 @@ class RefModeRecord(BiffRecord):
     """
     This record is part of the Calculation Settings Block.
     It stores which method is used to show cell addresses in formulas.
-    The “RC” mode uses numeric indexes for rows and columns,
-    i.e. “R(1)C(-1)”, or “R1C1:R2C2”.
-    The “A1” mode uses characters for columns and numbers for rows,
-    i.e. “B1”, or “$A$1:$B$2”.
+    The "RC" mode uses numeric indexes for rows and columns,
+    i.e. "R(1)C(-1)", or "R1C1:R2C2".
+    The "A1" mode uses characters for columns and numbers for rows,
+    i.e. "B1", or "$A$1:$B$2".
 
     Record REFMODE, BIFF2-BIFF8:
 
@@ -1779,7 +1779,7 @@ class DeltaRecord(BiffRecord):
 class SaveRecalcRecord(BiffRecord):
     """
     This record is part of the Calculation Settings Block.
-    It contains the “Recalculate before save” option in
+    It contains the "Recalculate before save" option in
     Excel's calculation settings dialogue.
 
     Record SAVERECALC, BIFF3-BIFF8:
@@ -2445,7 +2445,7 @@ class ExternnameRecord(BiffRecord):
     0       0001H   0 = Standard name; 1 = Built-in name
     1       0002H   0 = Manual link; 1 = Automatic link (DDE links and OLE links only)
     2       0004H   1 = Picture link (DDE links and OLE links only)
-    3       0008H   1 = This is the “StdDocumentName” identifier (DDE links only)
+    3       0008H   1 = This is the "StdDocumentName" identifier (DDE links only)
     4       0010H   1 = OLE link
     14-5    7FE0H   Clipboard format of last successful update (DDE links and OLE links only)
     15      8000H   1 = Iconified picture link (BIFF8 OLE links only)
