@@ -37,7 +37,7 @@ setup(
     maintainer='John Machin',
     maintainer_email='sjmachin@lexicon.net',
     url='http://www.python-excel.org/',
-    download_url='http://pypi.python.org/pypi/xlwt',
+    download_url='https://pypi.python.org/pypi/xlwt',
     description=DESCRIPTION,
     long_description=open(os.path.join(
         os.path.dirname(__file__), 'README.rst')

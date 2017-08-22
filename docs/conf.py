@@ -19,4 +19,4 @@ else:
     html_theme = 'classic'
 
 htmlhelp_basename = project+'doc'
-intersphinx_mapping = {'python': ('http://docs.python.org', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org', None)}

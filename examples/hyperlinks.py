@@ -22,7 +22,7 @@ ws = w.add_sheet('F')
 ##############
 
 n = "HYPERLINK"
-ws.write_merge(1, 1, 1, 10, Formula(n + '("http://www.irs.gov/pub/irs-pdf/f1000.pdf";"f1000.pdf")'), h_style)
+ws.write_merge(1, 1, 1, 10, Formula(n + '("https://www.irs.gov/pub/irs-pdf/f1000.pdf";"f1000.pdf")'), h_style)
 ws.write_merge(2, 2, 2, 25, Formula(n + '("mailto:roman.kiseliov@gmail.com?subject=pyExcelerator-feedback&Body=Hello,%20Roman!";"pyExcelerator-feedback")'), h_style)
 
 w.save("hyperlinks.xls")
