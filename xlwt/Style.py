@@ -130,7 +130,7 @@ class StyleCollection(object):
             xf_index = self._xf_id2x[xf]
             self.stats[3] += 1
         elif self.style_compression == 2:
-            xf_key = (font_idx, num_format_idx) + tuple([obj._search_key() for obj in gof])
+            xf_key = (font_idx, num_format_idx) + tuple(obj._search_key() for obj in gof)
             xf_index = self._xf_val2x.get(xf_key)
             if xf_index is not None:
                 self._xf_id2x[xf] = xf_index
