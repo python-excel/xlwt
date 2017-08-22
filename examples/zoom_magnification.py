@@ -11,4 +11,3 @@ for magn in (0, 60, 100, 75, 150):
         for rowx in range(100):
             sheet.write(rowx, 0, "Some text")
 book.save("zoom_magnification.xls")
-

@@ -2,10 +2,10 @@
 
 import struct
 from .compat import xrange
-        
+
 # This implementation writes only 'Root Entry', 'Workbook' streams
 # and 2 empty streams for aligning directory stream on sector boundary
-# 
+#
 # LAYOUT:
 # 0         header
 # 76                MSAT (1st part: 109 SID)
@@ -60,7 +60,7 @@ class XlsDoc:
            dentry_name_sz,
            dentry_type,
            dentry_colour,
-           dentry_did_left, 
+           dentry_did_left,
            dentry_did_right,
            dentry_did_root,
            0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -77,7 +77,7 @@ class XlsDoc:
         dentry_did_left  = -1
         dentry_did_right = -1
         dentry_did_root  = -1
-        dentry_start_sid = 0     
+        dentry_start_sid = 0
         dentry_stream_sz = self.book_stream_len
 
         self.dir_stream += struct.pack('<64s H 2B 3l 9L l L L',
@@ -85,15 +85,15 @@ class XlsDoc:
            dentry_name_sz,
            dentry_type,
            dentry_colour,
-           dentry_did_left, 
+           dentry_did_left,
            dentry_did_right,
            dentry_did_root,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 
+           0, 0, 0, 0, 0, 0, 0, 0, 0,
            dentry_start_sid,
            dentry_stream_sz,
            0
         )
-        
+
         # padding
         dentry_name      = b''
         dentry_name_sz   = len(dentry_name)
@@ -111,7 +111,7 @@ class XlsDoc:
            dentry_name_sz,
            dentry_type,
            dentry_colour,
-           dentry_did_left, 
+           dentry_did_left,
            dentry_did_right,
            dentry_did_root,
            0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -119,12 +119,12 @@ class XlsDoc:
            dentry_stream_sz,
            0
         ) * 2
-    
+
     def _build_sat(self):
         # Build SAT
         book_sect_count = self.book_stream_len >> 9
         dir_sect_count  = len(self.dir_stream) >> 9
-        
+
         total_sect_count     = book_sect_count + dir_sect_count
         SAT_sect_count       = 0
         MSAT_sect_count      = 0
@@ -155,7 +155,7 @@ class XlsDoc:
             sect += 1
 
         while sect < book_sect_count + MSAT_sect_count + SAT_sect_count:
-            self.SAT_sect.append(sect)            
+            self.SAT_sect.append(sect)
             SAT[sect] = self.SID_USED_BY_SAT
             sect += 1
 
@@ -245,7 +245,7 @@ class XlsDoc:
                                         msat_start_sid,
                                         total_msat_sectors
                                     ])
-                                        
+
 
     def save(self, file_name_or_filelike_obj, stream):
         # 1. Align stream on 0x1000 boundary (and therefore on sector boundary)
@@ -255,7 +255,7 @@ class XlsDoc:
         self._build_directory()
         self._build_sat()
         self._build_header()
-        
+
         f = file_name_or_filelike_obj
         we_own_it = not hasattr(f, 'write')
         if we_own_it:

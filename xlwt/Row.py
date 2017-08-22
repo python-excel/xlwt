@@ -81,7 +81,7 @@ class Row(object):
             if iarg > sheet.last_used_col:
                 sheet.last_used_col = iarg
 
-    def __excel_date_dt(self, date): 
+    def __excel_date_dt(self, date):
         adj = False
         if isinstance(date, dt.date):
             if self.__parent_wb.dates_1904:
@@ -97,11 +97,11 @@ class Row(object):
             date = dt.datetime.combine(dt.datetime(1900, 1, 1), date)
             epoch = dt.datetime(1900, 1, 1)
         delta = date - epoch
-        xldate = delta.days + delta.seconds / 86400.0                      
+        xldate = delta.days + delta.seconds / 86400.0
         # Add a day for Excel's missing leap day in 1900
         if adj and xldate > 59:
             xldate += 1
-        return xldate    
+        return xldate
 
     def get_height_in_pixels(self):
         return self.__height_in_pixels
@@ -263,7 +263,7 @@ class Row(object):
     def __rich_text_helper(self, col, rich_text_list, style, style_index=None):
         if style_index is None:
             style_index = self.__parent_wb.add_style(style)
-        default_font = None    
+        default_font = None
         rt = []
         for data in rich_text_list:
             if isinstance(data, basestring):
@@ -287,7 +287,3 @@ class Row(object):
 
     write_blanks = set_cell_mulblanks
     write_rich_text = set_cell_rich_text
-
-
-
-

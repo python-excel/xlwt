@@ -40,4 +40,3 @@ class Formula(object):
 
         '''
         return struct.pack("<H", len(self.__parser.rpn)) + self.__parser.rpn
-

@@ -48,5 +48,5 @@ ws0.write(0, 0, 'Olya'*0x4000, st0)
 
 #for i in range(0, 0x10):
 #    ws0.write(i, 2, ('%d'%i)*0x4000, st1)
-    
+
 wb.save('sst.xls')

@@ -241,4 +241,3 @@ def _get_cells_biff_data_mul(rowx, cell_items):
             pieces.append(packed_record)
         i = nexti
     return b''.join(pieces)
-

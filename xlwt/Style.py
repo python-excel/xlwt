@@ -151,10 +151,10 @@ class StyleCollection(object):
             raise ValueError("More than 4094 XFs (styles)")
 
         return xf, xf_index
-        
+
     def add_font(self, font):
         return self._add_font(font)
-        
+
     def _add_font(self, font):
         if font in self._font_id2x:
             font_idx = self._font_id2x[font]
@@ -175,7 +175,7 @@ class StyleCollection(object):
             font_idx = len(self._font_id2x) + 1
             self._font_id2x[font] = font_idx
             self.stats[2] += 1
-            
+
         return font_idx
 
 
@@ -373,7 +373,7 @@ del _colour_map_text, _line, _name, _num
 
 def add_palette_colour(colour_str, colour_index):
     if not (8 <= colour_index <= 63):
-        raise Exception("add_palette_colour: colour_index (%d) not in range(8, 64)" % 
+        raise Exception("add_palette_colour: colour_index (%d) not in range(8, 64)" %
                 (colour_index))
     colour_map[colour_str] = colour_index
 
@@ -395,65 +395,65 @@ def add_palette_colour(colour_str, colour_index):
 #    (153, 51,  0), (153, 51,102), ( 51, 51,153), ( 51, 51, 51),
 #    ]
 
-# Default colour table for BIFF8 copied from 
+# Default colour table for BIFF8 copied from
 # OpenOffice.org's Documentation of the Microsoft Excel File Format, Excel Version 2003
 # Note palette has LSB padded with 2 bytes 0x00
-excel_default_palette_b8 = ( 
-0x00000000, 
-0xFFFFFF00, 
-0xFF000000, 
-0x00FF0000, 
-0x0000FF00, 
-0xFFFF0000, 
-0xFF00FF00, 
+excel_default_palette_b8 = (
+0x00000000,
+0xFFFFFF00,
+0xFF000000,
+0x00FF0000,
+0x0000FF00,
+0xFFFF0000,
+0xFF00FF00,
 0x00FFFF00,
-0x80000000, 
-0x00800000, 
-0x00008000, 
-0x80800000, 
-0x80008000, 
-0x00808000, 
-0xC0C0C000, 
-0x80808000, 
-0x9999FF00, 
-0x99336600, 
-0xFFFFCC00, 
-0xCCFFFF00, 
-0x66006600, 
-0xFF808000, 
-0x0066CC00, 
-0xCCCCFF00, 
-0x00008000, 
-0xFF00FF00, 
-0xFFFF0000, 
-0x00FFFF00, 
-0x80008000, 
-0x80000000, 
-0x00808000, 
-0x0000FF00, 
-0x00CCFF00, 
-0xCCFFFF00, 
-0xCCFFCC00, 
-0xFFFF9900, 
-0x99CCFF00, 
-0xFF99CC00, 
-0xCC99FF00, 
-0xFFCC9900, 
-0x3366FF00, 
-0x33CCCC00, 
-0x99CC0000, 
-0xFFCC0000, 
-0xFF990000, 
-0xFF660000, 
-0x66669900, 
-0x96969600, 
-0x00336600, 
-0x33996600, 
-0x00330000, 
-0x33330000, 
-0x99330000, 
-0x99336600, 
-0x33339900, 
+0x80000000,
+0x00800000,
+0x00008000,
+0x80800000,
+0x80008000,
+0x00808000,
+0xC0C0C000,
+0x80808000,
+0x9999FF00,
+0x99336600,
+0xFFFFCC00,
+0xCCFFFF00,
+0x66006600,
+0xFF808000,
+0x0066CC00,
+0xCCCCFF00,
+0x00008000,
+0xFF00FF00,
+0xFFFF0000,
+0x00FFFF00,
+0x80008000,
+0x80000000,
+0x00808000,
+0x0000FF00,
+0x00CCFF00,
+0xCCFFFF00,
+0xCCFFCC00,
+0xFFFF9900,
+0x99CCFF00,
+0xFF99CC00,
+0xCC99FF00,
+0xFFCC9900,
+0x3366FF00,
+0x33CCCC00,
+0x99CC0000,
+0xFFCC0000,
+0xFF990000,
+0xFF660000,
+0x66669900,
+0x96969600,
+0x00336600,
+0x33996600,
+0x00330000,
+0x33330000,
+0x99330000,
+0x99336600,
+0x33339900,
 0x33333300)
 
 assert len(excel_default_palette_b8) == 56

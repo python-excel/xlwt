@@ -25,4 +25,3 @@ for i in range(0xE000, 0x10000):
     ws1.write(i//0x10, i%0x10, unichr(i), style)
 
 w.save('unicode2.xls')
-

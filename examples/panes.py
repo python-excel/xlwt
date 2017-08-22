@@ -55,4 +55,3 @@ ws6.vert_split_pos = 40
 ws4.vert_split_first_visible = 2
 
 w.save('panes.xls')
-

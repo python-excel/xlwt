@@ -19,7 +19,7 @@ print("\nstart: %s" % ctime(t0))
 
 print("Filling...")
 for col in xrange(colcount):
-    print("[%d]" % col, end=' ') 
+    print("[%d]" % col, end=' ')
     for row in xrange(rowcount):
         #ws0.write(row, col, "BIG(%d, %d)" % (row, col))
         ws0.write(row, col, "BIG")
@@ -32,5 +32,3 @@ wb.save('big-16Mb.xls')
 
 t2 = time() - t0
 print("since starting elapsed %.2f s" % (t2))
-
-

@@ -1,4 +1,3 @@
-
 # Write an XLS file with a single worksheet, containing
 # a heading row and some rows of data.
 
