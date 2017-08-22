@@ -3,6 +3,22 @@ Changes
 
 .. currentmodule:: xlwt
 
+1.3.0 (22 August 2017)
+----------------------
+
+- Officially support Python 3.6, drop support for 2.6.
+
+- Fix bytes/string type mismatch in :func:`upack2rt` on python 3.
+
+- Packaging and code style tweaks.
+
+- Use generator expressions to avoid unnecessary lists in memory.
+
+Thanks to the following for their contributions to this release:
+
+- Jon Dufresne
+- Bill Adams
+
 1.2.0 (4 January 2017)
 ----------------------
 
