@@ -4,7 +4,7 @@ import xlwt
 class TestByName(unittest.TestCase):
     def setUp(self):
         self.wb = xlwt.Workbook()
-        self.wb.add_sheet('Plan1')    
+        self.wb.add_sheet('Plan1')
         self.wb.add_sheet('Plan2')
         self.wb.add_sheet('Plan3')
         self.wb.add_sheet('Plan4')
@@ -18,13 +18,12 @@ class TestByName(unittest.TestCase):
         'Get sheet by name'
         ws = self.wb.get_sheet('Plan2')
         self.assertEqual('Plan2', ws.name)
-    
+
     def test_get_by_index(self):
         'Get sheet by index'
         ws = self.wb.get_sheet(1)
         self.assertEqual('Plan2', ws.name)
-    
+
     def test_invalid_sheet_parameter(self):
         'Raises exception when sheet is not string or integer'
         self.assertRaises(Exception, self.wb.get_sheet, 1.1)
-

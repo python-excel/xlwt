@@ -64,4 +64,3 @@ class TestSimple(unittest.TestCase):
     def test_font_compression(self):
         wb, ws = self.create_simple_xls(style_compression = 2)
         wb.save(in_tst_output_dir('simple.xls'), )
-

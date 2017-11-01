@@ -272,4 +272,3 @@ class ImDataBmpRecord(ImRawDataBmpRecord):
 
         self.width, self.height, self.size, data = _process_bitmap(filename)
         self._write_imdata(data)
-

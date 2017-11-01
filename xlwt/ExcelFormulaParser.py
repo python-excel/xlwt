@@ -666,4 +666,3 @@ def mk_tokenSet_0():
     data = [ 37681618946, 0]
     return data
 _tokenSet_0 = antlr.BitSet(mk_tokenSet_0())
-

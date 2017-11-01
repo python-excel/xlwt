@@ -18,7 +18,7 @@ class Column(object):
         self.user_set = 0
         self.best_fit = 0
         self.unused = 0
-        
+
     def set_width(self, width):
         if not(isinstance(width, int) and 0 <= width <= 65535):
             raise ValueError("column width (%r) not an int in range(65536)" % width)
@@ -44,6 +44,3 @@ class Column(object):
         options |= (self.collapse & 0x01) << 12
 
         return ColInfoRecord(self._index, self._index, self.width, self._xf_index, options, self.unused).get()
-
-
-

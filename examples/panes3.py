@@ -11,7 +11,7 @@ for px,py in (
     (10,0),  # vertical split
     (10,10), # both split
     ):
-    
+
     for active in range(4):
 
         # 0 - logical bottom-right pane
@@ -39,4 +39,3 @@ for px,py in (
         sheet.active_pane = active
 
 w.save('panes3.xls')
-

@@ -25,4 +25,3 @@ one_more_ws.write(0, 0, u'\u2665\u2665')
 
 w.add_sheet(u'\N{GREEK SMALL LETTER ETA WITH TONOS}')
 w.save('unicode1.xls')
-

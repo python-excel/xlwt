@@ -8,7 +8,7 @@ header {
     _RVAdeltaRef =  {"R": 0, "V": 0x20, "A": 0x40, "D": 0x20}
     _RVAdeltaArea = {"R": 0, "V": 0x20, "A": 0x40, "D": 0}
 
-    
+
     class FormulaParseException(Exception):
         """
         An exception indicating that a Formula could not be successfully parsed.
@@ -196,7 +196,7 @@ primary[arg_type]
             self.rpn += struct.pack("<B4H", ptg, r1, r2, c1, c2)
         }
     | sheet1 = sheet
-        { 
+        {
             sheet2 = sheet1
         }
         ( COLON sheet2 = sheet )? BANG ref3d_ref2d: REF2D

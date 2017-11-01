@@ -57,4 +57,3 @@ ws7.vert_split_pos = V * 955 + 410 # twips
 ws7.vert_split_first_visible = VF
 
 w.save('panes2.xls')
-

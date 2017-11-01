@@ -11,7 +11,7 @@
 
 .. |PyPI| image:: https://badge.fury.io/py/xlwt.svg
 .. _PyPI: https://badge.fury.io/py/xlwt
-    
+
 xlwt
 ====
 

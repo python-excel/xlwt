@@ -27,5 +27,3 @@ wb.save('big-35Mb.xls')
 
 t2 = time() - t0
 print("since starting elapsed %.2f s" % (t2))
-
-

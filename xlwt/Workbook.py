@@ -304,12 +304,12 @@ class Workbook(object):
 
     def set_colour_RGB(self, colour_index, red, green, blue):
         if not(8 <= colour_index <= 63):
-            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" % 
+            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" %
                     colour_index)
         if min(red, green, blue) < 0 or max(red, green, blue) > 255:
-            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)" 
+            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)"
                     % (red, green, blue))
-        if self.__custom_palette_b8 is None: 
+        if self.__custom_palette_b8 is None:
             self.__custom_palette_b8 = list(Style.excel_default_palette_b8)
         # User-defined Palette starts at colour index 8,
         # so subtract 8 from colour_index when placing in palette
@@ -322,7 +322,7 @@ class Workbook(object):
 
     def add_style(self, style):
         return self.__styles.add(style)
-    
+
     def add_font(self, font):
         return self.__styles.add_font(font)
 
@@ -334,10 +334,10 @@ class Workbook(object):
 
     def str_index(self, s):
         return self.__sst.str_index(s)
-        
+
     def add_rt(self, rt):
         return self.__sst.add_rt(rt)
-    
+
     def rt_index(self, rt):
         return self.__sst.rt_index(rt)
 
@@ -381,14 +381,14 @@ class Workbook(object):
             return self.__worksheets[sheetnum]
         else:
             raise Exception("sheet must be integer or string")
-    
+
     def sheet_index(self, sheetname):
         try:
-            sheetnum = self.__worksheet_idx_from_name[sheetname.lower()] 
+            sheetnum = self.__worksheet_idx_from_name[sheetname.lower()]
         except KeyError:
             self.raise_bad_sheetname(sheetname)
-            
-        return sheetnum       
+
+        return sheetnum
 
     def raise_bad_sheetname(self, sheetname):
         raise Exception("Formula: unknown sheet name %s" % sheetname)
@@ -570,7 +570,7 @@ class Workbook(object):
         return self.__styles.get_biff_data()
 
     def __palette_rec(self):
-        if self.__custom_palette_b8 is None: 
+        if self.__custom_palette_b8 is None:
             return b''
         info = BIFFRecords.PaletteRecord(self.__custom_palette_b8).get()
         return info
@@ -708,5 +708,3 @@ class Workbook(object):
 
         doc = CompoundDoc.XlsDoc()
         doc.save(filename_or_stream, self.get_biff_data())
-
-
