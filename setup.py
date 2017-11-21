@@ -5,7 +5,7 @@ from xlwt import __VERSION__
 DESCRIPTION = (
     'Library to create spreadsheet files compatible with '
     'MS Excel 97/2000/XP/2003 XLS files, '
-    'on any platform, with Python 2.6, 2.7, 3.3+'
+    'on any platform, with Python 2.7, 3.3+'
     )
 
 CLASSIFIERS = [
