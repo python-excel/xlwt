@@ -7,7 +7,7 @@
 .. _Coveralls: https://coveralls.io/r/python-excel/xlwt?branch=master
 
 .. |Docs| image:: https://readthedocs.org/projects/xlwt/badge/?version=latest
-.. _Docs: https://xlwt.readthedocs.org/en/latest/
+.. _Docs: https://xlwt.readthedocs.io/en/latest/
 
 .. |PyPI| image:: https://badge.fury.io/py/xlwt.svg
 .. _PyPI: https://badge.fury.io/py/xlwt
@@ -63,7 +63,7 @@ If these aren't sufficient, please consult the code in the
 examples directory and the source code itself.
 
 The latest documentation can also be found at:
-https://xlwt.readthedocs.org/en/latest/
+https://xlwt.readthedocs.io/en/latest/
 
 Problems?
 =========
