@@ -36,7 +36,7 @@ import tempfile
 
 from . import BIFFRecords, Bitmap, Style
 from .Column import Column
-from .compat import itervalues, unicode
+from .compat import PY3, itervalues, unicode
 from .Row import Row
 
 
@@ -724,7 +724,7 @@ class Worksheet(object):
     #################################################################
 
     def set_header_str(self, value):
-        if isinstance(value, str):
+        if not PY3 and isinstance(value, str):
             value = unicode(value, self.__parent.encoding)
         self.__header_str = value
 
@@ -736,7 +736,7 @@ class Worksheet(object):
     #################################################################
 
     def set_footer_str(self, value):
-        if isinstance(value, str):
+        if not PY3 and isinstance(value, str):
             value = unicode(value, self.__parent.encoding)
         self.__footer_str = value
 
