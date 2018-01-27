@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from struct import pack
 from .UnicodeUtils import upack1, upack2, upack2rt
 from .compat import basestring, unicode, unicode_type, xrange, iteritems
@@ -72,7 +73,7 @@ class SharedStringTable(object):
         data.sort() # in index order
         for idx, s in data:
             if self._tally[idx] == 0:
-                s = u''
+                s = ''
             if isinstance(s, basestring):
                 self._add_to_sst(s)
             else:

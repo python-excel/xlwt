@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 import unittest
 import filecmp
@@ -8,7 +9,7 @@ from utils import in_tst_dir, in_tst_output_dir
 
 import xlwt
 
-LOREM_IPSUM = u'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+LOREM_IPSUM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
 
 
 class TestSimple(unittest.TestCase):
@@ -46,8 +47,8 @@ class TestSimple(unittest.TestCase):
         wb, ws = self.create_simple_xls()
         more_content=[
             [
-                u'A{0}'.format(i),
-                u'Zażółć gęślą jaźń {0} {1}'.format(i, LOREM_IPSUM),
+                'A{0}'.format(i),
+                'Zażółć gęślą jaźń {0} {1}'.format(i, LOREM_IPSUM),
             ]
             for idx, i in enumerate(range(1000, 1050))
         ]
