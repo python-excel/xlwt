@@ -1,4 +1,4 @@
-# -*- coding: windows-1252 -*-
+# -*- coding: utf-8 -*-
 
 from struct import unpack, pack
 from . import BIFFRecords
