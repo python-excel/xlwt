@@ -1,4 +1,5 @@
 # coding:utf-8
+from __future__ import unicode_literals
 
 import sys
 import unittest
@@ -8,22 +9,22 @@ from xlwt.UnicodeUtils import upack1, upack2, upack2rt
 class TestUpack(unittest.TestCase):
     def test_upack1(self):
         result = b'\x1d\x00abcdefghijklmnopqrstuvwxyz\xd6\xc4\xdc'
-        ustr = upack1(u"abcdefghijklmnopqrstuvwxyzÖÄÜ")
+        ustr = upack1("abcdefghijklmnopqrstuvwxyzÖÄÜ")
         self.assertEqual(ustr, result)
 
     def test_upack2_ascii(self):
         result = b'\x1d\x00\x00abcdefghijklmnopqrstuvwxyz\xd6\xc4\xdc'
-        ustr = upack2(u"abcdefghijklmnopqrstuvwxyzÖÄÜ")
+        ustr = upack2("abcdefghijklmnopqrstuvwxyzÖÄÜ")
         self.assertEqual(ustr, result)
 
     def test_upack2_latin1(self):
         result = b'\x1d\x00\x00abcdefghijklmnopqrstuvwxyz\xd6\xc4\xdc'
-        ustr = upack2(u"abcdefghijklmnopqrstuvwxyzÖÄÜ", encoding='latin1')
+        ustr = upack2("abcdefghijklmnopqrstuvwxyzÖÄÜ", encoding='latin1')
         self.assertEqual(ustr, result)
 
     def test_upack2_cp1251(self):
         result = b'\x1d\x00\x00abcdefghijklmnopqrstuvwxyz\xce\xeb\xff'
-        ustr = upack2(u"abcdefghijklmnopqrstuvwxyz\xce\xeb\xff", encoding='cp1251')
+        ustr = upack2("abcdefghijklmnopqrstuvwxyz\xce\xeb\xff", encoding='cp1251')
         self.assertEqual(ustr, result)
 
     def test_unicode(self):
@@ -34,4 +35,4 @@ class TestUpack(unittest.TestCase):
 
     def test_upack2rt(self):
         result = b'\x06\x00\x09\x01\x00a\x00b\x00c\x00\x91\x03\x92\x03\x93\x03', b'\x00\x00\x0C\x00'
-        self.assertEqual(result, upack2rt([(u'abcΑΒΓ', 12)]))
+        self.assertEqual(result, upack2rt([('abcΑΒΓ', 12)]))

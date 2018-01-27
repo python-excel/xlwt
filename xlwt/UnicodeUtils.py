@@ -39,6 +39,8 @@ var.     ln or
 [var.]   sz     (optional, only if phonetic=1) Asian Phonetic Settings Block
 '''
 
+from __future__ import unicode_literals
+
 from .compat import unicode, unicode_type
 from struct import pack
 
@@ -65,13 +67,13 @@ def upack2(s, encoding='ascii'):
         n_items = len(encs) // 2
         # n_items is the number of "double byte characters" i.e. MS C wchars
         # Can't use len(us).
-        # len(u"\U0001D400") -> 1 on a wide-unicode build
+        # len("\U0001D400") -> 1 on a wide-unicode build
         # and 2 on a narrow-unicode build.
         # We need n_items == 2 in this case.
     return pack('<HB', n_items, flag) + encs
 
 def upack2rt(rt, encoding='ascii'):
-    us = u''
+    us = ''
     fr = b''
     offset = 0
     # convert rt strings to unicode if not already unicode
@@ -85,7 +87,7 @@ def upack2rt(rt, encoding='ascii'):
             # fontx can be None only for the first piece
             fr += pack('<HH', offset, fontx)
         # offset is the number of MS C wchar characters.
-        # That is 1 if c <= u'\uFFFF' else 2
+        # That is 1 if c <= '\uFFFF' else 2
         offset += len(s.encode('utf_16_le')) // 2
     num_fr = len(fr) // 4 # ensure result is int
     if offset > 32767:

@@ -1,6 +1,7 @@
 # see the xlwt.license module for details of licensing.
 
 # Utilities for work with reference to cells and with sheetnames
+from __future__ import unicode_literals
 
 import re
 from .ExcelMagic import MAX_ROW, MAX_COL
@@ -153,10 +154,10 @@ def cell_to_packed_rowcol(cell):
 # === sheetname functions ===
 
 def valid_sheet_name(sheet_name):
-    if sheet_name == u"" or sheet_name[0] == u"'" or len(sheet_name) > 31:
+    if sheet_name == "" or sheet_name[0] == "'" or len(sheet_name) > 31:
         return False
     for c in sheet_name:
-        if c in u"[]:\\?/*\x00":
+        if c in "[]:\\?/*\x00":
             return False
     return True
 
@@ -164,4 +165,4 @@ def quote_sheet_name(unquoted_sheet_name):
     if not valid_sheet_name(unquoted_sheet_name):
         raise Exception(
             'attempt to quote an invalid worksheet name %r' % unquoted_sheet_name)
-    return u"'" + unquoted_sheet_name.replace(u"'", u"''") + u"'"
+    return "'" + unquoted_sheet_name.replace("'", "''") + "'"
