@@ -21,7 +21,6 @@ def write_xls(file_name, sheet_name, headings, data, heading_xf, data_xfs):
     book.save(file_name)
 
 if __name__ == '__main__':
-    import sys
     mkd = datetime.date
     hdngs = ['Date', 'Stock Code', 'Quantity', 'Unit Price', 'Value', 'Message']
     kinds =  'date    text          int         price         money    text'.split()

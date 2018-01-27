@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import os
 import unittest
 import filecmp
 from datetime import datetime
