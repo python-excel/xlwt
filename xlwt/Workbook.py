@@ -1,4 +1,4 @@
-# -*- coding: windows-1252 -*-
+# -*- coding: utf-8 -*-
 # Record Order in BIFF8
 #   Workbook Globals Substream
 #       BOF Type = workbook globals

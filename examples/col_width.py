@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: windows-1251 -*-
+# -*- coding: utf-8 -*-
 # Copyright (C) 2005 Kiseliov Roman
 __rev_id__ = """$Id$"""
 

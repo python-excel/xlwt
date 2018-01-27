@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 from __future__ import print_function
-# -*- coding: windows-1252 -*-
 
 from .antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
 from . import ExcelFormulaParser

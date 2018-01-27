@@ -1,4 +1,4 @@
-# -*- coding: windows-1252 -*-
+# -*- coding: utf-8 -*-
 #             BOF
 #             UNCALCED
 #             INDEX
