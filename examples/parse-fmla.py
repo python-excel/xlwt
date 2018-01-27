@@ -1,5 +1,4 @@
-from xlwt import ExcelFormulaParser, ExcelFormula
-import sys
+from xlwt import ExcelFormula
 
 f = ExcelFormula.Formula(
 """ -((1.80 + 2.898 * 1)/(1.80 + 2.898))*
