@@ -1,4 +1,10 @@
 from __future__ import print_function
+
+## get sys module
+import sys
+
+from .compat import basestring, int_types, long, xrange
+
 ## This file is part of PyANTLR. See LICENSE.txt for license
 ## details..........Copyright (C) Wolfgang Haefelinger, 2004.
 
@@ -41,10 +47,7 @@ from __future__ import print_function
 
 ## End of contents of the ANTLR 2.7.7 LICENSE.txt ########################
 
-## get sys module
-import sys
 
-from .compat import long, basestring, int_types, xrange
 
 ###xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx###
 ###                     global symbols                             ###

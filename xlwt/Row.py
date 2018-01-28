@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from decimal import Decimal
-from . import BIFFRecords
-from . import Style
-from .Cell import StrCell, BlankCell, NumberCell, FormulaCell, MulBlankCell, BooleanCell, ErrorCell, \
-    _get_cells_biff_data_mul
-from . import ExcelFormula
 import datetime as dt
+from decimal import Decimal
+
+from . import BIFFRecords, ExcelFormula, Style
+from .Cell import (
+    BlankCell, BooleanCell, ErrorCell, FormulaCell, MulBlankCell, NumberCell,
+    StrCell, _get_cells_biff_data_mul,
+)
+from .compat import basestring, int_types, iteritems, xrange
 from .Formatting import Font
-from .compat import basestring, xrange, int_types, iteritems
 
 
 class Row(object):

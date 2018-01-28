@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from struct import pack
+
+from .compat import basestring, iteritems, unicode, unicode_type, xrange
 from .UnicodeUtils import upack1, upack2, upack2rt
-from .compat import basestring, unicode, unicode_type, xrange, iteritems
+
 
 class SharedStringTable(object):
     _SST_ID = 0x00FC

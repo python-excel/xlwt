@@ -1,4 +1,7 @@
 from __future__ import print_function
+
+from xlwt import *
+
 props = \
 [
         'name',
@@ -76,7 +79,6 @@ props = \
         'copies_num',
 ]
 
-from xlwt import *
 
 wb = Workbook()
 ws = wb.add_sheet('sheet')

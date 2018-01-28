@@ -1,4 +1,5 @@
 import xlwt
+
 book = xlwt.Workbook()
 for magn in (0, 60, 100, 75, 150):
     for preview in (False, True):

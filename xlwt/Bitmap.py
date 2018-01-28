@@ -4,8 +4,9 @@
 #  Portions are Copyright (c) 2004 Evgeny Filatov <fufff@users.sourceforge.net>
 #  Portions are Copyright (c) 2002-2004 John McNamara (Perl Spreadsheet::WriteExcel)
 
-from .BIFFRecords import BiffRecord
 from struct import pack, unpack
+
+from .BIFFRecords import BiffRecord
 
 
 def _size_col(sheet, col):

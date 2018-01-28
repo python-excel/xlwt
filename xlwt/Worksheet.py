@@ -32,13 +32,13 @@
 #             RANGEPROTECTION (BIFF8X only)
 #             EOF
 
-from . import BIFFRecords
-from . import Bitmap
-from . import Style
-from .Row import Row
-from .Column import Column
-from .compat import unicode, itervalues
 import tempfile
+
+from . import BIFFRecords, Bitmap, Style
+from .Column import Column
+from .compat import itervalues, unicode
+from .Row import Row
+
 
 class Worksheet(object):
     """

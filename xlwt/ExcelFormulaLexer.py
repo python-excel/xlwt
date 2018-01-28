@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from .antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
-from . import ExcelFormulaParser
-from re import compile as recompile, IGNORECASE, VERBOSE
+from re import IGNORECASE, VERBOSE, compile as recompile
 
+from . import ExcelFormulaParser
+from .antlr import EOF, CommonToken as Tok, TokenStream, TokenStreamException
 
 int_const_pattern = r"\d+\b"
 flt_const_pattern = r"""
