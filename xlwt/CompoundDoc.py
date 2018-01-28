@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import struct
+
 from .compat import xrange
 
 # This implementation writes only 'Root Entry', 'Workbook' streams

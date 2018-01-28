@@ -38,9 +38,9 @@
 #       ExtSST
 #       EOF
 
-from . import BIFFRecords
-from . import Style
-from .compat import unicode_type, int_types, basestring
+from . import BIFFRecords, Style
+from .compat import basestring, int_types, unicode_type
+
 
 class Workbook(object):
     """

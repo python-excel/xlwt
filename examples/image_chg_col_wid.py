@@ -2,6 +2,7 @@
 # when inserting a picture/image.
 
 import xlwt
+
 w = xlwt.Workbook()
 ws = w.add_sheet('Image')
 

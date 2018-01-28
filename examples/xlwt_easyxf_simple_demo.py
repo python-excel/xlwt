@@ -1,8 +1,10 @@
 # Write an XLS file with a single worksheet, containing
 # a heading row and some rows of data.
 
-import xlwt
 import datetime
+
+import xlwt
+
 ezxf = xlwt.easyxf
 
 def write_xls(file_name, sheet_name, headings, data, heading_xf, data_xfs):

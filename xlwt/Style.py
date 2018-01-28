@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 from . import Formatting
-from .BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
+from .BIFFRecords import NumberFormatRecord, StyleRecord, XFRecord
 from .compat import basestring, xrange
 
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164

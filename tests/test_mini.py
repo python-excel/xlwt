@@ -1,10 +1,11 @@
+import filecmp
 import os
 import unittest
-import filecmp
 
 from utils import in_tst_dir, in_tst_output_dir
 
 import xlwt
+
 
 def from_tst_dir(filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)

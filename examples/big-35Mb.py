@@ -1,8 +1,10 @@
-from __future__ import print_function
 #!/usr/bin/env python
 # tries stress SST, SAT and MSAT
 
+from __future__ import print_function
+
 from time import *
+
 from xlwt import *
 
 style = XFStyle()

@@ -1,5 +1,6 @@
 from xlwt import Workbook
 from xlwt.BIFFRecords import PanesRecord
+
 w = Workbook()
 
 # do each of the 4 scenarios with each of the 4 possible

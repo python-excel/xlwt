@@ -2,6 +2,7 @@
 
 from .BIFFRecords import ColInfoRecord
 
+
 class Column(object):
     def __init__(self, colx, parent_sheet):
         if not(isinstance(colx, int) and 0 <= colx <= 255):

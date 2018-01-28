@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
-import unittest
 import filecmp
+import unittest
+
+from utils import in_tst_dir, in_tst_output_dir
 
 import xlwt
 
-from utils import in_tst_dir, in_tst_output_dir
 
 def create_example_xls(filename):
     w = xlwt.Workbook()

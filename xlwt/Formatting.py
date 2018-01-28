@@ -34,6 +34,7 @@ is not set), it repeats the attributes of its style XF record.
 
 from . import BIFFRecords
 
+
 class Font(object):
 
     ESCAPEMENT_NONE         = 0x00

@@ -1,10 +1,11 @@
 # coding:utf-8
 from __future__ import unicode_literals
 
-from io import BytesIO
 import unittest
+from io import BytesIO
 
 import xlwt
+
 
 class TestSharedStringTable(unittest.TestCase):
     def test_shared_string_table(self):

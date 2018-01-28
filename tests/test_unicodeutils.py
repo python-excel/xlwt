@@ -6,6 +6,7 @@ import unittest
 
 from xlwt.UnicodeUtils import upack1, upack2, upack2rt
 
+
 class TestUpack(unittest.TestCase):
     def test_upack1(self):
         result = b'\x1d\x00abcdefghijklmnopqrstuvwxyz\xd6\xc4\xdc'

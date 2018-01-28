@@ -1,10 +1,11 @@
-import unittest
-import filecmp
 import datetime
+import filecmp
+import unittest
 
 from utils import in_tst_dir, in_tst_output_dir
 
 import xlwt as xlwt
+
 ezxf = xlwt.easyxf
 
 def write_xls(file_name, sheet_name, headings, data, heading_xf, data_xfs):

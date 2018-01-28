@@ -41,8 +41,10 @@ var.     ln or
 
 from __future__ import unicode_literals
 
-from .compat import unicode, unicode_type
 from struct import pack
+
+from .compat import unicode, unicode_type
+
 
 def upack2(s, encoding='ascii'):
     # If not unicode, make it so.

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import unittest
 import filecmp
+import unittest
 from datetime import datetime
 
 from utils import in_tst_dir, in_tst_output_dir

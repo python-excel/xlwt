@@ -4,8 +4,9 @@
 from __future__ import unicode_literals
 
 import re
-from .ExcelMagic import MAX_ROW, MAX_COL
+
 from .compat import xrange
+from .ExcelMagic import MAX_COL, MAX_ROW
 
 _re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)", re.IGNORECASE)
 _re_row_range = re.compile(r"\$?(\d+):\$?(\d+)")

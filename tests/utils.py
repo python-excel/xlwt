@@ -1,5 +1,6 @@
 import os
-from os.path import join, dirname, abspath, isdir
+from os.path import abspath, dirname, isdir, join
+
 
 def in_tst_dir(filename):
     return join(dirname(abspath(__file__)), filename)

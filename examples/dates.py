@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2005 Kiseliov Roman
 
-from xlwt import *
 from datetime import datetime
+
+from xlwt import *
 
 w = Workbook()
 ws = w.add_sheet('Hey, Dude')

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import unittest
 import filecmp
+import unittest
 
 from utils import in_tst_dir, in_tst_output_dir
 
 import xlwt
+
 
 class TestBitmaps(unittest.TestCase):
     def test_create_bitmap_from_memory(self):

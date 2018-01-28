@@ -1,12 +1,11 @@
 ### $ANTLR 2.7.7 (20060930): "xlwt/excel-formula.g" -> "ExcelFormulaParser.py"$
 ### import antlr and other modules ..
-from . import antlr
-
 ### header action >>>
 import struct
-from . import Utils
-from .UnicodeUtils import upack1
+
+from . import Utils, antlr
 from .ExcelMagic import *
+from .UnicodeUtils import upack1
 
 _RVAdelta =     {"R": 0, "V": 0x20, "A": 0x40}
 _RVAdeltaRef =  {"R": 0, "V": 0x20, "A": 0x40, "D": 0x20}
