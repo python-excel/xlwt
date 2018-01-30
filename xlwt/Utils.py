@@ -97,10 +97,10 @@ def rowcol_pair_to_cellrange(row1, col1, row2, col2,
     assert row1 <= row2
     assert col1 <= col2
     return (
-        rowcol_to_cell(row1, col1, row1_abs, col1_abs)
-        + ":"
-        + rowcol_to_cell(row2, col2, row2_abs, col2_abs)
-        )
+        rowcol_to_cell(row1, col1, row1_abs, col1_abs) +
+        ":" +
+        rowcol_to_cell(row2, col2, row2_abs, col2_abs)
+    )
 
 def cellrange_to_rowcol_pair(cellrange):
     """Convert cell range string in A1 notation to numeric row/col

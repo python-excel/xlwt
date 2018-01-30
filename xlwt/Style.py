@@ -97,10 +97,10 @@ class StyleCollection(object):
             num_format_idx = self._num_formats[num_format_str]
         else:
             num_format_idx = (
-                FIRST_USER_DEFINED_NUM_FORMAT_IDX
-                + len(self._num_formats)
-                - len(StyleCollection._std_num_fmt_list)
-                )
+                FIRST_USER_DEFINED_NUM_FORMAT_IDX +
+                len(self._num_formats) -
+                len(StyleCollection._std_num_fmt_list)
+            )
             self._num_formats[num_format_str] = num_format_idx
 
         font = style.font
