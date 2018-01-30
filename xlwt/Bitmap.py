@@ -92,8 +92,8 @@ def _position_image(sheet, row_start, col_start, x1, y1, width, height):
         row_end += 1
     # Bitmap isn't allowed to start or finish in a hidden cell, i.e. a cell
     # with zero height or width.
-    if ((_size_col(sheet, col_start) == 0) or (_size_col(sheet, col_end) == 0)
-            or (_size_row(sheet, row_start) == 0) or (_size_row(sheet, row_end) == 0)):
+    if ((_size_col(sheet, col_start) == 0) or (_size_col(sheet, col_end) == 0) or
+            (_size_row(sheet, row_start) == 0) or (_size_row(sheet, row_end) == 0)):
         return
     # Convert the pixel values to the percentage value expected by Excel
     x1 = int(float(x1) / _size_col(sheet, col_start) * 1024)
