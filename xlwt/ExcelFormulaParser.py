@@ -167,7 +167,6 @@ class Parser(antlr.LLkParser):
 
                 self.prec2_expr(arg_type)
                 self.rpn += op;
-                          # print "**prec1_expr4 %s" % arg_type
             else:
                 break
 
