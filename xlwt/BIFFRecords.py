@@ -97,13 +97,16 @@ class SharedStringTable(object):
 
         is_unicode_str = u_str[2] == b'\x01'[0]
         if is_unicode_str:
-            atom_len = 5 # 2 byte -- len,
-                         # 1 byte -- options,
-                         # 2 byte -- 1st sym
+            # 2 byte -- len
+            # 1 byte -- options
+            # 2 byte -- 1st sym
+            atom_len = 5
         else:
-            atom_len = 4 # 2 byte -- len,
-                         # 1 byte -- options,
-                         # 1 byte -- 1st sym
+            # 2 byte -- len
+            # 1 byte -- options
+            # 1 byte -- 1st sym
+            atom_len = 4
+
 
         self._save_atom(u_str[0:atom_len])
         self._save_splitted(u_str[atom_len:], is_unicode_str)
@@ -112,15 +115,17 @@ class SharedStringTable(object):
         rt_str, rt_fr = upack2rt(rt, self.encoding)
         is_unicode_str = rt_str[2] == b'\x09'[0]
         if is_unicode_str:
-            atom_len = 7 # 2 byte -- len,
-                         # 1 byte -- options,
-                         # 2 byte -- number of rt runs
-                         # 2 byte -- 1st sym
+            # 2 byte -- len
+            # 1 byte -- options
+            # 2 byte -- number of rt runs
+            # 2 byte -- 1st sym
+            atom_len = 7
         else:
-            atom_len = 6 # 2 byte -- len,
-                         # 1 byte -- options,
-                         # 2 byte -- number of rt runs
-                         # 1 byte -- 1st sym
+            # 2 byte -- len,
+            # 1 byte -- options,
+            # 2 byte -- number of rt runs
+            # 1 byte -- 1st sym
+            atom_len = 6
         self._save_atom(rt_str[0:atom_len])
         self._save_splitted(rt_str[atom_len:], is_unicode_str)
         for i in range(0, len(rt_fr), 4):
