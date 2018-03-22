@@ -706,5 +706,7 @@ class Workbook(object):
         """
         from . import CompoundDoc
 
+        if (self.__worksheets == []):
+            raise Exception("Can't save a workbook that contains no worksheets")
         doc = CompoundDoc.XlsDoc()
         doc.save(filename_or_stream, self.get_biff_data())
