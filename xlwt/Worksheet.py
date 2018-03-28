@@ -1089,7 +1089,7 @@ class Worksheet(object):
 
     def write_column(self, r, c = 0, ar = "", style=Style.default_style):
         """
-        This method is used to write a cell to a :class:`Worksheet`.
+        This method is used to write an array to a :class:`Worksheet`.
 
         :param r:
 
