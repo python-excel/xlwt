@@ -1087,6 +1087,63 @@ class Worksheet(object):
         """
         self.row(r).write(c, label, style)
 
+    def write_column(self, r, c = 0, ar = "", style=Style.default_style):
+        """
+        This method is used to write a cell to a :class:`Worksheet`.
+
+        :param r:
+
+           The zero-relative number of the row in the worksheet to which
+           the first element of a given array should be written.
+
+        :param c:
+
+           The zero-relative number of the column in the worksheet to which
+           the given array should be written.
+
+        :param ar:
+
+           The data array to be written.
+
+           When it comes to array content:
+           An :class:`int`, :class:`long`, or
+           :class:`~decimal.Decimal` instance is converted to :class:`float`.
+
+           A :class:`unicode` instance is written as is. A :class:`bytes`
+           instance is converted to :class:`unicode` using the
+           encoding, which defaults to ``ascii``, specified when the
+           :class:`Workbook` instance was created.
+
+           A :class:`~datetime.datetime`, :class:`~datetime.date` or
+           :class:`~datetime.time` instance is converted into Excel date format
+           (a float representing the number of days since (typically)
+           ``1899-12-31T00:00:00``, under the pretence that
+           1900 was a leap year).
+
+           A :class:`bool` instance will show up as ``TRUE`` or ``FALSE`` in
+           Excel.
+
+           ``None`` or an empty array cause the cell to be blank: no data, only formatting.
+
+           An :class:`xlwt.Formula` instance causes an Excel formula to be
+           written.
+
+        :param style:
+
+           A style, also known as an XF (extended format), is an
+           :class:`~xlwt.Style.XFStyle` object, which encapsulates the
+           formatting applied to the cell and its contents.
+
+           :class:`~xlwt.Style.XFStyle` objects are best set up using the
+           :func:`~xlwt.Style.easyxf` function. They may also be set up by
+           setting attributes in :class:`Alignment`, :class:`Borders`,
+           :class:`Pattern`, :class:`Font` and :class:`Protection` objects then
+           setting those objects and a format string as attributes of an
+           :class:`~xlwt.Style.XFStyle` object.
+        """
+        for i in range(len(ar)):
+            self.write(r + i, c, ar[i], style)
+
     def write_rich_text(self, r, c, rich_text_list, style=Style.default_style):
         self.row(r).set_cell_rich_text(c, rich_text_list, style)
 
