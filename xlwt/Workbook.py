@@ -38,8 +38,9 @@
 #       ExtSST
 #       EOF
 
+import six
+
 from . import BIFFRecords, Style
-from .compat import basestring, int_types, unicode_type
 
 
 class Workbook(object):
@@ -362,7 +363,7 @@ class Workbook(object):
         """
         from . import Utils
         from .Worksheet import Worksheet
-        if not isinstance(sheetname, unicode_type):
+        if not isinstance(sheetname, six.text_type):
             sheetname = sheetname.decode(self.encoding)
         if not Utils.valid_sheet_name(sheetname):
             raise Exception("invalid worksheet name %r" % sheetname)
@@ -374,9 +375,9 @@ class Workbook(object):
         return self.__worksheets[-1]
 
     def get_sheet(self, sheet):
-        if isinstance(sheet, int_types):
+        if isinstance(sheet, six.integer_types):
             return self.__worksheets[sheet]
-        elif isinstance(sheet, basestring):
+        elif isinstance(sheet, six.string_types):
             sheetnum = self.sheet_index(sheet)
             return self.__worksheets[sheetnum]
         else:
@@ -467,7 +468,7 @@ class Workbook(object):
                 self.setup_xcall()
             # print funcname, self._supbook_xref
             patches.append((offset, self._xcall_supbook_ref))
-            if not isinstance(funcname, unicode_type):
+            if not isinstance(funcname, six.text_type):
                 funcname = funcname.decode(self.encoding)
             if funcname in self._xcall_xref:
                 idx = self._xcall_xref[funcname]

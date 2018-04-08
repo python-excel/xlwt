@@ -3,7 +3,9 @@ from __future__ import print_function
 ## get sys module
 import sys
 
-from .compat import basestring, int_types, long
+import six
+
+from .compat import long
 
 ## This file is part of PyANTLR. See LICENSE.txt for license
 ## details..........Copyright (C) Wolfgang Haefelinger, 2004.
@@ -96,7 +98,7 @@ def ifelse(cond,_then,_else):
 def is_string_type(x):
     # return  (isinstance(x,str) or isinstance(x,unicode))
     # Simplify; xlwt doesn't support Python < 2.3
-    return isinstance(basestring)
+    return isinstance(six.string_types)
 
 def assert_string_type(x):
     assert is_string_type(x)
@@ -1597,7 +1599,7 @@ class BitSet(object):
             raise TypeError("BitSet requires integer, long, or " +
                             "list argument")
         for x in data:
-            if not isinstance(x, int_types):
+            if not isinstance(x, six.integer_types):
                 raise TypeError(self,"List argument item is " +
                                 "not a long: %s" % (x))
         self.data = data

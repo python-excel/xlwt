@@ -2,8 +2,6 @@ import os
 
 from setuptools import find_packages, setup
 
-from xlwt import __VERSION__
-
 DESCRIPTION = (
     'Library to create spreadsheet files compatible with '
     'MS Excel 97/2000/XP/2003 XLS files, '
@@ -34,7 +32,7 @@ KEYWORDS = (
 
 setup(
     name='xlwt',
-    version=__VERSION__,
+    version='1.3.0',
     maintainer='John Machin',
     maintainer_email='sjmachin@lexicon.net',
     url='http://www.python-excel.org/',
@@ -51,4 +49,5 @@ setup(
     zip_safe=False,
     include_package_data=True,
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+    install_requires=['six'],
 )

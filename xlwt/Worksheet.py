@@ -34,9 +34,10 @@
 
 import tempfile
 
+import six
+
 from . import BIFFRecords, Bitmap, Style
 from .Column import Column
-from .compat import PY3
 from .Row import Row
 
 
@@ -724,7 +725,7 @@ class Worksheet(object):
     #################################################################
 
     def set_header_str(self, value):
-        if not PY3 and isinstance(value, str):
+        if isinstance(value, bytes):
             value = value.decode(self.__parent.encoding)
         self.__header_str = value
 
@@ -736,7 +737,7 @@ class Worksheet(object):
     #################################################################
 
     def set_footer_str(self, value):
-        if not PY3 and isinstance(value, str):
+        if isinstance(value, bytes):
             value = value.decode(self.__parent.encoding)
         self.__footer_str = value
 
