@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 
 import struct
 
-from .compat import xrange
-
 # This implementation writes only 'Root Entry', 'Workbook' streams
 # and 2 empty streams for aligning directory stream on sector boundary
 #
@@ -275,7 +273,7 @@ class XlsDoc:
             if e.errno != 22: # "Invalid argument" i.e. 'stream' is too big
                 raise # some other problem
             chunk_size = 4 * 1024 * 1024
-            for offset in xrange(0, len(stream), chunk_size):
+            for offset in range(0, len(stream), chunk_size):
                 f.write(buffer(stream, offset, chunk_size))
         f.write(padding)
         f.write(self.packed_MSAT_2nd)

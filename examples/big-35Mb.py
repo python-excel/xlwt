@@ -17,8 +17,8 @@ rowcount = 6000 + 1
 
 t0 = time()
 
-for col in xrange(colcount):
-    for row in xrange(rowcount):
+for col in range(colcount):
+    for row in range(rowcount):
         ws0.write(row, col, "BIG(%d, %d)" % (row, col))
 
 t1 = time() - t0

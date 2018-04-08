@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from struct import pack
 
-from .compat import basestring, iteritems, unicode, unicode_type, xrange
+from .compat import basestring, iteritems, unicode, unicode_type
 from .UnicodeUtils import upack1, upack2, upack2rt
 
 
@@ -2383,7 +2383,7 @@ class ExternSheetRecord(BiffRecord):
     def get(self):
         res = []
         nrefs = len(self.refs)
-        for idx in xrange(0, nrefs, _maxRefPerRecord):
+        for idx in range(0, nrefs, _maxRefPerRecord):
             chunk = self.refs[idx:idx+_maxRefPerRecord]
             krefs = len(chunk)
             if idx: # CONTINUE record

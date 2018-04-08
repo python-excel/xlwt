@@ -266,21 +266,21 @@ primary[arg_type]
             chunklens = [len(chunk) for chunk in rpn_chunks]
             skiplens = [0] * nc
             skiplens[-1] = 3
-            for ic in xrange(nc-1, 0, -1):
+            for ic in range(nc-1, 0, -1):
                 skiplens[ic-1] = skiplens[ic] + chunklens[ic] + 4
             jump_pos = [2 * nc + 2]
-            for ic in xrange(nc):
+            for ic in range(nc):
                 jump_pos.append(jump_pos[-1] + chunklens[ic] + 4)
             chunk_shift = 2 * nc + 6 // size of tAttrChoose
-            for ic in xrange(nc):
-                for refx in xrange(ref_markers[ic], ref_markers[ic+1]):
+            for ic in range(nc):
+                for refx in range(ref_markers[ic], ref_markers[ic+1]):
                     ref = self.sheet_references[refx]
                     self.sheet_references[refx] = (ref[0], ref[1], ref[2] + chunk_shift)
                 chunk_shift += 4 // size of tAttrSkip
             choose_rpn = []
             choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x04, nc)) // 0x04 is tAttrChoose
             choose_rpn.append(struct.pack("<%dH" % (nc+1), *jump_pos))
-            for ic in xrange(nc):
+            for ic in range(nc):
                 choose_rpn.append(rpn_chunks[ic])
                 choose_rpn.append(struct.pack("<BBH", ptgAttr, 0x08, skiplens[ic])) // 0x08 is tAttrSkip
             choose_rpn.append(struct.pack("<BBH", ptgFuncVarV, nc+1, 100)) // 100 is CHOOSE fn

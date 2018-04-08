@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from . import Formatting
 from .BIFFRecords import NumberFormatRecord, StyleRecord, XFRecord
-from .compat import basestring, xrange
+from .compat import basestring
 
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
 
@@ -658,7 +658,7 @@ def _parse_strg_to_obj(strg, obj, parse_dict,
             v = ' '.join(guff[1:])
             if not v:
                 raise EasyXFCallerError("no value supplied for %s.%s" % (section, k))
-            for counter in xrange(2):
+            for counter in range(2):
                 result = section_dict.get(k)
                 if result is None:
                     raise EasyXFCallerError('%s.%s is not a known attribute' % (section, k))

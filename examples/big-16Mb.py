@@ -20,9 +20,9 @@ t0 = time()
 print("\nstart: %s" % ctime(t0))
 
 print("Filling...")
-for col in xrange(colcount):
+for col in range(colcount):
     print("[%d]" % col, end=' ')
-    for row in xrange(rowcount):
+    for row in range(rowcount):
         #ws0.write(row, col, "BIG(%d, %d)" % (row, col))
         ws0.write(row, col, "BIG")
 
