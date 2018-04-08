@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import six
+
 from . import Formatting
 from .BIFFRecords import NumberFormatRecord, StyleRecord, XFRecord
-from .compat import basestring
 
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
 
@@ -662,7 +663,7 @@ def _parse_strg_to_obj(strg, obj, parse_dict,
                 result = section_dict.get(k)
                 if result is None:
                     raise EasyXFCallerError('%s.%s is not a known attribute' % (section, k))
-                if not isinstance(result, basestring):
+                if not isinstance(result, six.string_types):
                     break
                 # synonym
                 old_k = k

@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 
 from struct import pack
 
-from .compat import basestring, unicode_type
+import six
+
 from .UnicodeUtils import upack1, upack2, upack2rt
 
 
@@ -25,7 +26,7 @@ class SharedStringTable(object):
         self._current_piece = None
 
     def add_str(self, s):
-        if self.encoding != 'ascii' and not isinstance(s, unicode_type):
+        if self.encoding != 'ascii' and not isinstance(s, six.text_type):
             s = s.decode(self.encoding)
         self._add_calls += 1
         if s not in self._str_indexes:
@@ -40,7 +41,7 @@ class SharedStringTable(object):
     def add_rt(self, rt):
         rtList = []
         for s, xf in rt:
-            if self.encoding != 'ascii' and not isinstance(s, unicode_type):
+            if self.encoding != 'ascii' and not isinstance(s, six.text_type):
                 s = s.decode(self.encoding)
             rtList.append((s, xf))
         rt = tuple(rtList)
@@ -77,7 +78,7 @@ class SharedStringTable(object):
         for idx, s in data:
             if self._tally[idx] == 0:
                 s = ''
-            if isinstance(s, basestring):
+            if isinstance(s, six.string_types):
                 self._add_to_sst(s)
             else:
                 self._add_rt_to_sst(s)
@@ -275,7 +276,7 @@ class WriteAccessRecord(BiffRecord):
     def __init__(self, owner):
         uowner = owner[0:0x30]
         uowner_len = len(uowner)
-        if isinstance(uowner, unicode_type):
+        if isinstance(uowner, six.text_type):
             uowner = uowner.encode('ascii')  # probably not ascii, but play it safe until we know more
         self._rec_data = pack('%ds%ds' % (uowner_len, 0x70 - uowner_len), uowner, b' '*(0x70 - uowner_len))
 
