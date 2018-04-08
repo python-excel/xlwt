@@ -3,7 +3,7 @@ from __future__ import print_function
 ## get sys module
 import sys
 
-from .compat import basestring, int_types, long, xrange
+from .compat import basestring, int_types, long
 
 ## This file is part of PyANTLR. See LICENSE.txt for license
 ## details..........Copyright (C) Wolfgang Haefelinger, 2004.
@@ -1605,7 +1605,7 @@ class BitSet(object):
     def __str__(self):
         bits = len(self.data) * BitSet.BITS
         s = ""
-        for i in xrange(0,bits):
+        for i in range(0,bits):
             if self.at(i):
                 s += "1"
             else:
@@ -1652,7 +1652,7 @@ class BitSet(object):
         mask = self.bitMask(bit)
         if i>=len(self.data):
             d = i - len(self.data) + 1
-            for x in xrange(0,d):
+            for x in range(0,d):
                 self.data.append(0)
             assert len(self.data) == i+1
         if on:
@@ -2077,7 +2077,7 @@ class LLkParser(Parser):
         if self.inputState.guessing > 0:
             guess = " [guessing]"
         print((ee + rname + guess))
-        for i in xrange(1,self.k+1):
+        for i in range(1,self.k+1):
             if i != 1:
                 print(", ")
             if self.LT(i) :
@@ -2804,7 +2804,7 @@ def make(*nodes):
     if not nodes:
         return None
 
-    for i in xrange(0,len(nodes)):
+    for i in range(0,len(nodes)):
         node = nodes[i]
         if node:
             assert isinstance(node,AST)
@@ -2814,7 +2814,7 @@ def make(*nodes):
     if root:
         root.setFirstChild(None)
 
-    for i in xrange(1,len(nodes)):
+    for i in range(1,len(nodes)):
         if not nodes[i]:
             continue
         if not root:

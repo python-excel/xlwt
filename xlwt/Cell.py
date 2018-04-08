@@ -3,7 +3,6 @@
 from struct import pack, unpack
 
 from . import BIFFRecords
-from .compat import xrange
 
 
 class StrCell(object):
@@ -197,7 +196,7 @@ def _get_cells_biff_data_mul(rowx, cell_items):
         lastcolx = icolx
         j = i
         packed_record = ''
-        for j in xrange(i+1, nitems):
+        for j in range(i+1, nitems):
             jcolx, jcell = cell_items[j]
             if jcolx != lastcolx + 1:
                 nexti = j

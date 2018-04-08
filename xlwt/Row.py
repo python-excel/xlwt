@@ -8,7 +8,7 @@ from .Cell import (
     BlankCell, BooleanCell, ErrorCell, FormulaCell, MulBlankCell, NumberCell,
     StrCell, _get_cells_biff_data_mul,
 )
-from .compat import basestring, int_types, iteritems, xrange
+from .compat import basestring, int_types, iteritems
 from .Formatting import Font
 
 
@@ -161,7 +161,7 @@ class Row(object):
 
     def insert_mulcells(self, colx1, colx2, cell_obj):
         self.insert_cell(colx1, cell_obj)
-        for col_index in xrange(colx1+1, colx2+1):
+        for col_index in range(colx1+1, colx2+1):
             self.insert_cell(col_index, None)
 
     def get_cells_biff_data(self):

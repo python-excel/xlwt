@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import re
 
-from .compat import xrange
 from .ExcelMagic import MAX_COL, MAX_ROW
 
 _re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)", re.IGNORECASE)
@@ -20,7 +19,7 @@ def col_by_name(colname):
     """
     col = 0
     power = 1
-    for i in xrange(len(colname)-1, -1, -1):
+    for i in range(len(colname)-1, -1, -1):
         ch = colname[i]
         col += (ord(ch) - ord('A') + 1) * power
         power *= 26
