@@ -8,7 +8,7 @@ from .Cell import (
     BlankCell, BooleanCell, ErrorCell, FormulaCell, MulBlankCell, NumberCell,
     StrCell, _get_cells_biff_data_mul,
 )
-from .compat import basestring, int_types, iteritems
+from .compat import basestring, int_types
 from .Formatting import Font
 
 
@@ -165,7 +165,7 @@ class Row(object):
             self.insert_cell(col_index, None)
 
     def get_cells_biff_data(self):
-        cell_items = [item for item in iteritems(self.__cells) if item[1] is not None]
+        cell_items = [item for item in self.__cells.items() if item[1] is not None]
         cell_items.sort() # in column order
         return _get_cells_biff_data_mul(self.__idx, cell_items)
         # previously:
