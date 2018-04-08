@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from struct import pack
 
-from .compat import basestring, unicode, unicode_type
+from .compat import basestring, unicode_type
 from .UnicodeUtils import upack1, upack2, upack2rt
 
 
@@ -26,7 +26,7 @@ class SharedStringTable(object):
 
     def add_str(self, s):
         if self.encoding != 'ascii' and not isinstance(s, unicode_type):
-            s = unicode(s, self.encoding)
+            s = s.decode(self.encoding)
         self._add_calls += 1
         if s not in self._str_indexes:
             idx = len(self._str_indexes) + len(self._rt_indexes)
@@ -41,7 +41,7 @@ class SharedStringTable(object):
         rtList = []
         for s, xf in rt:
             if self.encoding != 'ascii' and not isinstance(s, unicode_type):
-                s = unicode(s, self.encoding)
+                s = s.decode(self.encoding)
             rtList.append((s, xf))
         rt = tuple(rtList)
         self._add_calls += 1
