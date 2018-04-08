@@ -43,7 +43,7 @@ from __future__ import unicode_literals
 
 from struct import pack
 
-from .compat import unicode, unicode_type
+from .compat import unicode_type
 
 
 def upack2(s, encoding='ascii'):
@@ -51,7 +51,7 @@ def upack2(s, encoding='ascii'):
     if isinstance(s, unicode_type):
         us = s
     else:
-        us = unicode(s, encoding)
+        us = s.decode(encoding)
     # Limit is based on number of content characters
     # (not on number of bytes in packed result)
     len_us = len(us)
@@ -82,7 +82,7 @@ def upack2rt(rt, encoding='ascii'):
     # also generate the formatting run for the styles added
     for s, fontx in rt:
         if not isinstance(s, unicode_type):
-            s = unicode(s, encoding)
+            s = s.decode(encoding)
         us += s
         if fontx is not None:
             # code in Rows.py ensures that
@@ -111,7 +111,7 @@ def upack1(s, encoding='ascii'):
     if isinstance(s, unicode_type):
         us = s
     else:
-        us = unicode(s, encoding)
+        us = s.decode(encoding)
     len_us = len(us)
     if len_us > 255:
         raise Exception('String longer than 255 characters')
