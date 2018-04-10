@@ -1,10 +1,10 @@
 
 import unittest
 
+import xlrd
 from utils import in_tst_output_dir
 
 import xlwt
-import xlrd
 
 
 class TestWorksheet(unittest.TestCase):
