@@ -3,6 +3,7 @@ nose
 nose_fixes
 nose-cov
 tox
+xlrd
 # for docs
 sphinx
 pkginfo
