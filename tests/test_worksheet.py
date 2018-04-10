@@ -5,6 +5,7 @@ from utils import in_tst_output_dir
 
 import xlwt
 import xlrd
+import sys
 
 
 class TestWorksheet(unittest.TestCase):
@@ -85,5 +86,9 @@ class TestWorksheet(unittest.TestCase):
         sheet = workbook.get_sheet(self.result_sheetname)
         testarray = [1, 2, 3, 4]
         sheet.write_row(3, ar = testarray)
-        with self.assertRaisesRegex(Exception, 'Attempt to overwrite cell'):
-            sheet.write(3, 0, '')
+        try:
+            with self.assertRaisesRegex(Exception, 'Attempt to overwrite cell'):
+                sheet.write(3, 0, '')
+        except AttributeError:
+            with self.assertRaises(Exception):
+                sheet.write(3, 0, '')
