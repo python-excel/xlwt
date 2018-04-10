@@ -85,5 +85,9 @@ class TestWorksheet(unittest.TestCase):
         sheet = workbook.get_sheet(self.result_sheetname)
         testarray = [1, 2, 3, 4]
         sheet.write_column(3, ar = testarray)
-        with self.assertRaisesRegex(Exception, 'Attempt to overwrite cell'):
-            sheet.write(0, 3, '')
+        try:
+            with self.assertRaisesRegex(Exception, 'Attempt to overwrite cell'):
+                sheet.write(0, 3, '')
+        except AttributeError:
+            with self.assertRaises(Exception):
+                sheet.write(0, 3, '')
