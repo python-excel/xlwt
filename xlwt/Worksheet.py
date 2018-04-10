@@ -1087,19 +1087,19 @@ class Worksheet(object):
         """
         self.row(r).write(c, label, style)
 
-    def write_column(self, r, c = 0, ar = "", style=Style.default_style):
+    def write_column(self, c, r = 0, ar = "", style=Style.default_style):
         """
         This method is used to write an array to a :class:`Worksheet`.
-
-        :param r:
-
-           The zero-relative number of the row in the worksheet to which
-           the first element of a given array should be written.
 
         :param c:
 
            The zero-relative number of the column in the worksheet to which
            the given array should be written.
+
+        :param r:
+
+           The zero-relative number of the row in the worksheet to which
+           the first element of a given array should be written.
 
         :param ar:
 
