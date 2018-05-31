@@ -23,10 +23,10 @@ class Column(object):
     def set_width(self, width):
         if not(isinstance(width, int) and 0 <= width <= 65535):
             raise ValueError("column width (%r) not an int in range(65536)" % width)
-        self._width = width
+        self.width = width
 
     def get_width(self):
-        return self._width
+        return self.width
 
     width = property(get_width, set_width)
 
