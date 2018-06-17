@@ -85,6 +85,7 @@ class Row(object):
 
     def __excel_date_dt(self, date):
         adj = False
+        tz = date.tzinfo if hasattr(date, 'tzinfo') else None
         if isinstance(date, dt.date):
             if self.__parent_wb.dates_1904:
                 epoch_tuple = (1904, 1, 1)
@@ -92,12 +93,12 @@ class Row(object):
                 epoch_tuple = (1899, 12, 31)
                 adj = True
             if isinstance(date, dt.datetime):
-                epoch = dt.datetime(*epoch_tuple)
+                epoch = dt.datetime(*epoch_tuple, tzinfo=tz)
             else:
                 epoch = dt.date(*epoch_tuple)
         else: # it's a datetime.time instance
             date = dt.datetime.combine(dt.datetime(1900, 1, 1), date)
-            epoch = dt.datetime(1900, 1, 1)
+            epoch = dt.datetime(1900, 1, 1, tzinfo=tz)
         delta = date - epoch
         xldate = delta.days + delta.seconds / 86400.0
         # Add a day for Excel's missing leap day in 1900
