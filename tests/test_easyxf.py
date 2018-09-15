@@ -2,9 +2,9 @@ import datetime
 import filecmp
 import unittest
 
-from utils import in_tst_dir, in_tst_output_dir
-
 import xlwt as xlwt
+
+from .utils import in_tst_dir, in_tst_output_dir
 
 ezxf = xlwt.easyxf
 

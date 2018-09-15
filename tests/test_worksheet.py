@@ -1,9 +1,8 @@
-
 import unittest
 
-from utils import in_tst_output_dir
-
 import xlwt
+
+from .utils import in_tst_output_dir
 
 
 class TestWorksheet(unittest.TestCase):

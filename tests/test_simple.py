@@ -5,9 +5,9 @@ import filecmp
 import unittest
 from datetime import datetime
 
-from utils import in_tst_dir, in_tst_output_dir
-
 import xlwt
+
+from .utils import in_tst_dir, in_tst_output_dir
 
 LOREM_IPSUM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
 

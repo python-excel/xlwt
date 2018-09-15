@@ -1,14 +1,1 @@
-# for testing
-nose
-nose_fixes
-nose-cov
-tox
-# for docs
-sphinx
-pkginfo
 six
-# for build
-panci
-setuptools-git
-wheel
-twine
