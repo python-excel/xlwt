@@ -34,8 +34,6 @@
 
 import tempfile
 
-import six
-
 from . import BIFFRecords, Bitmap, Style
 from .Column import Column
 from .Row import Row
